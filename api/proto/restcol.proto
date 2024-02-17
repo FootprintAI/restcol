@@ -1,0 +1,234 @@
+syntax = "proto3";
+
+option go_package = "github.com/footprintai/restcol/api/pb";
+
+package restcol.api;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info: {
+        title: "RestCol API Documentations";
+        version: "1.0";
+        contact: {
+            name: "RestCol API Documentations";
+            url: "https://github.com/footprintai/restcol";
+            email: "";
+        };
+        license: {
+            name: "BSD 3-Clause License";
+            url: "https://github.com/footprintai/grandturk/blob/master/LICENSE.txt";
+        };
+    };
+    // Overwriting host entry breaks tests, so this is not done here.
+    external_docs: {
+        url: "https://github.com/footprintai/restcol";
+        description: "restapi";
+    }
+    schemes: HTTPS;
+    consumes: "application/json";
+    produces: "application/json";
+    security_definitions: {
+        security: {
+            key: "ApiKeyAuth";
+            value: {
+                type: TYPE_API_KEY;
+                in: IN_HEADER;
+                name: "Authorization";
+            }
+        }
+    }
+    security: {
+        security_requirement: {
+            key: "ApiKeyAuth";
+            value: {};
+        }
+    }
+};
+
+service RestColService {
+
+    rpc CreateCollection(CreateCollectionRequest) returns (CreateCollectionResponse) {
+        option (google.api.http) = {
+            post: "/v1/collections"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Add collection endpoint, a collection is a set of documents with scheme-free."
+            tags: "collections"
+        };
+    }
+
+    rpc ListCollections(ListCollectionsRequest) returns (ListCollectionsResponse) {
+        option (google.api.http) = {
+            get: "/v1/collections"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "list collections endpoint"
+            tags: "collections"
+        };
+
+    }
+
+    rpc GetCollection(GetCollectionRequest) returns (GetCollectionResponse) {
+        option (google.api.http) = {
+            get: "/v1/collections/{cid}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "retrieve an individual collection information and document keys assocaited with it"
+            tags: "collections"
+        };
+
+    }
+
+    rpc DeleteCollection(DeleteCollectionRequest) returns (DeleteCollectionResponse) {
+        option (google.api.http) = {
+            delete: "/v1/collections/{cid}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "remove an individual collection and its associated doc"
+            tags: "collections"
+        };
+    }
+
+    rpc CreateDocument(CreateDocumentRequest) returns (CreateDocumentResponse) {
+        option (google.api.http) = {
+            post: "/v1/collections/{cid}:add"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "create a document to the collection"
+            tags: "document"
+        };
+    }
+
+    // GetDocument endpoint is a generic endpoint for retrieving data across multiple collections
+    rpc GetDocument(GetDocumentRequest) returns (GetDocumentResponse) {
+        option (google.api.http) = {
+            get: "/v1/collections/{cid}/{did}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "retrieve a document information from the collection."
+            tags: "document"
+        };
+    }
+
+    // DeleteDocument endpoint is a generic endpoint for deleting a specific data
+    rpc DeleteDocument(DeleteDocumentRequest) returns (DeleteDocumentResponse) {
+        option (google.api.http) = {
+            delete: "/v1/collections/{cid}/{did}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Remove the specific document from the collection"
+            tags: "document"
+        };
+    }
+}
+
+enum CollectionType {
+    COLLECTION_TYPE_NONE = 0;
+    COLLECTION_TYPE_REGULAR_FILES = 1;
+    COLLECTION_TYPE_TIMESERIES = 2;
+    COLLECTION_TYPE_TRANSACTION = 3;
+    COLLECTION_TYPE_VECTOR = 4;
+    COLLECTION_TYPE_PROXY = 5;
+}
+
+message SchemaField {
+    string name = 1;
+    string datatype = 2; // regular sql-based datatype
+}
+
+message CollectionMetadata {
+    // cid (aka collectionId) would be used to naming ${cid} field, that field should be url safe
+    // otherwise an error would be returned.
+    // leave it empty would generate a random uuid for ${cid}
+    string cid = 1;
+
+    google.protobuf.Timestamp _createdAt = 10; // ts when the collection was created
+    optional google.protobuf.Timestamp _deletedAt = 11; // ts when the collection was deleted
+}
+
+message CreateCollectionRequest {
+    optional string cid = 1;
+
+    optional string description = 2;
+    optional CollectionType collectionType = 3;
+    repeated SchemaField schemas= 10;
+}
+
+message CreateCollectionResponse {
+    CollectionMetadata _metadata = 1;
+
+    string description = 2;
+    CollectionType collectionType = 3;
+    repeated SchemaField schemas = 10;
+}
+
+message ListCollectionsRequest {}
+
+message ListCollectionsResponse {}
+
+message GetCollectionRequest{
+    string cid = 1;
+}
+
+message GetCollectionResponse{
+    CollectionMetadata _metadata = 1;
+}
+
+message DeleteCollectionRequest {
+    string cid = 1;
+}
+
+message DeleteCollectionResponse {}
+
+enum DataFormat {
+    DATA_FORMAT_AUTO = 0;
+    DATA_FORMAT_JSON = 1;
+    DATA_FORMAT_CSV = 2;
+    DATA_FORMAT_XML = 3;
+    DATA_FORMAT_URL = 4;
+    DATA_FORMAT_MEDIA = 5;
+}
+
+message DataMetadata {
+    // cid is collection id from collection data
+    string cid = 1;
+
+    // did (aka dataid) would be used to naming ${did} field, that field should be url safe
+    string did = 2;
+
+    google.protobuf.Timestamp _createdAt = 10; // ts when the record was created
+    optional google.protobuf.Timestamp _deletedAt = 11; // ts when the record was deleted
+}
+
+
+// CreateDocumentRequest is used to create records against the data
+message CreateDocumentRequest {
+    string cid = 1;
+    optional string did = 2;
+
+    bytes data = 3; // data represents rawdata for any kind of formating
+    optional DataFormat dataformat = 4;
+}
+
+message CreateDocumentResponse {
+    DataMetadata _metadata = 1;
+}
+
+message GetDocumentRequest{
+    string cid = 1;
+    string did = 2;
+}
+
+message GetDocumentResponse{}
+
+message DeleteDocumentRequest {
+    string cid = 1;
+    string did = 2;
+}
+
+message DeleteDocumentResponse {}

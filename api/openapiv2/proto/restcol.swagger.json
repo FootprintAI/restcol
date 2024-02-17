@@ -1,0 +1,469 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "RestCol API Documentations",
+    "version": "1.0",
+    "contact": {
+      "name": "RestCol API Documentations",
+      "url": "https://github.com/footprintai/restcol"
+    },
+    "license": {
+      "name": "BSD 3-Clause License",
+      "url": "https://github.com/footprintai/grandturk/blob/master/LICENSE.txt"
+    }
+  },
+  "tags": [
+    {
+      "name": "RestColService"
+    }
+  ],
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/collections": {
+      "get": {
+        "summary": "list collections endpoint",
+        "operationId": "RestColService_ListCollections",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiListCollectionsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "collections"
+        ]
+      },
+      "post": {
+        "summary": "Add collection endpoint, a collection is a set of documents with scheme-free.",
+        "operationId": "RestColService_CreateCollection",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiCreateCollectionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiCreateCollectionRequest"
+            }
+          }
+        ],
+        "tags": [
+          "collections"
+        ]
+      }
+    },
+    "/v1/collections/{cid}": {
+      "get": {
+        "description": "retrieve an individual collection information and document keys assocaited with it",
+        "operationId": "RestColService_GetCollection",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiGetCollectionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "collections"
+        ]
+      },
+      "delete": {
+        "description": "remove an individual collection and its associated doc",
+        "operationId": "RestColService_DeleteCollection",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiDeleteCollectionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "collections"
+        ]
+      }
+    },
+    "/v1/collections/{cid}/{did}": {
+      "get": {
+        "summary": "GetDocument endpoint is a generic endpoint for retrieving data across multiple collections",
+        "description": "retrieve a document information from the collection.",
+        "operationId": "RestColService_GetDocument",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiGetDocumentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "did",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "document"
+        ]
+      },
+      "delete": {
+        "summary": "DeleteDocument endpoint is a generic endpoint for deleting a specific data",
+        "description": "Remove the specific document from the collection",
+        "operationId": "RestColService_DeleteDocument",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiDeleteDocumentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "did",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "document"
+        ]
+      }
+    },
+    "/v1/collections/{cid}:add": {
+      "post": {
+        "description": "create a document to the collection",
+        "operationId": "RestColService_CreateDocument",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiCreateDocumentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RestColServiceCreateDocumentBody"
+            }
+          }
+        ],
+        "tags": [
+          "document"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "RestColServiceCreateDocumentBody": {
+      "type": "object",
+      "properties": {
+        "did": {
+          "type": "string"
+        },
+        "data": {
+          "type": "string",
+          "format": "byte",
+          "title": "data represents rawdata for any kind of formating"
+        },
+        "dataformat": {
+          "$ref": "#/definitions/apiDataFormat"
+        }
+      },
+      "title": "CreateDocumentRequest is used to create records against the data"
+    },
+    "apiCollectionMetadata": {
+      "type": "object",
+      "properties": {
+        "cid": {
+          "type": "string",
+          "title": "cid (aka collectionId) would be used to naming ${cid} field, that field should be url safe\notherwise an error would be returned.\nleave it empty would generate a random uuid for ${cid}"
+        },
+        "CreatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "ts when the collection was created"
+        },
+        "DeletedAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "ts when the collection was deleted"
+        }
+      }
+    },
+    "apiCollectionType": {
+      "type": "string",
+      "enum": [
+        "COLLECTION_TYPE_NONE",
+        "COLLECTION_TYPE_REGULAR_FILES",
+        "COLLECTION_TYPE_TIMESERIES",
+        "COLLECTION_TYPE_TRANSACTION",
+        "COLLECTION_TYPE_VECTOR",
+        "COLLECTION_TYPE_PROXY"
+      ],
+      "default": "COLLECTION_TYPE_NONE"
+    },
+    "apiCreateCollectionRequest": {
+      "type": "object",
+      "properties": {
+        "cid": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "collectionType": {
+          "$ref": "#/definitions/apiCollectionType"
+        },
+        "schemas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/apiSchemaField"
+          }
+        }
+      }
+    },
+    "apiCreateCollectionResponse": {
+      "type": "object",
+      "properties": {
+        "Metadata": {
+          "$ref": "#/definitions/apiCollectionMetadata"
+        },
+        "description": {
+          "type": "string"
+        },
+        "collectionType": {
+          "$ref": "#/definitions/apiCollectionType"
+        },
+        "schemas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/apiSchemaField"
+          }
+        }
+      }
+    },
+    "apiCreateDocumentResponse": {
+      "type": "object",
+      "properties": {
+        "Metadata": {
+          "$ref": "#/definitions/apiDataMetadata"
+        }
+      }
+    },
+    "apiDataFormat": {
+      "type": "string",
+      "enum": [
+        "DATA_FORMAT_AUTO",
+        "DATA_FORMAT_JSON",
+        "DATA_FORMAT_CSV",
+        "DATA_FORMAT_XML",
+        "DATA_FORMAT_URL",
+        "DATA_FORMAT_MEDIA"
+      ],
+      "default": "DATA_FORMAT_AUTO"
+    },
+    "apiDataMetadata": {
+      "type": "object",
+      "properties": {
+        "cid": {
+          "type": "string",
+          "title": "cid is collection id from collection data"
+        },
+        "did": {
+          "type": "string",
+          "title": "did (aka dataid) would be used to naming ${did} field, that field should be url safe"
+        },
+        "CreatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "ts when the record was created"
+        },
+        "DeletedAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "ts when the record was deleted"
+        }
+      }
+    },
+    "apiDeleteCollectionResponse": {
+      "type": "object"
+    },
+    "apiDeleteDocumentResponse": {
+      "type": "object"
+    },
+    "apiGetCollectionResponse": {
+      "type": "object",
+      "properties": {
+        "Metadata": {
+          "$ref": "#/definitions/apiCollectionMetadata"
+        }
+      }
+    },
+    "apiGetDocumentResponse": {
+      "type": "object"
+    },
+    "apiListCollectionsResponse": {
+      "type": "object"
+    },
+    "apiSchemaField": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "datatype": {
+          "type": "string",
+          "title": "regular sql-based datatype"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "externalDocs": {
+    "description": "restapi",
+    "url": "https://github.com/footprintai/restcol"
+  }
+}

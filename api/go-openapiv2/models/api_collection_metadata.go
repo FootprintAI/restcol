@@ -31,6 +31,9 @@ type APICollectionMetadata struct {
 	// otherwise an error would be returned.
 	// leave it empty would generate a random uuid for ${cid}
 	Cid string `json:"cid,omitempty"`
+
+	// pid is used to isolate resources (by projects), making the collections are belonged to a specific project
+	Pid string `json:"pid,omitempty"`
 }
 
 // Validate validates this api collection metadata

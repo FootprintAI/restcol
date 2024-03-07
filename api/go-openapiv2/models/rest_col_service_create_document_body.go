@@ -13,10 +13,10 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// RestColServiceCreateDataBody CreateDataRequest is used to create records against the data
+// RestColServiceCreateDocumentBody rest col service create document body
 //
-// swagger:model RestColServiceCreateDataBody
-type RestColServiceCreateDataBody struct {
+// swagger:model RestColServiceCreateDocumentBody
+type RestColServiceCreateDocumentBody struct {
 
 	// data represents rawdata for any kind of formating
 	// Format: byte
@@ -27,10 +27,13 @@ type RestColServiceCreateDataBody struct {
 
 	// did
 	Did string `json:"did,omitempty"`
+
+	// pid
+	Pid string `json:"pid,omitempty"`
 }
 
-// Validate validates this rest col service create data body
-func (m *RestColServiceCreateDataBody) Validate(formats strfmt.Registry) error {
+// Validate validates this rest col service create document body
+func (m *RestColServiceCreateDocumentBody) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateDataformat(formats); err != nil {
@@ -43,7 +46,7 @@ func (m *RestColServiceCreateDataBody) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *RestColServiceCreateDataBody) validateDataformat(formats strfmt.Registry) error {
+func (m *RestColServiceCreateDocumentBody) validateDataformat(formats strfmt.Registry) error {
 	if swag.IsZero(m.Dataformat) { // not required
 		return nil
 	}
@@ -62,8 +65,8 @@ func (m *RestColServiceCreateDataBody) validateDataformat(formats strfmt.Registr
 	return nil
 }
 
-// ContextValidate validate this rest col service create data body based on the context it is used
-func (m *RestColServiceCreateDataBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validate this rest col service create document body based on the context it is used
+func (m *RestColServiceCreateDocumentBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.contextValidateDataformat(ctx, formats); err != nil {
@@ -76,7 +79,7 @@ func (m *RestColServiceCreateDataBody) ContextValidate(ctx context.Context, form
 	return nil
 }
 
-func (m *RestColServiceCreateDataBody) contextValidateDataformat(ctx context.Context, formats strfmt.Registry) error {
+func (m *RestColServiceCreateDocumentBody) contextValidateDataformat(ctx context.Context, formats strfmt.Registry) error {
 
 	if m.Dataformat != nil {
 
@@ -98,7 +101,7 @@ func (m *RestColServiceCreateDataBody) contextValidateDataformat(ctx context.Con
 }
 
 // MarshalBinary interface implementation
-func (m *RestColServiceCreateDataBody) MarshalBinary() ([]byte, error) {
+func (m *RestColServiceCreateDocumentBody) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -106,8 +109,8 @@ func (m *RestColServiceCreateDataBody) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *RestColServiceCreateDataBody) UnmarshalBinary(b []byte) error {
-	var res RestColServiceCreateDataBody
+func (m *RestColServiceCreateDocumentBody) UnmarshalBinary(b []byte) error {
+	var res RestColServiceCreateDocumentBody
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

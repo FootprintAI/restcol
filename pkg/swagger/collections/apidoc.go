@@ -34,19 +34,22 @@ func (c *CollectionSwaggerDoc) RenderDoc() (string, error) {
 		return json.RawMessage(rawBytes), nil
 	}
 
-	swagDoc, err := openapiloads.Spec(
-		"openapiv2/proto/restcol.swagger.json",
-		openapiloads.WithDocLoader(
-			embedFsLoader,
-		),
-	)
-	if err != nil {
-		return "", err
+	newSwagDoc := func() (*spec.Swagger, error) {
+		swagDoc, err := openapiloads.Spec(
+			"openapiv2/proto/restcol.swagger.json",
+			openapiloads.WithDocLoader(
+				embedFsLoader,
+			),
+		)
+		if err != nil {
+			return nil, err
+		}
+		return swagDoc.Spec(), nil
 	}
-	swagSpec := swagDoc.Spec()
 
 	var pathSpec []*spec.Swagger
 	for _, col := range c.Collections {
+		swagSpec, _ := newSwagDoc()
 		specClone, _ := copyPathsWithFilter(
 			swagSpec,
 			cidPathFilter,
@@ -59,10 +62,11 @@ func (c *CollectionSwaggerDoc) RenderDoc() (string, error) {
 	}
 
 	// merge multiple specs
-	if err := mergeSwagPaths(swagSpec, pathSpec...); err != nil {
+	newSwagSpec, _ := newSwagDoc()
+	if err := mergeSwagPaths(newSwagSpec, pathSpec...); err != nil {
 		return "", err
 	}
-	swagJsonBlob, err := json.Marshal(swagSpec)
+	swagJsonBlob, err := json.Marshal(newSwagSpec)
 	if err != nil {
 		return "", err
 	}
@@ -131,8 +135,9 @@ func copyPathsWithFilter(origSpec *spec.Swagger, pathFilter PathFilterFunc, tagF
 	return retSpec, nil
 }
 
+// replacePathsWithCollection expands $cid, $pid with values defined in col
 func replacePathsWithCollection(col modelcollections.ModelCollection, specClone *spec.Swagger) error {
-	// all response of a single collection now is under `apiResponse`
+	// all response of a single collection now is under `apiRequestResponse`
 	responseDefs, err := swagdef.ModelFieldsSchemaToSwagDef(col.Schemas[0].Fields, "apiRequestResponse")
 	if err != nil {
 		return err
@@ -141,20 +146,31 @@ func replacePathsWithCollection(col modelcollections.ModelCollection, specClone 
 	apiResponseSchema := (*responseDefs)["apiRequestResponse"]
 
 	var cidReplacer = regexp.MustCompile(`\{cid\}`)
+	var pidReplacer = regexp.MustCompile(`\{pid\}`)
 	pathClone := &spec.Paths{
 		Paths: map[string]spec.PathItem{},
 	}
 	// things to do:
-	// 1. replace {cid} path with collection id
+	// 1. replace {cid} and {pid} defined path param with collection values
 	// 2. add example value on params with cid as example
 	for path, pathItem := range specClone.SwaggerProps.Paths.Paths {
-		replacedPath := cidReplacer.ReplaceAllString(path, col.ID.String())
+		replacedPath :=
+			pidReplacer.ReplaceAllString(
+				cidReplacer.ReplaceAllString(
+					path, col.ID.String(),
+				), col.ModelProjectID.String(),
+			)
 		cidParam := spec.Parameter{
 			ParamProps: spec.ParamProps{
 				Name: "cid",
 			},
 		}
-		delParams := []spec.Parameter{cidParam}
+		pidParam := spec.Parameter{
+			ParamProps: spec.ParamProps{
+				Name: "pid",
+			},
+		}
+		delParams := []spec.Parameter{cidParam, pidParam}
 		// replace pathItem properties
 		if pathItem.PathItemProps.Get != nil {
 			updateToSwagOperation(pathItem.PathItemProps.Get, col.Summary, delParams, nil, &apiResponseSchema)
@@ -194,8 +210,8 @@ func updateToSwagOperation(op *spec.Operation, newSummary string, delParams []sp
 		bodyParam, bodyExists := curParamMap["body"]
 		if bodyExists && bodyParam.In == "body" {
 			bodyParam.ParamProps.Schema = apiRequestBodySchema
+			curParamMap["body"] = bodyParam
 		}
-		curParamMap["body"] = bodyParam
 	}
 	var paramSlice []spec.Parameter
 	for _, p := range curParamMap {
@@ -232,16 +248,22 @@ func mergeSwagPaths(dst *spec.Swagger, froms ...*spec.Swagger) error {
 
 func copyPathItemProps(to *spec.PathItem, from spec.PathItem) error {
 	if from.PathItemProps.Get != nil && to.PathItemProps.Get == nil {
-		to.PathItemProps.Get = from.PathItemProps.Get
+		to.PathItemProps.Get = mergeOperationParameters(to.PathItemProps.Get, from.PathItemProps.Get)
 	} else if from.PathItemProps.Post != nil && to.PathItemProps.Post == nil {
-		to.PathItemProps.Post = from.PathItemProps.Post
+		to.PathItemProps.Post = mergeOperationParameters(to.PathItemProps.Post, from.PathItemProps.Post)
 	} else if from.PathItemProps.Put != nil && to.PathItemProps.Put == nil {
-		to.PathItemProps.Put = from.PathItemProps.Put
+		to.PathItemProps.Put = mergeOperationParameters(to.PathItemProps.Put, from.PathItemProps.Put)
 	} else if from.PathItemProps.Delete != nil && to.PathItemProps.Delete == nil {
-		to.PathItemProps.Delete = from.PathItemProps.Delete
+		to.PathItemProps.Delete = mergeOperationParameters(to.PathItemProps.Delete, from.PathItemProps.Delete)
 	} else {
 		return errors.New("swag: unable to merge pathitemprops.")
 	}
 	return nil
 
+}
+
+// mergeOperationParameters use $from operation as reference
+// more like `cp <from> <to>` in shell
+func mergeOperationParameters(to *spec.Operation, from *spec.Operation) *spec.Operation {
+	return from
 }

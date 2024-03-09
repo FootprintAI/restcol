@@ -28,6 +28,9 @@ type APICreateCollectionRequest struct {
 	// description
 	Description string `json:"description,omitempty"`
 
+	// pid
+	Pid string `json:"pid,omitempty"`
+
 	// schemas
 	Schemas []*APISchemaField `json:"schemas"`
 }

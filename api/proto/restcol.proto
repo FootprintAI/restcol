@@ -54,6 +54,9 @@ service RestColService {
         option (google.api.http) = {
             post: "/v1/collections"
             body: "*"
+            additional_bindings {
+                post: "/v1/projects/{pid}/collections"
+            }
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Add collection endpoint, a collection is a set of documents with scheme-free."
@@ -64,6 +67,10 @@ service RestColService {
     rpc ListCollections(ListCollectionsRequest) returns (ListCollectionsResponse) {
         option (google.api.http) = {
             get: "/v1/collections"
+            additional_bindings {
+                get: "/v1/projects/{pid}/collections"
+            }
+
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "list collections endpoint"
@@ -75,6 +82,9 @@ service RestColService {
     rpc GetCollection(GetCollectionRequest) returns (GetCollectionResponse) {
         option (google.api.http) = {
             get: "/v1/collections/{cid}"
+            additional_bindings {
+                get: "/v1/projects/{pid}/collections/{cid}"
+            }
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "retrieve an individual collection information and document keys assocaited with it"
@@ -86,6 +96,9 @@ service RestColService {
     rpc DeleteCollection(DeleteCollectionRequest) returns (DeleteCollectionResponse) {
         option (google.api.http) = {
             delete: "/v1/collections/{cid}"
+            additional_bindings {
+                delete: "/v1/projects/{pid}/collections/{cid}"
+            }
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "remove an individual collection and its associated doc"
@@ -97,6 +110,9 @@ service RestColService {
         option (google.api.http) = {
             post: "/v1/collections/{cid}:add"
             body: "*"
+            additional_bindings {
+                post: "/v1/projects/{pid}/collections/{cid}:add"
+            }
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "create a document to the collection"
@@ -108,6 +124,9 @@ service RestColService {
     rpc GetDocument(GetDocumentRequest) returns (GetDocumentResponse) {
         option (google.api.http) = {
             get: "/v1/collections/{cid}/{did}"
+            additional_bindings {
+                get: "/v1/projects/{pid}/collections/{cid}/{did}"
+            }
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "retrieve a document information from the collection."
@@ -119,6 +138,9 @@ service RestColService {
     rpc DeleteDocument(DeleteDocumentRequest) returns (DeleteDocumentResponse) {
         option (google.api.http) = {
             delete: "/v1/collections/{cid}/{did}"
+            additional_bindings {
+                delete: "/v1/projects/{pid}/collections/{cid}/{did}"
+            }
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "Remove the specific document from the collection"
@@ -142,21 +164,25 @@ message SchemaField {
 }
 
 message CollectionMetadata {
+    // pid is used to isolate resources (by projects), making the collections are belonged to a specific project
+    string pid = 1;
+
     // cid (aka collectionId) would be used to naming ${cid} field, that field should be url safe
     // otherwise an error would be returned.
     // leave it empty would generate a random uuid for ${cid}
-    string cid = 1;
+    string cid = 2;
 
     google.protobuf.Timestamp _createdAt = 10; // ts when the collection was created
     optional google.protobuf.Timestamp _deletedAt = 11; // ts when the collection was deleted
 }
 
 message CreateCollectionRequest {
-    optional string cid = 1;
+    string pid = 1;
+    optional string cid = 2;
 
-    optional string description = 2;
-    optional CollectionType collectionType = 3;
-    repeated SchemaField schemas= 10;
+    optional string description = 10;
+    optional CollectionType collectionType = 11;
+    repeated SchemaField schemas= 12;
 }
 
 message CreateCollectionResponse {
@@ -167,12 +193,15 @@ message CreateCollectionResponse {
     repeated SchemaField schemas = 10;
 }
 
-message ListCollectionsRequest {}
+message ListCollectionsRequest {
+    string pid = 1;
+}
 
 message ListCollectionsResponse {}
 
 message GetCollectionRequest{
-    string cid = 1;
+    string pid = 1;
+    string cid = 2;
 }
 
 message GetCollectionResponse{
@@ -180,7 +209,8 @@ message GetCollectionResponse{
 }
 
 message DeleteCollectionRequest {
-    string cid = 1;
+    string pid = 1;
+    string cid = 2;
 }
 
 message DeleteCollectionResponse {}
@@ -195,24 +225,27 @@ enum DataFormat {
 }
 
 message DataMetadata {
+    // pid is project id
+    string pid = 1;
+
     // cid is collection id from collection data
-    string cid = 1;
+    string cid = 2;
 
     // did (aka dataid) would be used to naming ${did} field, that field should be url safe
-    string did = 2;
+    string did = 3;
 
     google.protobuf.Timestamp _createdAt = 10; // ts when the record was created
     optional google.protobuf.Timestamp _deletedAt = 11; // ts when the record was deleted
 }
 
 
-// CreateDocumentRequest is used to create records against the data
 message CreateDocumentRequest {
-    string cid = 1;
-    optional string did = 2;
+    string pid = 1;
+    string cid = 2;
+    optional string did = 3;
 
-    bytes data = 3; // data represents rawdata for any kind of formating
-    optional DataFormat dataformat = 4;
+    bytes data = 10; // data represents rawdata for any kind of formating
+    optional DataFormat dataformat = 11;
 }
 
 message CreateDocumentResponse {
@@ -220,15 +253,17 @@ message CreateDocumentResponse {
 }
 
 message GetDocumentRequest{
-    string cid = 1;
-    string did = 2;
+    string pid = 1;
+    string cid = 2;
+    string did = 3;
 }
 
 message GetDocumentResponse{}
 
 message DeleteDocumentRequest {
-    string cid = 1;
-    string did = 2;
+    string pid = 1;
+    string cid = 2;
+    string did = 3;
 }
 
 message DeleteDocumentResponse {}

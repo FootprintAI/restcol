@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"gorm.io/gorm"
+
+	modelprojects "github.com/footprintai/restcol/pkg/models/projects"
 )
 
 type ModelCollection struct {
@@ -15,7 +17,8 @@ type ModelCollection struct {
 	UpdatedAt time.Time      `gorm:"column:updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at"`
 
-	Schemas []ModelSchema `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"` // associated to many schemes
+	Schemas        []ModelSchema           `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"` // associated to many schemes
+	ModelProjectID modelprojects.ProjectID // foreign key to model project
 }
 
 func (m ModelCollection) TableName() string {

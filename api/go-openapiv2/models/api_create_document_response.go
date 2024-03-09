@@ -13,17 +13,17 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// APICreateDataResponse api create data response
+// APICreateDocumentResponse api create document response
 //
-// swagger:model apiCreateDataResponse
-type APICreateDataResponse struct {
+// swagger:model apiCreateDocumentResponse
+type APICreateDocumentResponse struct {
 
 	// metadata
 	Metadata *APIDataMetadata `json:"Metadata,omitempty"`
 }
 
-// Validate validates this api create data response
-func (m *APICreateDataResponse) Validate(formats strfmt.Registry) error {
+// Validate validates this api create document response
+func (m *APICreateDocumentResponse) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateMetadata(formats); err != nil {
@@ -36,7 +36,7 @@ func (m *APICreateDataResponse) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *APICreateDataResponse) validateMetadata(formats strfmt.Registry) error {
+func (m *APICreateDocumentResponse) validateMetadata(formats strfmt.Registry) error {
 	if swag.IsZero(m.Metadata) { // not required
 		return nil
 	}
@@ -55,8 +55,8 @@ func (m *APICreateDataResponse) validateMetadata(formats strfmt.Registry) error 
 	return nil
 }
 
-// ContextValidate validate this api create data response based on the context it is used
-func (m *APICreateDataResponse) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validate this api create document response based on the context it is used
+func (m *APICreateDocumentResponse) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.contextValidateMetadata(ctx, formats); err != nil {
@@ -69,7 +69,7 @@ func (m *APICreateDataResponse) ContextValidate(ctx context.Context, formats str
 	return nil
 }
 
-func (m *APICreateDataResponse) contextValidateMetadata(ctx context.Context, formats strfmt.Registry) error {
+func (m *APICreateDocumentResponse) contextValidateMetadata(ctx context.Context, formats strfmt.Registry) error {
 
 	if m.Metadata != nil {
 
@@ -91,7 +91,7 @@ func (m *APICreateDataResponse) contextValidateMetadata(ctx context.Context, for
 }
 
 // MarshalBinary interface implementation
-func (m *APICreateDataResponse) MarshalBinary() ([]byte, error) {
+func (m *APICreateDocumentResponse) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -99,8 +99,8 @@ func (m *APICreateDataResponse) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *APICreateDataResponse) UnmarshalBinary(b []byte) error {
-	var res APICreateDataResponse
+func (m *APICreateDocumentResponse) UnmarshalBinary(b []byte) error {
+	var res APICreateDocumentResponse
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

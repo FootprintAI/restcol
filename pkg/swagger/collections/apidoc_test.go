@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	modelcollections "github.com/footprintai/restcol/pkg/models/collections"
+	modelprojects "github.com/footprintai/restcol/pkg/models/projects"
 )
 
 func TestCollectionDoc(t *testing.T) {
@@ -19,8 +20,9 @@ func TestCollectionDoc(t *testing.T) {
 	}
 
 	c1 := modelcollections.ModelCollection{
-		ID:      cid1,
-		Summary: "test swagger doc generation",
+		ID:             cid1,
+		ModelProjectID: modelprojects.NewProjectID(1),
+		Summary:        "test swagger doc generation",
 		Schemas: []modelcollections.ModelSchema{
 			modelcollections.ModelSchema{
 				Fields: []modelcollections.ModelFieldSchema{

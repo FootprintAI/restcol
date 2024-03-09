@@ -32,6 +32,9 @@ type APIDataMetadata struct {
 
 	// did (aka dataid) would be used to naming ${did} field, that field should be url safe
 	Did string `json:"did,omitempty"`
+
+	// pid is project id
+	Pid string `json:"pid,omitempty"`
 }
 
 // Validate validates this api data metadata

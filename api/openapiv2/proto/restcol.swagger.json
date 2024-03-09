@@ -45,6 +45,14 @@
             }
           }
         },
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
         "tags": [
           "collections"
         ]
@@ -105,6 +113,12 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "pid",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -133,6 +147,12 @@
             "name": "cid",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "pid",
+            "in": "query",
+            "required": false,
             "type": "string"
           }
         ],
@@ -172,6 +192,12 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "pid",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -207,6 +233,12 @@
             "name": "did",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "pid",
+            "in": "query",
+            "required": false,
             "type": "string"
           }
         ],
@@ -253,12 +285,326 @@
           "document"
         ]
       }
+    },
+    "/v1/projects/{pid}/collections": {
+      "get": {
+        "summary": "list collections endpoint",
+        "operationId": "RestColService_ListCollections2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiListCollectionsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "collections"
+        ]
+      },
+      "post": {
+        "summary": "Add collection endpoint, a collection is a set of documents with scheme-free.",
+        "operationId": "RestColService_CreateCollection2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiCreateCollectionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "cid",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collectionType",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "COLLECTION_TYPE_NONE",
+              "COLLECTION_TYPE_REGULAR_FILES",
+              "COLLECTION_TYPE_TIMESERIES",
+              "COLLECTION_TYPE_TRANSACTION",
+              "COLLECTION_TYPE_VECTOR",
+              "COLLECTION_TYPE_PROXY"
+            ],
+            "default": "COLLECTION_TYPE_NONE"
+          }
+        ],
+        "tags": [
+          "collections"
+        ]
+      }
+    },
+    "/v1/projects/{pid}/collections/{cid}": {
+      "get": {
+        "description": "retrieve an individual collection information and document keys assocaited with it",
+        "operationId": "RestColService_GetCollection2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiGetCollectionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "collections"
+        ]
+      },
+      "delete": {
+        "description": "remove an individual collection and its associated doc",
+        "operationId": "RestColService_DeleteCollection2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiDeleteCollectionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "collections"
+        ]
+      }
+    },
+    "/v1/projects/{pid}/collections/{cid}/{did}": {
+      "get": {
+        "summary": "GetDocument endpoint is a generic endpoint for retrieving data across multiple collections",
+        "description": "retrieve a document information from the collection.",
+        "operationId": "RestColService_GetDocument2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiGetDocumentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "did",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "document"
+        ]
+      },
+      "delete": {
+        "summary": "DeleteDocument endpoint is a generic endpoint for deleting a specific data",
+        "description": "Remove the specific document from the collection",
+        "operationId": "RestColService_DeleteDocument2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiDeleteDocumentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "did",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "document"
+        ]
+      }
+    },
+    "/v1/projects/{pid}/collections/{cid}:add": {
+      "post": {
+        "description": "create a document to the collection",
+        "operationId": "RestColService_CreateDocument2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiCreateDocumentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "did",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "data",
+            "description": "data represents rawdata for any kind of formating",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "dataformat",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DATA_FORMAT_AUTO",
+              "DATA_FORMAT_JSON",
+              "DATA_FORMAT_CSV",
+              "DATA_FORMAT_XML",
+              "DATA_FORMAT_URL",
+              "DATA_FORMAT_MEDIA"
+            ],
+            "default": "DATA_FORMAT_AUTO"
+          }
+        ],
+        "tags": [
+          "document"
+        ]
+      }
     }
   },
   "definitions": {
     "RestColServiceCreateDocumentBody": {
       "type": "object",
       "properties": {
+        "pid": {
+          "type": "string"
+        },
         "did": {
           "type": "string"
         },
@@ -270,12 +616,15 @@
         "dataformat": {
           "$ref": "#/definitions/apiDataFormat"
         }
-      },
-      "title": "CreateDocumentRequest is used to create records against the data"
+      }
     },
     "apiCollectionMetadata": {
       "type": "object",
       "properties": {
+        "pid": {
+          "type": "string",
+          "title": "pid is used to isolate resources (by projects), making the collections are belonged to a specific project"
+        },
         "cid": {
           "type": "string",
           "title": "cid (aka collectionId) would be used to naming ${cid} field, that field should be url safe\notherwise an error would be returned.\nleave it empty would generate a random uuid for ${cid}"
@@ -307,6 +656,9 @@
     "apiCreateCollectionRequest": {
       "type": "object",
       "properties": {
+        "pid": {
+          "type": "string"
+        },
         "cid": {
           "type": "string"
         },
@@ -369,6 +721,10 @@
     "apiDataMetadata": {
       "type": "object",
       "properties": {
+        "pid": {
+          "type": "string",
+          "title": "pid is project id"
+        },
         "cid": {
           "type": "string",
           "title": "cid is collection id from collection data"

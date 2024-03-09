@@ -1,8 +1,9 @@
 package authz
 
+import "context"
+
 type UserIdentity interface {
-	Group() string
-	UserID() string
+	UserIDOrGroup() string
 }
 
 type Resource interface {
@@ -19,10 +20,22 @@ func (s StringAuthzAction) action() string {
 	return string(s)
 }
 
+func NewStringAuthzAction(s string, defaultAction StringAuthzAction) StringAuthzAction {
+	switch s {
+	case StringAuthzActionRead.action():
+		return StringAuthzActionRead
+	case StringAuthzActionWrite.action():
+		return StringAuthzActionWrite
+	case StringAuthzActionDelete.action():
+		return StringAuthzActionDelete
+	}
+	return defaultAction
+}
+
 var (
-	StringAuthzActionRead      StringAuthzAction = "read"
-	StringAuthzActionReadWrite StringAuthzAction = "readwrite"
-	StringAuthzActionDelete    StringAuthzAction = "delete"
+	StringAuthzActionRead   StringAuthzAction = "GET"
+	StringAuthzActionWrite  StringAuthzAction = "POST"
+	StringAuthzActionDelete StringAuthzAction = "DELETE"
 )
 
 type AuthzEffect interface {
@@ -41,8 +54,8 @@ var (
 )
 
 type AuthzService interface {
-	Lookup(userIdentity UserIdentity) ([]Permission, error)
-	Enforce(userIdentity UserIdentity, resource Resource, action AuthzAction) (bool, error)
+	Lookup(ctx context.Context, userIdentity UserIdentity) ([]Permission, error)
+	Enforce(ctx context.Context, userIdentity UserIdentity, resource Resource, action AuthzAction) (bool, error)
 }
 
 type Permission struct {

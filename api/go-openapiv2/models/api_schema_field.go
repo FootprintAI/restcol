@@ -8,6 +8,7 @@ package models
 import (
 	"context"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
@@ -17,8 +18,11 @@ import (
 // swagger:model apiSchemaField
 type APISchemaField struct {
 
-	// regular sql-based datatype
-	Datatype string `json:"datatype,omitempty"`
+	// datatype
+	Datatype *APISchemaFieldDataType `json:"datatype,omitempty"`
+
+	// example
+	Example *APISchemaFieldExampleValue `json:"example,omitempty"`
 
 	// name
 	Name string `json:"name,omitempty"`
@@ -26,11 +30,117 @@ type APISchemaField struct {
 
 // Validate validates this api schema field
 func (m *APISchemaField) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateDatatype(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateExample(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 
-// ContextValidate validates this api schema field based on context it is used
+func (m *APISchemaField) validateDatatype(formats strfmt.Registry) error {
+	if swag.IsZero(m.Datatype) { // not required
+		return nil
+	}
+
+	if m.Datatype != nil {
+		if err := m.Datatype.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("datatype")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("datatype")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *APISchemaField) validateExample(formats strfmt.Registry) error {
+	if swag.IsZero(m.Example) { // not required
+		return nil
+	}
+
+	if m.Example != nil {
+		if err := m.Example.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("example")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("example")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this api schema field based on the context it is used
 func (m *APISchemaField) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateDatatype(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateExample(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *APISchemaField) contextValidateDatatype(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Datatype != nil {
+
+		if swag.IsZero(m.Datatype) { // not required
+			return nil
+		}
+
+		if err := m.Datatype.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("datatype")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("datatype")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *APISchemaField) contextValidateExample(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Example != nil {
+
+		if swag.IsZero(m.Example) { // not required
+			return nil
+		}
+
+		if err := m.Example.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("example")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("example")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 

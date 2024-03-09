@@ -7,6 +7,7 @@ package models
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -20,6 +21,15 @@ type APIGetCollectionResponse struct {
 
 	// metadata
 	Metadata *APICollectionMetadata `json:"Metadata,omitempty"`
+
+	// collection type
+	CollectionType *APICollectionType `json:"collectionType,omitempty"`
+
+	// description
+	Description string `json:"description,omitempty"`
+
+	// schemas
+	Schemas []*APISchemaField `json:"schemas"`
 }
 
 // Validate validates this api get collection response
@@ -27,6 +37,14 @@ func (m *APIGetCollectionResponse) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateMetadata(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateCollectionType(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateSchemas(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -55,11 +73,64 @@ func (m *APIGetCollectionResponse) validateMetadata(formats strfmt.Registry) err
 	return nil
 }
 
+func (m *APIGetCollectionResponse) validateCollectionType(formats strfmt.Registry) error {
+	if swag.IsZero(m.CollectionType) { // not required
+		return nil
+	}
+
+	if m.CollectionType != nil {
+		if err := m.CollectionType.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("collectionType")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("collectionType")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *APIGetCollectionResponse) validateSchemas(formats strfmt.Registry) error {
+	if swag.IsZero(m.Schemas) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.Schemas); i++ {
+		if swag.IsZero(m.Schemas[i]) { // not required
+			continue
+		}
+
+		if m.Schemas[i] != nil {
+			if err := m.Schemas[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("schemas" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("schemas" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
 // ContextValidate validate this api get collection response based on the context it is used
 func (m *APIGetCollectionResponse) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.contextValidateMetadata(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateCollectionType(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateSchemas(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -85,6 +156,52 @@ func (m *APIGetCollectionResponse) contextValidateMetadata(ctx context.Context, 
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *APIGetCollectionResponse) contextValidateCollectionType(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.CollectionType != nil {
+
+		if swag.IsZero(m.CollectionType) { // not required
+			return nil
+		}
+
+		if err := m.CollectionType.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("collectionType")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("collectionType")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *APIGetCollectionResponse) contextValidateSchemas(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Schemas); i++ {
+
+		if m.Schemas[i] != nil {
+
+			if swag.IsZero(m.Schemas[i]) { // not required
+				return nil
+			}
+
+			if err := m.Schemas[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("schemas" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("schemas" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil

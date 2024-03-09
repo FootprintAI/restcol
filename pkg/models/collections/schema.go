@@ -11,6 +11,8 @@ import (
 
 	"github.com/cthulhu/jsonpath"
 	"gorm.io/gorm"
+
+	apppb "github.com/footprintai/restcol/api/pb/proto"
 )
 
 type SchemaID int
@@ -54,19 +56,48 @@ func (f SwagValueType) valueType() string {
 }
 
 var (
+	NoneSwagValueType    SwagValueType = "none"
 	StringSwagValueType  SwagValueType = "string"
 	NumberSwagValueType  SwagValueType = "number"
 	IntegerSwagValueType SwagValueType = "integer"
 	BoolSwagValueType    SwagValueType = "bool"
 )
 
-type fieldValueValue interface {
+func (f SwagValueType) Proto() apppb.SchemaFieldDataType {
+	switch f {
+	case StringSwagValueType:
+		return apppb.SchemaFieldDataType_SCHEMA_FIELD_DATA_TYPE_STRING
+	case NumberSwagValueType:
+		return apppb.SchemaFieldDataType_SCHEMA_FIELD_DATA_TYPE_NUMBER
+	case IntegerSwagValueType:
+		return apppb.SchemaFieldDataType_SCHEMA_FIELD_DATA_TYPE_INTEGER
+	case BoolSwagValueType:
+		return apppb.SchemaFieldDataType_SCHEMA_FIELD_DATA_TYPE_BOOL
+	default:
+		return apppb.SchemaFieldDataType_SCHEMA_FIELD_DATA_TYPE_NONE
+	}
+}
+
+func NewSwaggerValueType(pbDataType apppb.SchemaFieldDataType) SwagValueType {
+	if pbDataType == apppb.SchemaFieldDataType_SCHEMA_FIELD_DATA_TYPE_STRING {
+		return StringSwagValueType
+	}
+	if pbDataType == apppb.SchemaFieldDataType_SCHEMA_FIELD_DATA_TYPE_NUMBER {
+		return NumberSwagValueType
+	}
+	if pbDataType == apppb.SchemaFieldDataType_SCHEMA_FIELD_DATA_TYPE_INTEGER {
+		return IntegerSwagValueType
+	}
+	if pbDataType == apppb.SchemaFieldDataType_SCHEMA_FIELD_DATA_TYPE_BOOL {
+		return BoolSwagValueType
+	}
+	return NoneSwagValueType
 }
 
 type SwagValueValue struct {
 	StringValue  *string  `json:"str,omitempty"`
 	NumberValue  *float64 `json:"num,omitempty"`
-	IntegerValue *int     `json:"int,omitempty"`
+	IntegerValue *int64   `json:"int,omitempty"`
 	BoolValue    *bool    `json:"bool,omitempty"`
 }
 
@@ -79,8 +110,8 @@ func Must(s SwagValueValue, e error) SwagValueValue {
 
 func NewSwagValue(v any) (SwagValueValue, error) {
 	switch v.(type) {
-	case int:
-		i := v.(int)
+	case int, int64, int32:
+		i := int64(v.(int))
 		return SwagValueValue{
 			IntegerValue: &i,
 		}, nil
@@ -99,8 +130,38 @@ func NewSwagValue(v any) (SwagValueValue, error) {
 		return SwagValueValue{
 			StringValue: &s,
 		}, nil
-	default:
-		return SwagValueValue{}, errors.New("Schema: no available type for swag value")
+	case *apppb.SchemaFieldExampleValue:
+		pbValue := v.(*apppb.SchemaFieldExampleValue)
+		if pbValue.StringValue != nil {
+			return SwagValueValue{
+				StringValue: pbValue.StringValue,
+			}, nil
+		}
+		if pbValue.NumberValue != nil {
+			return SwagValueValue{
+				NumberValue: pbValue.NumberValue,
+			}, nil
+		}
+		if pbValue.IntegerValue != nil {
+			return SwagValueValue{
+				IntegerValue: pbValue.IntegerValue,
+			}, nil
+		}
+		if pbValue.BoolValue != nil {
+			return SwagValueValue{
+				BoolValue: pbValue.BoolValue,
+			}, nil
+		}
+	}
+	return SwagValueValue{}, errors.New("Schema: no available type for swag value")
+}
+
+func (s SwagValueValue) Proto() *apppb.SchemaFieldExampleValue {
+	return &apppb.SchemaFieldExampleValue{
+		StringValue:  s.StringValue,
+		NumberValue:  s.NumberValue,
+		IntegerValue: s.IntegerValue,
+		BoolValue:    s.BoolValue,
 	}
 }
 

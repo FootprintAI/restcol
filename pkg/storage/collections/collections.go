@@ -16,6 +16,12 @@ type CollectionCURD struct {
 	*storagepostgres.PostgresDb
 }
 
+func NewCollectionCURD(db *storagepostgres.PostgresDb) *CollectionCURD {
+	return &CollectionCURD{
+		PostgresDb: db,
+	}
+}
+
 func (c *CollectionCURD) AutoMigrate() *errors.Error {
 	tables := []interface{}{
 		&appmodelcollections.ModelCollection{},

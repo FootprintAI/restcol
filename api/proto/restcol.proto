@@ -5,6 +5,7 @@ option go_package = "github.com/footprintai/restcol/api/pb";
 package restcol.api;
 
 import "google/api/annotations.proto";
+import "google/protobuf/any.proto";
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
@@ -149,18 +150,25 @@ service RestColService {
     }
 }
 
-enum CollectionType {
-    COLLECTION_TYPE_NONE = 0;
-    COLLECTION_TYPE_REGULAR_FILES = 1;
-    COLLECTION_TYPE_TIMESERIES = 2;
-    COLLECTION_TYPE_TRANSACTION = 3;
-    COLLECTION_TYPE_VECTOR = 4;
-    COLLECTION_TYPE_PROXY = 5;
-}
-
 message SchemaField {
     string name = 1;
-    string datatype = 2; // regular sql-based datatype
+    SchemaFieldDataType datatype = 2; 
+    optional SchemaFieldExampleValue example = 3;
+}
+
+enum SchemaFieldDataType {
+    SCHEMA_FIELD_DATA_TYPE_NONE = 0;
+    SCHEMA_FIELD_DATA_TYPE_STRING = 1;
+    SCHEMA_FIELD_DATA_TYPE_NUMBER = 2;
+    SCHEMA_FIELD_DATA_TYPE_INTEGER = 3;
+    SCHEMA_FIELD_DATA_TYPE_BOOL = 4;
+}
+
+message SchemaFieldExampleValue {
+    optional string stringValue = 1;
+    optional double numberValue = 2;
+    optional int64 integerValue = 3;
+    optional bool boolValue = 4;
 }
 
 message CollectionMetadata {
@@ -185,6 +193,15 @@ message CreateCollectionRequest {
     repeated SchemaField schemas= 12;
 }
 
+enum CollectionType {
+    COLLECTION_TYPE_NONE = 0;
+    COLLECTION_TYPE_REGULAR_FILES = 1;
+    COLLECTION_TYPE_TIMESERIES = 2;
+    COLLECTION_TYPE_TRANSACTION = 3;
+    COLLECTION_TYPE_VECTOR = 4;
+    COLLECTION_TYPE_PROXY = 5;
+}
+
 message CreateCollectionResponse {
     CollectionMetadata _metadata = 1;
 
@@ -206,6 +223,10 @@ message GetCollectionRequest{
 
 message GetCollectionResponse{
     CollectionMetadata _metadata = 1;
+
+    string description = 2;
+    CollectionType collectionType = 3;
+    repeated SchemaField schemas = 10;
 }
 
 message DeleteCollectionRequest {

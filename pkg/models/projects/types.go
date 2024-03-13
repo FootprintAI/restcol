@@ -16,9 +16,13 @@ func NewProjectID(intId int) ProjectID {
 	return ProjectID(fmt.Sprintf("%d", intId))
 }
 
+func NewProjectIDStr(s string) ProjectID {
+	return ProjectID(s)
+}
+
 type ProjectType string
 
-func (p ProjectType) projectType() string {
+func (p ProjectType) String() string {
 	return string(p)
 }
 

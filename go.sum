@@ -212,8 +212,8 @@ github.com/sagikazarmark/locafero v0.4.0/go.mod h1:Pe1W6UlPYUk/+wc/6KFhbORCfqzgY
 github.com/sagikazarmark/slog-shim v0.1.0 h1:diDBnUNK9N/354PgrxMywXnAwEr1QZcOr6gto+ugjYE=
 github.com/sagikazarmark/slog-shim v0.1.0/go.mod h1:SrcSrq8aKtyuqEI1uvTDTK1arOWRIczQRv+GVI1AkeQ=
 github.com/satori/go.uuid v1.2.0/go.mod h1:dA0hQrYB0VpLJoorglMZABFdXlWrHn1NEOzdhQKdks0=
-github.com/sdinsure/agent v0.0.0-20240312071418-5e084265319e h1:mWBx/f2zUbtrsZzKg0iocVq4H+XlutcPxRS1AcHQDok=
-github.com/sdinsure/agent v0.0.0-20240312071418-5e084265319e/go.mod h1:AeNnKP1xEQruXrb5wTqN1ZlBA1tRjKUiFzvCAFsYWrE=
+github.com/sdinsure/agent v0.0.0-20240313220801-1c863cfaff0e h1:xMon5nelelSQDKHVUvx476o1/jftVoN+v8w7wI4lvb0=
+github.com/sdinsure/agent v0.0.0-20240313220801-1c863cfaff0e/go.mod h1:AeNnKP1xEQruXrb5wTqN1ZlBA1tRjKUiFzvCAFsYWrE=
 github.com/shopspring/decimal v0.0.0-20180709203117-cd690d0c9e24/go.mod h1:M+9NzErvs504Cn4c5DxATwIqPbtswREoFCre64PpcG4=
 github.com/sirupsen/logrus v1.4.1/go.mod h1:ni0Sbl8bgC9z8RoU9G6nDWqqs/fq4eDPysMBDgk/93Q=
 github.com/sirupsen/logrus v1.4.2/go.mod h1:tLMulIdttU9McNUspp0xgXVQah82FyeX6MwdIuYE2rE=

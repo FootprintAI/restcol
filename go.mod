@@ -10,7 +10,7 @@ require (
 	github.com/go-openapi/runtime v0.27.1
 	github.com/go-openapi/spec v0.20.14
 	github.com/go-openapi/strfmt v0.22.0
-	github.com/go-openapi/swag v0.22.9
+	github.com/go-openapi/swag v0.23.0
 	github.com/go-openapi/validate v0.23.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/uuid v1.6.0
@@ -18,7 +18,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1
 	github.com/hashicorp/go-version v1.6.0
 	github.com/sdinsure/agent v0.0.0-20240313220801-1c863cfaff0e
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240213162025-012b6fc9bca9
 	google.golang.org/grpc v1.61.1
 	google.golang.org/protobuf v1.33.0

@@ -17,11 +17,11 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1
 	github.com/hashicorp/go-version v1.6.0
-	github.com/sdinsure/agent v0.0.0-20240312071418-5e084265319e
+	github.com/sdinsure/agent v0.0.0-20240313220801-1c863cfaff0e
 	github.com/stretchr/testify v1.8.4
 	google.golang.org/genproto/googleapis/api v0.0.0-20240213162025-012b6fc9bca9
 	google.golang.org/grpc v1.61.1
-	google.golang.org/protobuf v1.32.0
+	google.golang.org/protobuf v1.33.0
 	gorm.io/gorm v1.25.7
 	rogchap.com/v8go v0.9.0
 )

@@ -24,6 +24,10 @@ func TestStorage(t *testing.T) {
 	//
 	// or run ./run_postgre.sh
 
+	if testing.Short() {
+		t.Skip("skip this for now")
+		return
+	}
 	ctx := context.Background()
 	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger())
 	assert.NoError(t, err)

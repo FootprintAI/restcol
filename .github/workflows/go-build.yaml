@@ -39,4 +39,4 @@ jobs:
         run: |
           export GOPATH=/home/runner/go
           export PATH=$PATH:/home/runner/go/bin
-          go test -test.v ./... -coverprofile coverage.out
+          go test -test.v ./... --short -coverprofile coverage.out

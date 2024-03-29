@@ -220,7 +220,7 @@ func (m ModelFieldsSchema) ToJSON(dotPrefixs ...string) ([]byte, error) {
 		} else if field.FieldValueType == IntegerSwagValueType && field.FieldExample.IntegerValue != nil {
 			fieldsMap[fmt.Sprintf("%s.num()", fieldName)] = fmt.Sprintf("%d", *field.FieldExample.IntegerValue)
 		} else if field.FieldValueType == BoolSwagValueType && field.FieldExample.BoolValue != nil {
-			fieldsMap[fmt.Sprintf("%s.bool()", fieldName)] = fmt.Sprintf("%b", *field.FieldExample.BoolValue)
+			fieldsMap[fmt.Sprintf("%s.bool()", fieldName)] = fmt.Sprintf("%t", *field.FieldExample.BoolValue)
 		} else if field.FieldValueType == StringSwagValueType && field.FieldExample.StringValue != nil {
 			fieldsMap[fieldName] = *field.FieldExample.StringValue
 		} else {

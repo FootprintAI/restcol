@@ -30,6 +30,9 @@ func (m APIDataFormat) Pointer() *APIDataFormat {
 
 const (
 
+	// APIDataFormatDATAFORMATUNKNOWN captures enum value "DATA_FORMAT_UNKNOWN"
+	APIDataFormatDATAFORMATUNKNOWN APIDataFormat = "DATA_FORMAT_UNKNOWN"
+
 	// APIDataFormatDATAFORMATAUTO captures enum value "DATA_FORMAT_AUTO"
 	APIDataFormatDATAFORMATAUTO APIDataFormat = "DATA_FORMAT_AUTO"
 
@@ -54,7 +57,7 @@ var apiDataFormatEnum []interface{}
 
 func init() {
 	var res []APIDataFormat
-	if err := json.Unmarshal([]byte(`["DATA_FORMAT_AUTO","DATA_FORMAT_JSON","DATA_FORMAT_CSV","DATA_FORMAT_XML","DATA_FORMAT_URL","DATA_FORMAT_MEDIA"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["DATA_FORMAT_UNKNOWN","DATA_FORMAT_AUTO","DATA_FORMAT_JSON","DATA_FORMAT_CSV","DATA_FORMAT_XML","DATA_FORMAT_URL","DATA_FORMAT_MEDIA"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {

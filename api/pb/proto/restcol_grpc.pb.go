@@ -8,6 +8,7 @@ package pb
 
 import (
 	context "context"
+	httpbody "google.golang.org/genproto/googleapis/api/httpbody"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -19,6 +20,7 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
+	RestColService_GetSwaggerDoc_FullMethodName    = "/restcol.api.RestColService/GetSwaggerDoc"
 	RestColService_CreateCollection_FullMethodName = "/restcol.api.RestColService/CreateCollection"
 	RestColService_ListCollections_FullMethodName  = "/restcol.api.RestColService/ListCollections"
 	RestColService_GetCollection_FullMethodName    = "/restcol.api.RestColService/GetCollection"
@@ -32,6 +34,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RestColServiceClient interface {
+	GetSwaggerDoc(ctx context.Context, in *GetSwaggerDocRequest, opts ...grpc.CallOption) (*httpbody.HttpBody, error)
 	CreateCollection(ctx context.Context, in *CreateCollectionRequest, opts ...grpc.CallOption) (*CreateCollectionResponse, error)
 	ListCollections(ctx context.Context, in *ListCollectionsRequest, opts ...grpc.CallOption) (*ListCollectionsResponse, error)
 	GetCollection(ctx context.Context, in *GetCollectionRequest, opts ...grpc.CallOption) (*GetCollectionResponse, error)
@@ -49,6 +52,15 @@ type restColServiceClient struct {
 
 func NewRestColServiceClient(cc grpc.ClientConnInterface) RestColServiceClient {
 	return &restColServiceClient{cc}
+}
+
+func (c *restColServiceClient) GetSwaggerDoc(ctx context.Context, in *GetSwaggerDocRequest, opts ...grpc.CallOption) (*httpbody.HttpBody, error) {
+	out := new(httpbody.HttpBody)
+	err := c.cc.Invoke(ctx, RestColService_GetSwaggerDoc_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *restColServiceClient) CreateCollection(ctx context.Context, in *CreateCollectionRequest, opts ...grpc.CallOption) (*CreateCollectionResponse, error) {
@@ -118,6 +130,7 @@ func (c *restColServiceClient) DeleteDocument(ctx context.Context, in *DeleteDoc
 // All implementations must embed UnimplementedRestColServiceServer
 // for forward compatibility
 type RestColServiceServer interface {
+	GetSwaggerDoc(context.Context, *GetSwaggerDocRequest) (*httpbody.HttpBody, error)
 	CreateCollection(context.Context, *CreateCollectionRequest) (*CreateCollectionResponse, error)
 	ListCollections(context.Context, *ListCollectionsRequest) (*ListCollectionsResponse, error)
 	GetCollection(context.Context, *GetCollectionRequest) (*GetCollectionResponse, error)
@@ -134,6 +147,9 @@ type RestColServiceServer interface {
 type UnimplementedRestColServiceServer struct {
 }
 
+func (UnimplementedRestColServiceServer) GetSwaggerDoc(context.Context, *GetSwaggerDocRequest) (*httpbody.HttpBody, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSwaggerDoc not implemented")
+}
 func (UnimplementedRestColServiceServer) CreateCollection(context.Context, *CreateCollectionRequest) (*CreateCollectionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateCollection not implemented")
 }
@@ -166,6 +182,24 @@ type UnsafeRestColServiceServer interface {
 
 func RegisterRestColServiceServer(s grpc.ServiceRegistrar, srv RestColServiceServer) {
 	s.RegisterService(&RestColService_ServiceDesc, srv)
+}
+
+func _RestColService_GetSwaggerDoc_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSwaggerDocRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RestColServiceServer).GetSwaggerDoc(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RestColService_GetSwaggerDoc_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RestColServiceServer).GetSwaggerDoc(ctx, req.(*GetSwaggerDocRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _RestColService_CreateCollection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -301,6 +335,10 @@ var RestColService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "restcol.api.RestColService",
 	HandlerType: (*RestColServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetSwaggerDoc",
+			Handler:    _RestColService_GetSwaggerDoc_Handler,
+		},
 		{
 			MethodName: "CreateCollection",
 			Handler:    _RestColService_CreateCollection_Handler,

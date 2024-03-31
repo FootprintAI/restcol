@@ -11,46 +11,33 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
-// APIDataMetadata api data metadata
+// APICreateDocumentRequest api create document request
 //
-// swagger:model apiDataMetadata
-type APIDataMetadata struct {
+// swagger:model apiCreateDocumentRequest
+type APICreateDocumentRequest struct {
 
-	// ts when the record was created
-	// Format: date-time
-	CreatedAt strfmt.DateTime `json:"CreatedAt,omitempty"`
-
-	// ts when the record was deleted
-	// Format: date-time
-	DeletedAt strfmt.DateTime `json:"DeletedAt,omitempty"`
-
-	// cid is collection id from collection data
+	// cid
 	Cid string `json:"cid,omitempty"`
+
+	// data represents rawdata for any kind of formating
+	// Format: byte
+	Data strfmt.Base64 `json:"data,omitempty"`
 
 	// dataformat
 	Dataformat *APIDataFormat `json:"dataformat,omitempty"`
 
-	// did (aka dataid) would be used to naming ${did} field, that field should be url safe
+	// did
 	Did string `json:"did,omitempty"`
 
-	// pid is project id
+	// pid
 	Pid string `json:"pid,omitempty"`
 }
 
-// Validate validates this api data metadata
-func (m *APIDataMetadata) Validate(formats strfmt.Registry) error {
+// Validate validates this api create document request
+func (m *APICreateDocumentRequest) Validate(formats strfmt.Registry) error {
 	var res []error
-
-	if err := m.validateCreatedAt(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateDeletedAt(formats); err != nil {
-		res = append(res, err)
-	}
 
 	if err := m.validateDataformat(formats); err != nil {
 		res = append(res, err)
@@ -62,31 +49,7 @@ func (m *APIDataMetadata) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *APIDataMetadata) validateCreatedAt(formats strfmt.Registry) error {
-	if swag.IsZero(m.CreatedAt) { // not required
-		return nil
-	}
-
-	if err := validate.FormatOf("CreatedAt", "body", "date-time", m.CreatedAt.String(), formats); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *APIDataMetadata) validateDeletedAt(formats strfmt.Registry) error {
-	if swag.IsZero(m.DeletedAt) { // not required
-		return nil
-	}
-
-	if err := validate.FormatOf("DeletedAt", "body", "date-time", m.DeletedAt.String(), formats); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *APIDataMetadata) validateDataformat(formats strfmt.Registry) error {
+func (m *APICreateDocumentRequest) validateDataformat(formats strfmt.Registry) error {
 	if swag.IsZero(m.Dataformat) { // not required
 		return nil
 	}
@@ -105,8 +68,8 @@ func (m *APIDataMetadata) validateDataformat(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validate this api data metadata based on the context it is used
-func (m *APIDataMetadata) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validate this api create document request based on the context it is used
+func (m *APICreateDocumentRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.contextValidateDataformat(ctx, formats); err != nil {
@@ -119,7 +82,7 @@ func (m *APIDataMetadata) ContextValidate(ctx context.Context, formats strfmt.Re
 	return nil
 }
 
-func (m *APIDataMetadata) contextValidateDataformat(ctx context.Context, formats strfmt.Registry) error {
+func (m *APICreateDocumentRequest) contextValidateDataformat(ctx context.Context, formats strfmt.Registry) error {
 
 	if m.Dataformat != nil {
 
@@ -141,7 +104,7 @@ func (m *APIDataMetadata) contextValidateDataformat(ctx context.Context, formats
 }
 
 // MarshalBinary interface implementation
-func (m *APIDataMetadata) MarshalBinary() ([]byte, error) {
+func (m *APICreateDocumentRequest) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -149,8 +112,8 @@ func (m *APIDataMetadata) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *APIDataMetadata) UnmarshalBinary(b []byte) error {
-	var res APIDataMetadata
+func (m *APICreateDocumentRequest) UnmarshalBinary(b []byte) error {
+	var res APICreateDocumentRequest
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

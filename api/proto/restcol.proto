@@ -4,6 +4,7 @@ option go_package = "github.com/footprintai/restcol/api/pb";
 
 package restcol.api;
 
+import "google/api/httpbody.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/timestamp.proto";
@@ -50,7 +51,18 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 };
 
 service RestColService {
-
+    rpc GetSwaggerDoc(GetSwaggerDocRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/v1/apidoc"
+            additional_bindings {
+                post: "/v1/projects/{pid}/apidoc"
+            }
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Return API Doc in Swagger"
+            tags: "swagger"
+        };
+    }
     rpc CreateCollection(CreateCollectionRequest) returns (CreateCollectionResponse) {
         option (google.api.http) = {
             post: "/v1/collections"
@@ -109,10 +121,13 @@ service RestColService {
 
     rpc CreateDocument(CreateDocumentRequest) returns (CreateDocumentResponse) {
         option (google.api.http) = {
-            post: "/v1/collections/{cid}:add"
+            post: "/v1/newdoc"
             body: "*"
             additional_bindings {
-                post: "/v1/projects/{pid}/collections/{cid}:add"
+                post: "/v1/collections/{cid}:newdoc"
+            }
+            additional_bindings {
+                post: "/v1/projects/{pid}/collections/{cid}:newdoc"
             }
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -124,7 +139,10 @@ service RestColService {
     // GetDocument endpoint is a generic endpoint for retrieving data across multiple collections
     rpc GetDocument(GetDocumentRequest) returns (GetDocumentResponse) {
         option (google.api.http) = {
-            get: "/v1/collections/{cid}/{did}"
+            get: "/v1/doc/{did}"
+            additional_bindings {
+                get: "/v1/collections/{cid}/{did}"
+            }
             additional_bindings {
                 get: "/v1/projects/{pid}/collections/{cid}/{did}"
             }
@@ -148,6 +166,10 @@ service RestColService {
             tags: "document"
         };
     }
+}
+
+message GetSwaggerDocRequest {
+    string pid = 1;
 }
 
 message SchemaField {
@@ -237,12 +259,13 @@ message DeleteCollectionRequest {
 message DeleteCollectionResponse {}
 
 enum DataFormat {
-    DATA_FORMAT_AUTO = 0;
-    DATA_FORMAT_JSON = 1;
-    DATA_FORMAT_CSV = 2;
-    DATA_FORMAT_XML = 3;
-    DATA_FORMAT_URL = 4;
-    DATA_FORMAT_MEDIA = 5;
+    DATA_FORMAT_UNKNOWN = 0;
+    DATA_FORMAT_AUTO = 1;
+    DATA_FORMAT_JSON = 2;
+    DATA_FORMAT_CSV = 3;
+    DATA_FORMAT_XML = 4;
+    DATA_FORMAT_URL = 5;
+    DATA_FORMAT_MEDIA = 6;
 }
 
 message DataMetadata {
@@ -257,6 +280,7 @@ message DataMetadata {
 
     google.protobuf.Timestamp _createdAt = 10; // ts when the record was created
     optional google.protobuf.Timestamp _deletedAt = 11; // ts when the record was deleted
+    optional DataFormat dataformat = 12;
 }
 
 
@@ -279,7 +303,10 @@ message GetDocumentRequest{
     string did = 3;
 }
 
-message GetDocumentResponse{}
+message GetDocumentResponse{
+    DataMetadata _metadata = 1;
+    bytes data = 2;
+}
 
 message DeleteDocumentRequest {
     string pid = 1;

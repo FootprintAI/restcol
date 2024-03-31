@@ -19,7 +19,7 @@ func TestCollectionDoc(t *testing.T) {
 		)
 	}
 
-	c1 := modelcollections.ModelCollection{
+	c1 := &modelcollections.ModelCollection{
 		ID:             cid1,
 		ModelProjectID: modelprojects.NewProjectID(1),
 		Summary:        "test swagger doc generation",

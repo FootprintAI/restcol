@@ -26,13 +26,19 @@ type ModelCollection struct {
 	ModelProject   modelprojects.ModelProject
 }
 
-func NewModelCollection(pid modelprojects.ProjectID, id CollectionID, t apppb.CollectionType, summary string, schemas []ModelSchema) *ModelCollection {
+func NewModelCollection(
+	modelProject *modelprojects.ModelProject,
+	id CollectionID,
+	t apppb.CollectionType,
+	summary string,
+	schemas []ModelSchema,
+) *ModelCollection {
 	return &ModelCollection{
 		ID:             id,
 		Type:           ModelCollectionType(t),
 		Summary:        summary,
 		Schemas:        schemas,
-		ModelProjectID: pid,
+		ModelProjectID: modelProject.ID,
 	}
 }
 

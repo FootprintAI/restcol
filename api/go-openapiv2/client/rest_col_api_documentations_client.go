@@ -12,6 +12,7 @@ import (
 
 	"github.com/footprintai/restcol/api/go-openapiv2/client/collections"
 	"github.com/footprintai/restcol/api/go-openapiv2/client/document"
+	"github.com/footprintai/restcol/api/go-openapiv2/client/swagger"
 )
 
 // Default rest col API documentations HTTP client.
@@ -58,6 +59,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *RestColAPI
 	cli.Transport = transport
 	cli.Collections = collections.New(transport, formats)
 	cli.Document = document.New(transport, formats)
+	cli.Swagger = swagger.New(transport, formats)
 	return cli
 }
 
@@ -106,6 +108,8 @@ type RestColAPIDocumentations struct {
 
 	Document document.ClientService
 
+	Swagger swagger.ClientService
+
 	Transport runtime.ClientTransport
 }
 
@@ -114,4 +118,5 @@ func (c *RestColAPIDocumentations) SetTransport(transport runtime.ClientTranspor
 	c.Transport = transport
 	c.Collections.SetTransport(transport)
 	c.Document.SetTransport(transport)
+	c.Swagger.SetTransport(transport)
 }

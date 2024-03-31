@@ -62,7 +62,7 @@ RestColServiceGetDocumentParams contains all the parameters to send to the API e
 type RestColServiceGetDocumentParams struct {
 
 	// Cid.
-	Cid string
+	Cid *string
 
 	// Did.
 	Did string
@@ -124,13 +124,13 @@ func (o *RestColServiceGetDocumentParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithCid adds the cid to the rest col service get document params
-func (o *RestColServiceGetDocumentParams) WithCid(cid string) *RestColServiceGetDocumentParams {
+func (o *RestColServiceGetDocumentParams) WithCid(cid *string) *RestColServiceGetDocumentParams {
 	o.SetCid(cid)
 	return o
 }
 
 // SetCid adds the cid to the rest col service get document params
-func (o *RestColServiceGetDocumentParams) SetCid(cid string) {
+func (o *RestColServiceGetDocumentParams) SetCid(cid *string) {
 	o.Cid = cid
 }
 
@@ -164,9 +164,21 @@ func (o *RestColServiceGetDocumentParams) WriteToRequest(r runtime.ClientRequest
 	}
 	var res []error
 
-	// path param cid
-	if err := r.SetPathParam("cid", o.Cid); err != nil {
-		return err
+	if o.Cid != nil {
+
+		// query param cid
+		var qrCid string
+
+		if o.Cid != nil {
+			qrCid = *o.Cid
+		}
+		qCid := qrCid
+		if qCid != "" {
+
+			if err := r.SetQueryParam("cid", qCid); err != nil {
+				return err
+			}
+		}
 	}
 
 	// path param did

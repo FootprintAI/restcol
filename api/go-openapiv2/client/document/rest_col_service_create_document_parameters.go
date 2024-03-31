@@ -64,10 +64,7 @@ RestColServiceCreateDocumentParams contains all the parameters to send to the AP
 type RestColServiceCreateDocumentParams struct {
 
 	// Body.
-	Body *models.RestColServiceCreateDocumentBody
-
-	// Cid.
-	Cid string
+	Body *models.APICreateDocumentRequest
 
 	timeout    time.Duration
 	Context    context.Context
@@ -123,25 +120,14 @@ func (o *RestColServiceCreateDocumentParams) SetHTTPClient(client *http.Client) 
 }
 
 // WithBody adds the body to the rest col service create document params
-func (o *RestColServiceCreateDocumentParams) WithBody(body *models.RestColServiceCreateDocumentBody) *RestColServiceCreateDocumentParams {
+func (o *RestColServiceCreateDocumentParams) WithBody(body *models.APICreateDocumentRequest) *RestColServiceCreateDocumentParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the rest col service create document params
-func (o *RestColServiceCreateDocumentParams) SetBody(body *models.RestColServiceCreateDocumentBody) {
+func (o *RestColServiceCreateDocumentParams) SetBody(body *models.APICreateDocumentRequest) {
 	o.Body = body
-}
-
-// WithCid adds the cid to the rest col service create document params
-func (o *RestColServiceCreateDocumentParams) WithCid(cid string) *RestColServiceCreateDocumentParams {
-	o.SetCid(cid)
-	return o
-}
-
-// SetCid adds the cid to the rest col service create document params
-func (o *RestColServiceCreateDocumentParams) SetCid(cid string) {
-	o.Cid = cid
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -155,11 +141,6 @@ func (o *RestColServiceCreateDocumentParams) WriteToRequest(r runtime.ClientRequ
 		if err := r.SetBodyParam(o.Body); err != nil {
 			return err
 		}
-	}
-
-	// path param cid
-	if err := r.SetPathParam("cid", o.Cid); err != nil {
-		return err
 	}
 
 	if len(res) > 0 {

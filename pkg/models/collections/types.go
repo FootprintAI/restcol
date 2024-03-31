@@ -33,7 +33,7 @@ func (c *CollectionID) Scan(value interface{}) error {
 	if !isStringType {
 		return fmt.Errorf("db.model: invalid type, expect string")
 	}
-	cid, err := NewCollectionIDFromStr(value.(string))
+	cid, err := Parse(value.(string))
 	if err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ func NewCollectionID() CollectionID {
 	return CollectionID(uid)
 }
 
-func NewCollectionIDFromStr(s string) (CollectionID, error) {
+func Parse(s string) (CollectionID, error) {
 	innerUuid, err := uuid.Parse(s)
 	if err != nil {
 		return CollectionID{}, err

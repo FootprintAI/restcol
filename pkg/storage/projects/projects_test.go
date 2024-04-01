@@ -1,7 +1,6 @@
 package storageprojects
 
 import (
-	"context"
 	"testing"
 
 	"github.com/sdinsure/agent/pkg/logger"
@@ -24,10 +23,9 @@ func TestProject(t *testing.T) {
 		t.Skip("skip this for now")
 		return
 	}
-	ctx := context.Background()
 	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger())
 	assert.NoError(t, err)
 
-	_, _, err := TestProjectSuite(postgrescli)
+	_, _, err = TestProjectSuite(postgrescli)
 	assert.Nil(t, err)
 }

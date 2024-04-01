@@ -27,6 +27,37 @@
     "application/json"
   ],
   "paths": {
+    "/v1/apidoc": {
+      "get": {
+        "summary": "Return API Doc in Swagger",
+        "operationId": "RestColService_GetSwaggerDoc",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiHttpBody"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "swagger"
+        ]
+      }
+    },
     "/v1/collections": {
       "get": {
         "summary": "list collections endpoint",
@@ -165,7 +196,7 @@
       "get": {
         "summary": "GetDocument endpoint is a generic endpoint for retrieving data across multiple collections",
         "description": "retrieve a document information from the collection.",
-        "operationId": "RestColService_GetDocument",
+        "operationId": "RestColService_GetDocument2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -247,10 +278,10 @@
         ]
       }
     },
-    "/v1/collections/{cid}:add": {
+    "/v1/collections/{cid}:newdoc": {
       "post": {
         "description": "create a document to the collection",
-        "operationId": "RestColService_CreateDocument",
+        "operationId": "RestColService_CreateDocument2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -273,16 +304,152 @@
             "type": "string"
           },
           {
+            "name": "pid",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "did",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "data",
+            "description": "data represents rawdata for any kind of formating",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "dataformat",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DATA_FORMAT_UNKNOWN",
+              "DATA_FORMAT_AUTO",
+              "DATA_FORMAT_JSON",
+              "DATA_FORMAT_CSV",
+              "DATA_FORMAT_XML",
+              "DATA_FORMAT_URL",
+              "DATA_FORMAT_MEDIA"
+            ],
+            "default": "DATA_FORMAT_UNKNOWN"
+          }
+        ],
+        "tags": [
+          "document"
+        ]
+      }
+    },
+    "/v1/doc/{did}": {
+      "get": {
+        "summary": "GetDocument endpoint is a generic endpoint for retrieving data across multiple collections",
+        "description": "retrieve a document information from the collection.",
+        "operationId": "RestColService_GetDocument",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiGetDocumentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "did",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "pid",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "cid",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "document"
+        ]
+      }
+    },
+    "/v1/newdoc": {
+      "post": {
+        "description": "create a document to the collection",
+        "operationId": "RestColService_CreateDocument",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiCreateDocumentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/RestColServiceCreateDocumentBody"
+              "$ref": "#/definitions/apiCreateDocumentRequest"
             }
           }
         ],
         "tags": [
           "document"
+        ]
+      }
+    },
+    "/v1/projects/{pid}/apidoc": {
+      "post": {
+        "summary": "Return API Doc in Swagger",
+        "operationId": "RestColService_GetSwaggerDoc2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiHttpBody"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "swagger"
         ]
       }
     },
@@ -449,7 +616,7 @@
       "get": {
         "summary": "GetDocument endpoint is a generic endpoint for retrieving data across multiple collections",
         "description": "retrieve a document information from the collection.",
-        "operationId": "RestColService_GetDocument2",
+        "operationId": "RestColService_GetDocument3",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -531,10 +698,10 @@
         ]
       }
     },
-    "/v1/projects/{pid}/collections/{cid}:add": {
+    "/v1/projects/{pid}/collections/{cid}:newdoc": {
       "post": {
         "description": "create a document to the collection",
-        "operationId": "RestColService_CreateDocument2",
+        "operationId": "RestColService_CreateDocument3",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -582,6 +749,7 @@
             "required": false,
             "type": "string",
             "enum": [
+              "DATA_FORMAT_UNKNOWN",
               "DATA_FORMAT_AUTO",
               "DATA_FORMAT_JSON",
               "DATA_FORMAT_CSV",
@@ -589,7 +757,7 @@
               "DATA_FORMAT_URL",
               "DATA_FORMAT_MEDIA"
             ],
-            "default": "DATA_FORMAT_AUTO"
+            "default": "DATA_FORMAT_UNKNOWN"
           }
         ],
         "tags": [
@@ -599,25 +767,6 @@
     }
   },
   "definitions": {
-    "RestColServiceCreateDocumentBody": {
-      "type": "object",
-      "properties": {
-        "pid": {
-          "type": "string"
-        },
-        "did": {
-          "type": "string"
-        },
-        "data": {
-          "type": "string",
-          "format": "byte",
-          "title": "data represents rawdata for any kind of formating"
-        },
-        "dataformat": {
-          "$ref": "#/definitions/apiDataFormat"
-        }
-      }
-    },
     "apiCollectionMetadata": {
       "type": "object",
       "properties": {
@@ -698,6 +847,28 @@
         }
       }
     },
+    "apiCreateDocumentRequest": {
+      "type": "object",
+      "properties": {
+        "pid": {
+          "type": "string"
+        },
+        "cid": {
+          "type": "string"
+        },
+        "did": {
+          "type": "string"
+        },
+        "data": {
+          "type": "string",
+          "format": "byte",
+          "title": "data represents rawdata for any kind of formating"
+        },
+        "dataformat": {
+          "$ref": "#/definitions/apiDataFormat"
+        }
+      }
+    },
     "apiCreateDocumentResponse": {
       "type": "object",
       "properties": {
@@ -709,6 +880,7 @@
     "apiDataFormat": {
       "type": "string",
       "enum": [
+        "DATA_FORMAT_UNKNOWN",
         "DATA_FORMAT_AUTO",
         "DATA_FORMAT_JSON",
         "DATA_FORMAT_CSV",
@@ -716,7 +888,7 @@
         "DATA_FORMAT_URL",
         "DATA_FORMAT_MEDIA"
       ],
-      "default": "DATA_FORMAT_AUTO"
+      "default": "DATA_FORMAT_UNKNOWN"
     },
     "apiDataMetadata": {
       "type": "object",
@@ -742,6 +914,9 @@
           "type": "string",
           "format": "date-time",
           "title": "ts when the record was deleted"
+        },
+        "dataformat": {
+          "$ref": "#/definitions/apiDataFormat"
         }
       }
     },
@@ -773,7 +948,39 @@
       }
     },
     "apiGetDocumentResponse": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "Metadata": {
+          "$ref": "#/definitions/apiDataMetadata"
+        },
+        "data": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "apiHttpBody": {
+      "type": "object",
+      "properties": {
+        "contentType": {
+          "type": "string",
+          "description": "The HTTP Content-Type header value specifying the content type of the body."
+        },
+        "data": {
+          "type": "string",
+          "format": "byte",
+          "description": "The HTTP request/response body as raw binary."
+        },
+        "extensions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          },
+          "description": "Application specific response metadata. Must be set in the first response\nfor streaming APIs."
+        }
+      },
+      "description": "Message that represents an arbitrary HTTP body. It should only be used for\npayload formats that can't be represented as JSON, such as raw binary or\nan HTML page.\n\n\nThis message can be used both in streaming and non-streaming API methods in\nthe request as well as the response.\n\nIt can be used as a top-level request field, which is convenient if one\nwants to extract parameters from either the URL or HTTP template into the\nrequest fields and also want access to the raw HTTP body.\n\nExample:\n\n    message GetResourceRequest {\n      // A unique request id.\n      string request_id = 1;\n\n      // The raw HTTP body is bound to this field.\n      google.api.HttpBody http_body = 2;\n\n    }\n\n    service ResourceService {\n      rpc GetResource(GetResourceRequest)\n        returns (google.api.HttpBody);\n      rpc UpdateResource(google.api.HttpBody)\n        returns (google.protobuf.Empty);\n\n    }\n\nExample with streaming methods:\n\n    service CaldavService {\n      rpc GetCalendar(stream google.api.HttpBody)\n        returns (stream google.api.HttpBody);\n      rpc UpdateCalendar(stream google.api.HttpBody)\n        returns (stream google.api.HttpBody);\n\n    }\n\nUse of this type only changes how the request and response bodies are\nhandled, all other features will continue to work unchanged."
     },
     "apiListCollectionsResponse": {
       "type": "object"

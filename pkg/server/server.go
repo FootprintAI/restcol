@@ -28,6 +28,7 @@ func NewServerService(
 	authNMiddleware := authnmiddleware.NewAuthNMiddleware(
 		log,
 		authnClaimParser,
+		authnmiddleware.EnableAnnonymous(true),
 	)
 
 	authZMiddleware := authzmiddleware.NewAuthZMiddleware(

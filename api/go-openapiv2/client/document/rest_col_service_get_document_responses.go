@@ -52,7 +52,7 @@ RestColServiceGetDocumentOK describes a response with status code 200, with defa
 A successful response.
 */
 type RestColServiceGetDocumentOK struct {
-	Payload models.APIGetDocumentResponse
+	Payload *models.APIGetDocumentResponse
 }
 
 // IsSuccess returns true when this rest col service get document o k response has a 2xx status code
@@ -86,21 +86,23 @@ func (o *RestColServiceGetDocumentOK) Code() int {
 }
 
 func (o *RestColServiceGetDocumentOK) Error() string {
-	return fmt.Sprintf("[GET /v1/collections/{cid}/{did}][%d] restColServiceGetDocumentOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[GET /v1/doc/{did}][%d] restColServiceGetDocumentOK  %+v", 200, o.Payload)
 }
 
 func (o *RestColServiceGetDocumentOK) String() string {
-	return fmt.Sprintf("[GET /v1/collections/{cid}/{did}][%d] restColServiceGetDocumentOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[GET /v1/doc/{did}][%d] restColServiceGetDocumentOK  %+v", 200, o.Payload)
 }
 
-func (o *RestColServiceGetDocumentOK) GetPayload() models.APIGetDocumentResponse {
+func (o *RestColServiceGetDocumentOK) GetPayload() *models.APIGetDocumentResponse {
 	return o.Payload
 }
 
 func (o *RestColServiceGetDocumentOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
+	o.Payload = new(models.APIGetDocumentResponse)
+
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
 		return err
 	}
 
@@ -156,11 +158,11 @@ func (o *RestColServiceGetDocumentDefault) Code() int {
 }
 
 func (o *RestColServiceGetDocumentDefault) Error() string {
-	return fmt.Sprintf("[GET /v1/collections/{cid}/{did}][%d] RestColService_GetDocument default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[GET /v1/doc/{did}][%d] RestColService_GetDocument default  %+v", o._statusCode, o.Payload)
 }
 
 func (o *RestColServiceGetDocumentDefault) String() string {
-	return fmt.Sprintf("[GET /v1/collections/{cid}/{did}][%d] RestColService_GetDocument default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[GET /v1/doc/{did}][%d] RestColService_GetDocument default  %+v", o._statusCode, o.Payload)
 }
 
 func (o *RestColServiceGetDocumentDefault) GetPayload() *models.RPCStatus {

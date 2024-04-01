@@ -6,7 +6,6 @@ import (
 
 	apppb "github.com/footprintai/restcol/api/pb/proto"
 	appmodelcollections "github.com/footprintai/restcol/pkg/models/collections"
-	appmodelprojects "github.com/footprintai/restcol/pkg/models/projects"
 	storageprojects "github.com/footprintai/restcol/pkg/storage/projects"
 	"github.com/sdinsure/agent/pkg/logger"
 	storagetestutils "github.com/sdinsure/agent/pkg/storage/testutils"
@@ -32,27 +31,18 @@ func TestStorage(t *testing.T) {
 	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger())
 	assert.NoError(t, err)
 
-	pcrud := storageprojects.NewProjectCURD(postgrescli)
-	assert.Nil(t, pcrud.AutoMigrate())
+	regularProject, proxyProject, err := storageprojects.TestProjectSuite(postgrescli)
+	assert.NoError(t, err)
 
 	tcrud := &CollectionCURD{postgrescli}
 	assert.Nil(t, tcrud.AutoMigrate())
 
-	regularProject := appmodelprojects.ModelProject{
-		ID:   appmodelprojects.NewProjectID(1),
-		Type: appmodelprojects.RegularProjectType,
-	}
-	assert.Nil(t, pcrud.Write(ctx, "", &regularProject))
-	proxyProject := appmodelprojects.ModelProject{
-		ID:   appmodelprojects.NewProjectID(2),
-		Type: appmodelprojects.ProxyProjectType,
-	}
-	assert.Nil(t, pcrud.Write(ctx, "", &proxyProject))
-
 	cid := appmodelcollections.NewCollectionID()
+	_, err = TestCollectionSuite(postgrescli, proxyProject)
+	assert.Nil(t, err)
 
 	mc := appmodelcollections.NewModelCollection(
-		appmodelprojects.NewProjectID(1),
+		regularProject,
 		cid,
 		apppb.CollectionType_COLLECTION_TYPE_REGULAR_FILES,
 		"test description",
@@ -91,7 +81,7 @@ func TestStorage(t *testing.T) {
 
 	// change schema and desc
 	mc2 := appmodelcollections.NewModelCollection(
-		appmodelprojects.NewProjectID(1),
+		regularProject,
 		cid,
 		apppb.CollectionType_COLLECTION_TYPE_REGULAR_FILES,
 		"test description - part 2",

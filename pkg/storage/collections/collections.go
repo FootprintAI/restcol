@@ -3,13 +3,13 @@ package storagecollections
 import (
 	"context"
 
-	"github.com/sdinsure/agent/pkg/errors"
-	storageerrors "github.com/sdinsure/agent/pkg/storage/errors"
 	storagepostgres "github.com/sdinsure/agent/pkg/storage/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
 	appmodelcollections "github.com/footprintai/restcol/pkg/models/collections"
+	appmodelprojects "github.com/footprintai/restcol/pkg/models/projects"
+	"github.com/footprintai/restcol/pkg/storage"
 )
 
 type CollectionCURD struct {
@@ -22,35 +22,42 @@ func NewCollectionCURD(db *storagepostgres.PostgresDb) *CollectionCURD {
 	}
 }
 
-func (c *CollectionCURD) AutoMigrate() *errors.Error {
+func (c *CollectionCURD) AutoMigrate() error {
 	tables := []interface{}{
 		&appmodelcollections.ModelCollection{},
 		&appmodelcollections.ModelSchema{},
 		&appmodelcollections.ModelFieldSchema{},
 	}
-	return storageerrors.WrapStorageError(c.PostgresDb.AutoMigrate(tables))
+	return storage.WrapStorageError(c.PostgresDb.AutoMigrate(tables))
 }
 
-func (c *CollectionCURD) Write(ctx context.Context, tableName string, record *appmodelcollections.ModelCollection) *errors.Error {
+func (c *CollectionCURD) Write(ctx context.Context, tableName string, record *appmodelcollections.ModelCollection) error {
 	err := c.With(ctx, tableName).Clauses(clause.OnConflict{UpdateAll: true}).Create(record).Error
-	return storageerrors.WrapStorageError(err)
+	return storage.WrapStorageError(err)
 }
 
-func (c *CollectionCURD) Update(ctx context.Context, tableName string, record *appmodelcollections.ModelCollection) *errors.Error {
+func (c *CollectionCURD) Update(ctx context.Context, tableName string, record *appmodelcollections.ModelCollection) error {
 	err := c.With(ctx, tableName).Session(&gorm.Session{FullSaveAssociations: true}).Updates(record).Error
-	return storageerrors.WrapStorageError(err)
+	return storage.WrapStorageError(err)
 }
 
-func (c *CollectionCURD) GetLatestSchema(ctx context.Context, tableName string, cid appmodelcollections.CollectionID) (*appmodelcollections.ModelCollection, *errors.Error) {
+func (c *CollectionCURD) GetLatestSchema(ctx context.Context, tableName string, cid appmodelcollections.CollectionID) (*appmodelcollections.ModelCollection, error) {
 	s := &appmodelcollections.ModelSchema{}
 	err := c.With(ctx, tableName).Where("model_collection_id = ?", cid.String()).Order("id desc").First(s).Error
 	if err != nil {
-		return nil, storageerrors.WrapStorageError(err)
+		return nil, storage.WrapStorageError(err)
 	}
 	return c.Get(ctx, tableName, cid, s.ID)
 }
 
-func (c *CollectionCURD) Get(ctx context.Context, tableName string, cid appmodelcollections.CollectionID, sid appmodelcollections.SchemaID) (*appmodelcollections.ModelCollection, *errors.Error) {
+func (c *CollectionCURD) ListByProjectID(ctx context.Context, tableName string, pid appmodelprojects.ProjectID) ([]*appmodelcollections.ModelCollection, error) {
+	var cs []*appmodelcollections.ModelCollection
+
+	err := c.With(ctx, tableName).Where("model_project_id = ?", pid.String()).Order("id desc").Find(&cs).Error
+	return cs, storage.WrapStorageError(err)
+}
+
+func (c *CollectionCURD) Get(ctx context.Context, tableName string, cid appmodelcollections.CollectionID, sid appmodelcollections.SchemaID) (*appmodelcollections.ModelCollection, error) {
 	record := &appmodelcollections.ModelCollection{}
 	err := c.With(ctx, tableName).
 		Preload("Schemas", func(db *gorm.DB) *gorm.DB {
@@ -58,7 +65,7 @@ func (c *CollectionCURD) Get(ctx context.Context, tableName string, cid appmodel
 		}).
 		Preload("Schemas.Fields").Where("id = ?", cid.String()).Find(record).Error
 	if err != nil {
-		return nil, storageerrors.WrapStorageError(err)
+		return nil, storage.WrapStorageError(err)
 	}
 	return record, nil
 }

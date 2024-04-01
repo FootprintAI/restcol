@@ -68,7 +68,7 @@ type RestColServiceGetDocument2Params struct {
 	Did string
 
 	// Pid.
-	Pid string
+	Pid *string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -146,13 +146,13 @@ func (o *RestColServiceGetDocument2Params) SetDid(did string) {
 }
 
 // WithPid adds the pid to the rest col service get document2 params
-func (o *RestColServiceGetDocument2Params) WithPid(pid string) *RestColServiceGetDocument2Params {
+func (o *RestColServiceGetDocument2Params) WithPid(pid *string) *RestColServiceGetDocument2Params {
 	o.SetPid(pid)
 	return o
 }
 
 // SetPid adds the pid to the rest col service get document2 params
-func (o *RestColServiceGetDocument2Params) SetPid(pid string) {
+func (o *RestColServiceGetDocument2Params) SetPid(pid *string) {
 	o.Pid = pid
 }
 
@@ -174,9 +174,21 @@ func (o *RestColServiceGetDocument2Params) WriteToRequest(r runtime.ClientReques
 		return err
 	}
 
-	// path param pid
-	if err := r.SetPathParam("pid", o.Pid); err != nil {
-		return err
+	if o.Pid != nil {
+
+		// query param pid
+		var qrPid string
+
+		if o.Pid != nil {
+			qrPid = *o.Pid
+		}
+		qPid := qrPid
+		if qPid != "" {
+
+			if err := r.SetQueryParam("pid", qPid); err != nil {
+				return err
+			}
+		}
 	}
 
 	if len(res) > 0 {

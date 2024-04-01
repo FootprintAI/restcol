@@ -15,10 +15,10 @@ import (
 )
 
 type CollectionSwaggerDoc struct {
-	Collections []modelcollections.ModelCollection
+	Collections []*modelcollections.ModelCollection
 }
 
-func NewCollectionSwaggerDoc(collections ...modelcollections.ModelCollection) *CollectionSwaggerDoc {
+func NewCollectionSwaggerDoc(collections ...*modelcollections.ModelCollection) *CollectionSwaggerDoc {
 	return &CollectionSwaggerDoc{
 		Collections: collections,
 	}
@@ -136,7 +136,7 @@ func copyPathsWithFilter(origSpec *spec.Swagger, pathFilter PathFilterFunc, tagF
 }
 
 // replacePathsWithCollection expands $cid, $pid with values defined in col
-func replacePathsWithCollection(col modelcollections.ModelCollection, specClone *spec.Swagger) error {
+func replacePathsWithCollection(col *modelcollections.ModelCollection, specClone *spec.Swagger) error {
 	// all response of a single collection now is under `apiRequestResponse`
 	responseDefs, err := swagdef.ModelFieldsSchemaToSwagDef(col.Schemas[0].Fields, "apiRequestResponse")
 	if err != nil {

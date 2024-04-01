@@ -31,6 +31,94 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
+var (
+	filter_RestColService_GetSwaggerDoc_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+)
+
+func request_RestColService_GetSwaggerDoc_0(ctx context.Context, marshaler runtime.Marshaler, client RestColServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetSwaggerDocRequest
+	var metadata runtime.ServerMetadata
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_RestColService_GetSwaggerDoc_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.GetSwaggerDoc(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_RestColService_GetSwaggerDoc_0(ctx context.Context, marshaler runtime.Marshaler, server RestColServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetSwaggerDocRequest
+	var metadata runtime.ServerMetadata
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_RestColService_GetSwaggerDoc_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := server.GetSwaggerDoc(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+func request_RestColService_GetSwaggerDoc_1(ctx context.Context, marshaler runtime.Marshaler, client RestColServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetSwaggerDocRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["pid"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pid")
+	}
+
+	protoReq.Pid, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pid", err)
+	}
+
+	msg, err := client.GetSwaggerDoc(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_RestColService_GetSwaggerDoc_1(ctx context.Context, marshaler runtime.Marshaler, server RestColServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetSwaggerDocRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["pid"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pid")
+	}
+
+	protoReq.Pid, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pid", err)
+	}
+
+	msg, err := server.GetSwaggerDoc(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 func request_RestColService_CreateCollection_0(ctx context.Context, marshaler runtime.Marshaler, client RestColServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq CreateCollectionRequest
 	var metadata runtime.ServerMetadata
@@ -507,23 +595,6 @@ func request_RestColService_CreateDocument_0(ctx context.Context, marshaler runt
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["cid"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "cid")
-	}
-
-	protoReq.Cid, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "cid", err)
-	}
-
 	msg, err := client.CreateDocument(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
@@ -537,30 +608,13 @@ func local_request_RestColService_CreateDocument_0(ctx context.Context, marshale
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["cid"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "cid")
-	}
-
-	protoReq.Cid, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "cid", err)
-	}
-
 	msg, err := server.CreateDocument(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
 var (
-	filter_RestColService_CreateDocument_1 = &utilities.DoubleArray{Encoding: map[string]int{"pid": 0, "cid": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_RestColService_CreateDocument_1 = &utilities.DoubleArray{Encoding: map[string]int{"cid": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 )
 
 func request_RestColService_CreateDocument_1(ctx context.Context, marshaler runtime.Marshaler, client RestColServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -573,16 +627,6 @@ func request_RestColService_CreateDocument_1(ctx context.Context, marshaler runt
 		err error
 		_   = err
 	)
-
-	val, ok = pathParams["pid"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pid")
-	}
-
-	protoReq.Pid, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pid", err)
-	}
 
 	val, ok = pathParams["cid"]
 	if !ok {
@@ -617,16 +661,6 @@ func local_request_RestColService_CreateDocument_1(ctx context.Context, marshale
 		_   = err
 	)
 
-	val, ok = pathParams["pid"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pid")
-	}
-
-	protoReq.Pid, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pid", err)
-	}
-
 	val, ok = pathParams["cid"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "cid")
@@ -650,7 +684,97 @@ func local_request_RestColService_CreateDocument_1(ctx context.Context, marshale
 }
 
 var (
-	filter_RestColService_GetDocument_0 = &utilities.DoubleArray{Encoding: map[string]int{"cid": 0, "did": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_RestColService_CreateDocument_2 = &utilities.DoubleArray{Encoding: map[string]int{"pid": 0, "cid": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+)
+
+func request_RestColService_CreateDocument_2(ctx context.Context, marshaler runtime.Marshaler, client RestColServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq CreateDocumentRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["pid"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pid")
+	}
+
+	protoReq.Pid, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pid", err)
+	}
+
+	val, ok = pathParams["cid"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "cid")
+	}
+
+	protoReq.Cid, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "cid", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_RestColService_CreateDocument_2); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.CreateDocument(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_RestColService_CreateDocument_2(ctx context.Context, marshaler runtime.Marshaler, server RestColServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq CreateDocumentRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["pid"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pid")
+	}
+
+	protoReq.Pid, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pid", err)
+	}
+
+	val, ok = pathParams["cid"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "cid")
+	}
+
+	protoReq.Cid, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "cid", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_RestColService_CreateDocument_2); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := server.CreateDocument(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+var (
+	filter_RestColService_GetDocument_0 = &utilities.DoubleArray{Encoding: map[string]int{"did": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 )
 
 func request_RestColService_GetDocument_0(ctx context.Context, marshaler runtime.Marshaler, client RestColServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -663,16 +787,6 @@ func request_RestColService_GetDocument_0(ctx context.Context, marshaler runtime
 		err error
 		_   = err
 	)
-
-	val, ok = pathParams["cid"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "cid")
-	}
-
-	protoReq.Cid, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "cid", err)
-	}
 
 	val, ok = pathParams["did"]
 	if !ok {
@@ -707,6 +821,43 @@ func local_request_RestColService_GetDocument_0(ctx context.Context, marshaler r
 		_   = err
 	)
 
+	val, ok = pathParams["did"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "did")
+	}
+
+	protoReq.Did, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "did", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_RestColService_GetDocument_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := server.GetDocument(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+var (
+	filter_RestColService_GetDocument_1 = &utilities.DoubleArray{Encoding: map[string]int{"cid": 0, "did": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+)
+
+func request_RestColService_GetDocument_1(ctx context.Context, marshaler runtime.Marshaler, client RestColServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetDocumentRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
 	val, ok = pathParams["cid"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "cid")
@@ -730,7 +881,50 @@ func local_request_RestColService_GetDocument_0(ctx context.Context, marshaler r
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_RestColService_GetDocument_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_RestColService_GetDocument_1); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.GetDocument(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_RestColService_GetDocument_1(ctx context.Context, marshaler runtime.Marshaler, server RestColServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetDocumentRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["cid"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "cid")
+	}
+
+	protoReq.Cid, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "cid", err)
+	}
+
+	val, ok = pathParams["did"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "did")
+	}
+
+	protoReq.Did, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "did", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_RestColService_GetDocument_1); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -739,7 +933,7 @@ func local_request_RestColService_GetDocument_0(ctx context.Context, marshaler r
 
 }
 
-func request_RestColService_GetDocument_1(ctx context.Context, marshaler runtime.Marshaler, client RestColServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_RestColService_GetDocument_2(ctx context.Context, marshaler runtime.Marshaler, client RestColServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq GetDocumentRequest
 	var metadata runtime.ServerMetadata
 
@@ -785,7 +979,7 @@ func request_RestColService_GetDocument_1(ctx context.Context, marshaler runtime
 
 }
 
-func local_request_RestColService_GetDocument_1(ctx context.Context, marshaler runtime.Marshaler, server RestColServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_RestColService_GetDocument_2(ctx context.Context, marshaler runtime.Marshaler, server RestColServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq GetDocumentRequest
 	var metadata runtime.ServerMetadata
 
@@ -1019,6 +1213,56 @@ func local_request_RestColService_DeleteDocument_1(ctx context.Context, marshale
 // Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterRestColServiceHandlerFromEndpoint instead.
 func RegisterRestColServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server RestColServiceServer) error {
 
+	mux.Handle("GET", pattern_RestColService_GetSwaggerDoc_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/restcol.api.RestColService/GetSwaggerDoc", runtime.WithHTTPPathPattern("/v1/apidoc"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_RestColService_GetSwaggerDoc_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_RestColService_GetSwaggerDoc_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_RestColService_GetSwaggerDoc_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/restcol.api.RestColService/GetSwaggerDoc", runtime.WithHTTPPathPattern("/v1/projects/{pid}/apidoc"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_RestColService_GetSwaggerDoc_1(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_RestColService_GetSwaggerDoc_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("POST", pattern_RestColService_CreateCollection_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -1227,7 +1471,7 @@ func RegisterRestColServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/restcol.api.RestColService/CreateDocument", runtime.WithHTTPPathPattern("/v1/collections/{cid}:add"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/restcol.api.RestColService/CreateDocument", runtime.WithHTTPPathPattern("/v1/newdoc"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1252,7 +1496,7 @@ func RegisterRestColServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/restcol.api.RestColService/CreateDocument", runtime.WithHTTPPathPattern("/v1/projects/{pid}/collections/{cid}:add"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/restcol.api.RestColService/CreateDocument", runtime.WithHTTPPathPattern("/v1/collections/{cid}:newdoc"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1269,6 +1513,31 @@ func RegisterRestColServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 
 	})
 
+	mux.Handle("POST", pattern_RestColService_CreateDocument_2, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/restcol.api.RestColService/CreateDocument", runtime.WithHTTPPathPattern("/v1/projects/{pid}/collections/{cid}:newdoc"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_RestColService_CreateDocument_2(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_RestColService_CreateDocument_2(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("GET", pattern_RestColService_GetDocument_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -1277,7 +1546,7 @@ func RegisterRestColServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/restcol.api.RestColService/GetDocument", runtime.WithHTTPPathPattern("/v1/collections/{cid}/{did}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/restcol.api.RestColService/GetDocument", runtime.WithHTTPPathPattern("/v1/doc/{did}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1302,7 +1571,7 @@ func RegisterRestColServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/restcol.api.RestColService/GetDocument", runtime.WithHTTPPathPattern("/v1/projects/{pid}/collections/{cid}/{did}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/restcol.api.RestColService/GetDocument", runtime.WithHTTPPathPattern("/v1/collections/{cid}/{did}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1316,6 +1585,31 @@ func RegisterRestColServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		}
 
 		forward_RestColService_GetDocument_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_RestColService_GetDocument_2, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/restcol.api.RestColService/GetDocument", runtime.WithHTTPPathPattern("/v1/projects/{pid}/collections/{cid}/{did}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_RestColService_GetDocument_2(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_RestColService_GetDocument_2(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1409,6 +1703,50 @@ func RegisterRestColServiceHandler(ctx context.Context, mux *runtime.ServeMux, c
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "RestColServiceClient" to call the correct interceptors.
 func RegisterRestColServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client RestColServiceClient) error {
+
+	mux.Handle("GET", pattern_RestColService_GetSwaggerDoc_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/restcol.api.RestColService/GetSwaggerDoc", runtime.WithHTTPPathPattern("/v1/apidoc"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_RestColService_GetSwaggerDoc_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_RestColService_GetSwaggerDoc_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_RestColService_GetSwaggerDoc_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/restcol.api.RestColService/GetSwaggerDoc", runtime.WithHTTPPathPattern("/v1/projects/{pid}/apidoc"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_RestColService_GetSwaggerDoc_1(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_RestColService_GetSwaggerDoc_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
 
 	mux.Handle("POST", pattern_RestColService_CreateCollection_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
@@ -1592,7 +1930,7 @@ func RegisterRestColServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/restcol.api.RestColService/CreateDocument", runtime.WithHTTPPathPattern("/v1/collections/{cid}:add"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/restcol.api.RestColService/CreateDocument", runtime.WithHTTPPathPattern("/v1/newdoc"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1614,7 +1952,7 @@ func RegisterRestColServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/restcol.api.RestColService/CreateDocument", runtime.WithHTTPPathPattern("/v1/projects/{pid}/collections/{cid}:add"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/restcol.api.RestColService/CreateDocument", runtime.WithHTTPPathPattern("/v1/collections/{cid}:newdoc"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1630,13 +1968,35 @@ func RegisterRestColServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 
 	})
 
+	mux.Handle("POST", pattern_RestColService_CreateDocument_2, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/restcol.api.RestColService/CreateDocument", runtime.WithHTTPPathPattern("/v1/projects/{pid}/collections/{cid}:newdoc"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_RestColService_CreateDocument_2(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_RestColService_CreateDocument_2(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("GET", pattern_RestColService_GetDocument_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/restcol.api.RestColService/GetDocument", runtime.WithHTTPPathPattern("/v1/collections/{cid}/{did}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/restcol.api.RestColService/GetDocument", runtime.WithHTTPPathPattern("/v1/doc/{did}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1658,7 +2018,7 @@ func RegisterRestColServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/restcol.api.RestColService/GetDocument", runtime.WithHTTPPathPattern("/v1/projects/{pid}/collections/{cid}/{did}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/restcol.api.RestColService/GetDocument", runtime.WithHTTPPathPattern("/v1/collections/{cid}/{did}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1671,6 +2031,28 @@ func RegisterRestColServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		}
 
 		forward_RestColService_GetDocument_1(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_RestColService_GetDocument_2, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/restcol.api.RestColService/GetDocument", runtime.WithHTTPPathPattern("/v1/projects/{pid}/collections/{cid}/{did}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_RestColService_GetDocument_2(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_RestColService_GetDocument_2(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1722,6 +2104,10 @@ func RegisterRestColServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 }
 
 var (
+	pattern_RestColService_GetSwaggerDoc_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "apidoc"}, ""))
+
+	pattern_RestColService_GetSwaggerDoc_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1", "projects", "pid", "apidoc"}, ""))
+
 	pattern_RestColService_CreateCollection_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "collections"}, ""))
 
 	pattern_RestColService_CreateCollection_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1", "projects", "pid", "collections"}, ""))
@@ -1738,13 +2124,17 @@ var (
 
 	pattern_RestColService_DeleteCollection_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"v1", "projects", "pid", "collections", "cid"}, ""))
 
-	pattern_RestColService_CreateDocument_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "collections", "cid"}, "add"))
+	pattern_RestColService_CreateDocument_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "newdoc"}, ""))
 
-	pattern_RestColService_CreateDocument_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"v1", "projects", "pid", "collections", "cid"}, "add"))
+	pattern_RestColService_CreateDocument_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "collections", "cid"}, "newdoc"))
 
-	pattern_RestColService_GetDocument_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"v1", "collections", "cid", "did"}, ""))
+	pattern_RestColService_CreateDocument_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"v1", "projects", "pid", "collections", "cid"}, "newdoc"))
 
-	pattern_RestColService_GetDocument_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"v1", "projects", "pid", "collections", "cid", "did"}, ""))
+	pattern_RestColService_GetDocument_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "doc", "did"}, ""))
+
+	pattern_RestColService_GetDocument_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"v1", "collections", "cid", "did"}, ""))
+
+	pattern_RestColService_GetDocument_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"v1", "projects", "pid", "collections", "cid", "did"}, ""))
 
 	pattern_RestColService_DeleteDocument_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"v1", "collections", "cid", "did"}, ""))
 
@@ -1752,6 +2142,10 @@ var (
 )
 
 var (
+	forward_RestColService_GetSwaggerDoc_0 = runtime.ForwardResponseMessage
+
+	forward_RestColService_GetSwaggerDoc_1 = runtime.ForwardResponseMessage
+
 	forward_RestColService_CreateCollection_0 = runtime.ForwardResponseMessage
 
 	forward_RestColService_CreateCollection_1 = runtime.ForwardResponseMessage
@@ -1772,9 +2166,13 @@ var (
 
 	forward_RestColService_CreateDocument_1 = runtime.ForwardResponseMessage
 
+	forward_RestColService_CreateDocument_2 = runtime.ForwardResponseMessage
+
 	forward_RestColService_GetDocument_0 = runtime.ForwardResponseMessage
 
 	forward_RestColService_GetDocument_1 = runtime.ForwardResponseMessage
+
+	forward_RestColService_GetDocument_2 = runtime.ForwardResponseMessage
 
 	forward_RestColService_DeleteDocument_0 = runtime.ForwardResponseMessage
 

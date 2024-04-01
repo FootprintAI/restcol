@@ -74,14 +74,14 @@ type RestColServiceCreateDocument2Params struct {
 
 	// Dataformat.
 	//
-	// Default: "DATA_FORMAT_AUTO"
+	// Default: "DATA_FORMAT_UNKNOWN"
 	Dataformat *string
 
 	// Did.
 	Did *string
 
 	// Pid.
-	Pid string
+	Pid *string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -101,7 +101,7 @@ func (o *RestColServiceCreateDocument2Params) WithDefaults() *RestColServiceCrea
 // All values with no default are reset to their zero value.
 func (o *RestColServiceCreateDocument2Params) SetDefaults() {
 	var (
-		dataformatDefault = string("DATA_FORMAT_AUTO")
+		dataformatDefault = string("DATA_FORMAT_UNKNOWN")
 	)
 
 	val := RestColServiceCreateDocument2Params{
@@ -192,13 +192,13 @@ func (o *RestColServiceCreateDocument2Params) SetDid(did *string) {
 }
 
 // WithPid adds the pid to the rest col service create document2 params
-func (o *RestColServiceCreateDocument2Params) WithPid(pid string) *RestColServiceCreateDocument2Params {
+func (o *RestColServiceCreateDocument2Params) WithPid(pid *string) *RestColServiceCreateDocument2Params {
 	o.SetPid(pid)
 	return o
 }
 
 // SetPid adds the pid to the rest col service create document2 params
-func (o *RestColServiceCreateDocument2Params) SetPid(pid string) {
+func (o *RestColServiceCreateDocument2Params) SetPid(pid *string) {
 	o.Pid = pid
 }
 
@@ -266,9 +266,21 @@ func (o *RestColServiceCreateDocument2Params) WriteToRequest(r runtime.ClientReq
 		}
 	}
 
-	// path param pid
-	if err := r.SetPathParam("pid", o.Pid); err != nil {
-		return err
+	if o.Pid != nil {
+
+		// query param pid
+		var qrPid string
+
+		if o.Pid != nil {
+			qrPid = *o.Pid
+		}
+		qPid := qrPid
+		if qPid != "" {
+
+			if err := r.SetQueryParam("pid", qPid); err != nil {
+				return err
+			}
+		}
 	}
 
 	if len(res) > 0 {

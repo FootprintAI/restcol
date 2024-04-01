@@ -32,6 +32,8 @@ type ClientService interface {
 
 	RestColServiceCreateDocument2(params *RestColServiceCreateDocument2Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceCreateDocument2OK, error)
 
+	RestColServiceCreateDocument3(params *RestColServiceCreateDocument3Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceCreateDocument3OK, error)
+
 	RestColServiceDeleteDocument(params *RestColServiceDeleteDocumentParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceDeleteDocumentOK, error)
 
 	RestColServiceDeleteDocument2(params *RestColServiceDeleteDocument2Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceDeleteDocument2OK, error)
@@ -39,6 +41,8 @@ type ClientService interface {
 	RestColServiceGetDocument(params *RestColServiceGetDocumentParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceGetDocumentOK, error)
 
 	RestColServiceGetDocument2(params *RestColServiceGetDocument2Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceGetDocument2OK, error)
+
+	RestColServiceGetDocument3(params *RestColServiceGetDocument3Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceGetDocument3OK, error)
 
 	SetTransport(transport runtime.ClientTransport)
 }
@@ -54,7 +58,7 @@ func (a *Client) RestColServiceCreateDocument(params *RestColServiceCreateDocume
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_CreateDocument",
 		Method:             "POST",
-		PathPattern:        "/v1/collections/{cid}:add",
+		PathPattern:        "/v1/newdoc",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},
@@ -92,7 +96,7 @@ func (a *Client) RestColServiceCreateDocument2(params *RestColServiceCreateDocum
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_CreateDocument2",
 		Method:             "POST",
-		PathPattern:        "/v1/projects/{pid}/collections/{cid}:add",
+		PathPattern:        "/v1/collections/{cid}:newdoc",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},
@@ -116,6 +120,44 @@ func (a *Client) RestColServiceCreateDocument2(params *RestColServiceCreateDocum
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*RestColServiceCreateDocument2Default)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+RestColServiceCreateDocument3 create a document to the collection
+*/
+func (a *Client) RestColServiceCreateDocument3(params *RestColServiceCreateDocument3Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceCreateDocument3OK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewRestColServiceCreateDocument3Params()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "RestColService_CreateDocument3",
+		Method:             "POST",
+		PathPattern:        "/v1/projects/{pid}/collections/{cid}:newdoc",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &RestColServiceCreateDocument3Reader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*RestColServiceCreateDocument3OK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*RestColServiceCreateDocument3Default)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
@@ -212,7 +254,7 @@ func (a *Client) RestColServiceGetDocument(params *RestColServiceGetDocumentPara
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_GetDocument",
 		Method:             "GET",
-		PathPattern:        "/v1/collections/{cid}/{did}",
+		PathPattern:        "/v1/doc/{did}",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},
@@ -252,7 +294,7 @@ func (a *Client) RestColServiceGetDocument2(params *RestColServiceGetDocument2Pa
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_GetDocument2",
 		Method:             "GET",
-		PathPattern:        "/v1/projects/{pid}/collections/{cid}/{did}",
+		PathPattern:        "/v1/collections/{cid}/{did}",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},
@@ -276,6 +318,46 @@ func (a *Client) RestColServiceGetDocument2(params *RestColServiceGetDocument2Pa
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*RestColServiceGetDocument2Default)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+RestColServiceGetDocument3 gets document endpoint is a generic endpoint for retrieving data across multiple collections
+
+retrieve a document information from the collection.
+*/
+func (a *Client) RestColServiceGetDocument3(params *RestColServiceGetDocument3Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceGetDocument3OK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewRestColServiceGetDocument3Params()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "RestColService_GetDocument3",
+		Method:             "GET",
+		PathPattern:        "/v1/projects/{pid}/collections/{cid}/{did}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &RestColServiceGetDocument3Reader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*RestColServiceGetDocument3OK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*RestColServiceGetDocument3Default)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 

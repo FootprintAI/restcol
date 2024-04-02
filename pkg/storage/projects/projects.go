@@ -34,6 +34,6 @@ func (c *ProjectCURD) Write(ctx context.Context, tableName string, record *appmo
 
 func (c *ProjectCURD) Get(ctx context.Context, tableName string, pid appmodelprojects.ProjectID) (*appmodelprojects.ModelProject, error) {
 	record := &appmodelprojects.ModelProject{}
-	err := c.With(ctx, tableName).Where(" id = ? ", pid.String()).Create(record).Error
+	err := c.With(ctx, tableName).Where(" id = ? ", pid.String()).First(record).Error
 	return record, storage.WrapStorageError(err)
 }

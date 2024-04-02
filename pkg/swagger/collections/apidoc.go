@@ -49,6 +49,9 @@ func (c *CollectionSwaggerDoc) RenderDoc() (string, error) {
 
 	var pathSpec []*spec.Swagger
 	for _, col := range c.Collections {
+		if len(col.Schemas) == 0 {
+			continue
+		}
 		swagSpec, _ := newSwagDoc()
 		specClone, _ := copyPathsWithFilter(
 			swagSpec,

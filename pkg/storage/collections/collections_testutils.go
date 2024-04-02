@@ -41,8 +41,8 @@ func TestCollectionSuite(
 			},
 		},
 	)
-	if err := tcrud.Write(ctx, "", mc); err != nil {
+	if err := tcrud.Write(ctx, "", &mc); err != nil {
 		return nil, err
 	}
-	return mc, nil
+	return &mc, nil
 }

@@ -52,8 +52,12 @@ func (c *CollectionCURD) GetLatestSchema(ctx context.Context, tableName string, 
 
 func (c *CollectionCURD) ListByProjectID(ctx context.Context, tableName string, pid appmodelprojects.ProjectID) ([]*appmodelcollections.ModelCollection, error) {
 	var cs []*appmodelcollections.ModelCollection
-
-	err := c.With(ctx, tableName).Where("model_project_id = ?", pid.String()).Order("id desc").Find(&cs).Error
+	err := c.With(ctx, tableName).
+		Preload("Schemas", func(db *gorm.DB) *gorm.DB {
+			return db.Order("id desc").Limit(1)
+		}).
+		Preload("Schemas.Fields").
+		Where("model_project_id = ?", pid.String()).Order("id desc").Find(&cs).Error
 	return cs, storage.WrapStorageError(err)
 }
 
@@ -63,7 +67,9 @@ func (c *CollectionCURD) Get(ctx context.Context, tableName string, cid appmodel
 		Preload("Schemas", func(db *gorm.DB) *gorm.DB {
 			return db.Where(&appmodelcollections.ModelSchema{ID: sid})
 		}).
-		Preload("Schemas.Fields").Where("id = ?", cid.String()).Find(record).Error
+		Preload("Schemas.Fields").
+		Where("id = ?", cid.String()).
+		Find(record).Error
 	if err != nil {
 		return nil, storage.WrapStorageError(err)
 	}

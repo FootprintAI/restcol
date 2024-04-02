@@ -22,7 +22,7 @@ var (
 	errBadParams = sderrors.NewNotImplError(errors.New("bad params"))
 )
 
-func GetDecoder(dataformat pb.DataFormat) (Decoder, *sderrors.Error) {
+func GetDecoder(dataformat pb.DataFormat) (Decoder, error) {
 	switch dataformat {
 	case pb.DataFormat_DATA_FORMAT_AUTO:
 		return newAutoDecoder(), nil
@@ -107,7 +107,8 @@ var (
 
 func (c chainDecoder) Decode(data []byte, v any) (pb.DataFormat, error) {
 	for _, decoder := range c.chain {
-		if format, err := decoder.Decode(data, v); err == nil {
+		format, err := decoder.Decode(data, v)
+		if err == nil {
 			return format, nil
 		}
 	}

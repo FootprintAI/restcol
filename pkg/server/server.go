@@ -55,7 +55,7 @@ func NewServerService(
 		grpc_auth.StreamServerInterceptor(authZMiddleware.AuthFunc),
 	}
 
-	svr := grpcserver.NewGrpcServerWithInterceptors(grpcPort, log, nil, unaryInterceptors, streamInterceptors)
+	svr := grpcserver.NewGrpcServerWithInterceptors(log, nil, unaryInterceptors, streamInterceptors, grpcserver.WithGrpcPort(grpcPort))
 	httpGateway, err := httpgateway.NewHTTPGatewayServer(svr, log, httpPort)
 	if err != nil {
 		return nil, err

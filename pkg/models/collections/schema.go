@@ -165,6 +165,22 @@ func (s SwagValueValue) Proto() *apppb.SchemaFieldExampleValue {
 	}
 }
 
+func (s SwagValueValue) Type() SwagValueType {
+	if s.StringValue != nil {
+		return StringSwagValueType
+	}
+	if s.NumberValue != nil {
+		return NumberSwagValueType
+	}
+	if s.IntegerValue != nil {
+		return IntegerSwagValueType
+	}
+	if s.BoolValue != nil {
+		return BoolSwagValueType
+	}
+	return NoneSwagValueType
+}
+
 var (
 	_ sql.Scanner   = &SwagValueValue{}
 	_ driver.Valuer = SwagValueValue{}

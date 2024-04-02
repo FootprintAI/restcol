@@ -13,6 +13,7 @@ import (
 	collectionsmodel "github.com/footprintai/restcol/pkg/models/collections"
 	documentsmodel "github.com/footprintai/restcol/pkg/models/documents"
 	projectsmodel "github.com/footprintai/restcol/pkg/models/projects"
+	schemafinder "github.com/footprintai/restcol/pkg/schema"
 	collectionsstorage "github.com/footprintai/restcol/pkg/storage/collections"
 	documentsstorage "github.com/footprintai/restcol/pkg/storage/documents"
 	collectionsswagger "github.com/footprintai/restcol/pkg/swagger/collections"
@@ -103,12 +104,12 @@ func (r *RestColServiceServerService) CreateCollection(ctx context.Context, req 
 		summary,
 		modelSchemaSlice,
 	)
-	if err := r.collectionCURD.Write(ctx, "", mc); err != nil {
+	if err := r.collectionCURD.Write(ctx, "", &mc); err != nil {
 		return nil, err
 	}
 
 	resp := &apppb.CreateCollectionResponse{
-		XMetadata:      collectionsmodel.NewPbCollectionMetadata(mc),
+		XMetadata:      collectionsmodel.NewPbCollectionMetadata(&mc),
 		Description:    mc.Summary,
 		CollectionType: mc.Type.Proto(),
 		Schemas:        collectionsmodel.NewPbSchemaFields(mc.Schemas[0]),
@@ -126,7 +127,8 @@ func (r *RestColServiceServerService) getModelProject(ctx context.Context, pidSt
 	} else {
 		pid = projectsmodel.NewProjectIDStr(pidStr)
 	}
-	return r.projectGetter.GetProject(ctx, pid)
+	modelProj, err := r.projectGetter.GetProject(ctx, pid)
+	return modelProj, err
 }
 
 // TODO getCollectionIDFromSchemas would lookup collection id with schema list given// This should scan all collections and match by its schema and return the right collection id
@@ -180,13 +182,30 @@ func (r *RestColServiceServerService) CreateDocument(ctx context.Context, req *a
 			return nil, err
 		}
 	}
+	// auto detect schema
+	schemaBuilder := schemafinder.NewSchemaBuilder()
+	_, modelSchema, err := schemaBuilder.Parse(req.Data)
+	if err != nil {
+		r.log.Error("failed to convert into modelschema, err:%+v\n", err)
+		return nil, err
+	}
 	docModel := &documentsmodel.ModelDocument{
 		ID:                documentsmodel.NewDocumentID(),
 		Data:              datatypes.JSON(req.Data),
 		ModelCollectionID: cid,
-		ModelProjectID:    modelProject.ID,
+		ModelCollection: collectionsmodel.NewModelCollection(
+			modelProject,
+			cid,
+			apppb.CollectionType_COLLECTION_TYPE_REGULAR_FILES,
+			"auto created collection",
+			[]collectionsmodel.ModelSchema{
+				*modelSchema,
+			},
+		),
+		ModelProjectID: modelProject.ID,
 	}
 	if err := r.documentCURD.Write(ctx, "", docModel); err != nil {
+		r.log.Error("failed to write docmodel, err:%+v\n", err)
 		return nil, err
 	}
 	return &apppb.CreateDocumentResponse{

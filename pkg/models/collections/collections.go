@@ -32,8 +32,8 @@ func NewModelCollection(
 	t apppb.CollectionType,
 	summary string,
 	schemas []ModelSchema,
-) *ModelCollection {
-	return &ModelCollection{
+) ModelCollection {
+	return ModelCollection{
 		ID:             id,
 		Type:           ModelCollectionType(t),
 		Summary:        summary,

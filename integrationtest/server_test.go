@@ -21,6 +21,11 @@ import (
 )
 
 func TestIntegrationTest(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skip now")
+		return
+	}
+
 	log := logger.NewLogger()
 	postgresDb, err := storagetestutils.NewTestPostgresCli(log)
 	if err != nil {

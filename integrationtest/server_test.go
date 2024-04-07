@@ -35,10 +35,10 @@ func TestIntegrationTest(t *testing.T) {
 	if err != nil {
 		log.Fatal("%+v", err)
 	}
+	defer svr.Stop()
 
 	fmt.Print("integrationtest about to start\n")
-	svr.Start(1 * time.Second)
-	defer svr.Stop(3 * time.Second)
+	go svr.Start()
 
 	time.Sleep(1 * time.Second)
 

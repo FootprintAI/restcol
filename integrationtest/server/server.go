@@ -2,7 +2,6 @@ package integrationtestserver
 
 import (
 	"context"
-	"time"
 
 	"github.com/sdinsure/agent/pkg/logger"
 
@@ -18,8 +17,8 @@ import (
 )
 
 type StartStopServer interface {
-	Start(wait time.Duration) error
-	Stop(wait time.Duration) error
+	Start() error
+	Stop() error
 }
 
 var (
@@ -89,30 +88,12 @@ type Server struct {
 	httpPort int
 }
 
-func (s *Server) Start(wait time.Duration) error {
-	startedErrChan := make(chan error, 1)
-	go func() {
-		startedErrChan <- s.server.Start()
-	}()
-
-	select {
-	case <-time.After(wait):
-		return nil // no error during the waiting period
-	case err := <-startedErrChan:
-		return err
-	}
+// Start starts Server and blocks forever
+func (s *Server) Start() error {
+	return s.server.Start()
 }
 
-func (s *Server) Stop(wait time.Duration) error {
-	stoppedErrChan := make(chan error, 1)
-	go func() {
-		stoppedErrChan <- s.server.Stop()
-	}()
-
-	select {
-	case <-time.After(wait):
-		return nil // no error during the waiting period
-	case err := <-stoppedErrChan:
-		return err
-	}
+// Stop stops server
+func (s *Server) Stop() error {
+	return s.server.Stop()
 }

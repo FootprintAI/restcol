@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"time"
 
 	logger "github.com/sdinsure/agent/pkg/logger"
 	storageflags "github.com/sdinsure/agent/pkg/storage/flags"
@@ -34,7 +33,7 @@ func main() {
 	if err != nil {
 		log.Fatal("failed to init dsn, err:%+v\n", err)
 	}
-	if err := svr.Start(30 * time.Second); err != nil {
+	if err := svr.Start(); err != nil {
 		log.Fatal("failed to launch server:%+v\n", err)
 	}
 }

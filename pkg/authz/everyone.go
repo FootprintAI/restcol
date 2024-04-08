@@ -8,17 +8,17 @@ var (
 
 type AllowEveryOne struct{}
 
-func (a *AllowEveryOne) Lookup(ctx context.Context, userIdentity UserIdentity) ([]Permission, error) {
+func (a *AllowEveryOne) Lookup(ctx context.Context, userIdentity string) ([]Permission, error) {
 	return []Permission{
 		Permission{
 			UserIDOrGroup: "*",
 			Resource:      "*",
-			Action:        StringAuthzActionRead,
-			Effect:        StringAuthzEffectAllow,
+			Action:        "*",
+			Effect:        "allow",
 		},
 	}, nil
 }
 
-func (a *AllowEveryOne) Enforce(ctx context.Context, userIdentity UserIdentity, resource Resource, action AuthzAction) (bool, error) {
+func (a *AllowEveryOne) Enforce(ctx context.Context, userIdentity string, resource string, action string) (bool, error) {
 	return true, nil
 }

@@ -32,10 +32,6 @@ func NewRestColServiceServerService(
 	}
 }
 
-//type SchemaGetter interface {
-//	GetCollection(ctx context.Context) (*collectionsmodel.ModelCollection, error)
-//}
-
 type RestColServiceServerService struct {
 	apppb.UnimplementedRestColServiceServer
 
@@ -77,10 +73,10 @@ func (r *RestColServiceServerService) CreateCollection(ctx context.Context, req 
 		return nil, err
 	}
 	var cid collectionsmodel.CollectionID
-	if req.Cid == nil {
+	if req.CollectionId == nil {
 		cid = collectionsmodel.NewCollectionID()
 	} else {
-		cid, err = collectionsmodel.Parse(*req.Cid)
+		cid, err = collectionsmodel.Parse(*req.CollectionId)
 		if err != nil {
 			return nil, err
 		}
@@ -135,8 +131,7 @@ func (r *RestColServiceServerService) getProjectIdFromCtx(ctx context.Context) (
 	}
 	rawPid, err := projectInfor.GetProjectID()
 	if err != nil {
-		pid = projectsmodel.ProjectID("invalid")
-		reterr = err
+		pid = projectsmodel.NewProjectID(1001)
 		return
 	}
 	return projectsmodel.ProjectID(rawPid), nil
@@ -154,10 +149,10 @@ func (r *RestColServiceServerService) ListCollections(ctx context.Context, req *
 
 func (r *RestColServiceServerService) GetCollection(ctx context.Context, req *apppb.GetCollectionRequest) (*apppb.GetCollectionResponse, error) {
 	var cid collectionsmodel.CollectionID
-	if len(req.Cid) == 0 {
+	if len(req.CollectionId) == 0 {
 		return nil, sderrors.NewBadParamsError(errors.New("missing required field"))
 	}
-	cid, err := collectionsmodel.Parse(req.Cid)
+	cid, err := collectionsmodel.Parse(req.CollectionId)
 	if err != nil {
 		return nil, err
 	}
@@ -182,8 +177,8 @@ func (r *RestColServiceServerService) CreateDocument(ctx context.Context, req *a
 		return nil, err
 	}
 	var cid collectionsmodel.CollectionID
-	if req.Cid != "" {
-		cid, err = collectionsmodel.Parse(req.Cid)
+	if req.CollectionId != "" {
+		cid, err = collectionsmodel.Parse(req.CollectionId)
 		if err != nil {
 			return nil, err
 		}
@@ -226,7 +221,7 @@ func (r *RestColServiceServerService) CreateDocument(ctx context.Context, req *a
 func (r *RestColServiceServerService) GetDocument(ctx context.Context, req *apppb.GetDocumentRequest) (*apppb.GetDocumentResponse, error) {
 	// TODO: use pid and cid for permission checking
 	// as for retrieving data, did is only required field
-	did, err := documentsmodel.Parse(req.Did)
+	did, err := documentsmodel.Parse(req.DocumentId)
 	if err != nil {
 		return nil, err
 	}

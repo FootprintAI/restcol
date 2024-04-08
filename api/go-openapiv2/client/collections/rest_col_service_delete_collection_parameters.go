@@ -61,11 +61,11 @@ RestColServiceDeleteCollectionParams contains all the parameters to send to the 
 */
 type RestColServiceDeleteCollectionParams struct {
 
-	// Cid.
-	Cid string
+	// CollectionID.
+	CollectionID string
 
-	// Pid.
-	Pid *string
+	// ProjectID.
+	ProjectID *string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -120,26 +120,26 @@ func (o *RestColServiceDeleteCollectionParams) SetHTTPClient(client *http.Client
 	o.HTTPClient = client
 }
 
-// WithCid adds the cid to the rest col service delete collection params
-func (o *RestColServiceDeleteCollectionParams) WithCid(cid string) *RestColServiceDeleteCollectionParams {
-	o.SetCid(cid)
+// WithCollectionID adds the collectionID to the rest col service delete collection params
+func (o *RestColServiceDeleteCollectionParams) WithCollectionID(collectionID string) *RestColServiceDeleteCollectionParams {
+	o.SetCollectionID(collectionID)
 	return o
 }
 
-// SetCid adds the cid to the rest col service delete collection params
-func (o *RestColServiceDeleteCollectionParams) SetCid(cid string) {
-	o.Cid = cid
+// SetCollectionID adds the collectionId to the rest col service delete collection params
+func (o *RestColServiceDeleteCollectionParams) SetCollectionID(collectionID string) {
+	o.CollectionID = collectionID
 }
 
-// WithPid adds the pid to the rest col service delete collection params
-func (o *RestColServiceDeleteCollectionParams) WithPid(pid *string) *RestColServiceDeleteCollectionParams {
-	o.SetPid(pid)
+// WithProjectID adds the projectID to the rest col service delete collection params
+func (o *RestColServiceDeleteCollectionParams) WithProjectID(projectID *string) *RestColServiceDeleteCollectionParams {
+	o.SetProjectID(projectID)
 	return o
 }
 
-// SetPid adds the pid to the rest col service delete collection params
-func (o *RestColServiceDeleteCollectionParams) SetPid(pid *string) {
-	o.Pid = pid
+// SetProjectID adds the projectId to the rest col service delete collection params
+func (o *RestColServiceDeleteCollectionParams) SetProjectID(projectID *string) {
+	o.ProjectID = projectID
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -150,23 +150,23 @@ func (o *RestColServiceDeleteCollectionParams) WriteToRequest(r runtime.ClientRe
 	}
 	var res []error
 
-	// path param cid
-	if err := r.SetPathParam("cid", o.Cid); err != nil {
+	// path param collectionId
+	if err := r.SetPathParam("collectionId", o.CollectionID); err != nil {
 		return err
 	}
 
-	if o.Pid != nil {
+	if o.ProjectID != nil {
 
-		// query param pid
-		var qrPid string
+		// query param projectId
+		var qrProjectID string
 
-		if o.Pid != nil {
-			qrPid = *o.Pid
+		if o.ProjectID != nil {
+			qrProjectID = *o.ProjectID
 		}
-		qPid := qrPid
-		if qPid != "" {
+		qProjectID := qrProjectID
+		if qProjectID != "" {
 
-			if err := r.SetQueryParam("pid", qPid); err != nil {
+			if err := r.SetQueryParam("projectId", qProjectID); err != nil {
 				return err
 			}
 		}

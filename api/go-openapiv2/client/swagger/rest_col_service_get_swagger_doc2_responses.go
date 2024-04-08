@@ -86,11 +86,11 @@ func (o *RestColServiceGetSwaggerDoc2OK) Code() int {
 }
 
 func (o *RestColServiceGetSwaggerDoc2OK) Error() string {
-	return fmt.Sprintf("[POST /v1/projects/{pid}/apidoc][%d] restColServiceGetSwaggerDoc2OK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /v1/projects/{projectId}/apidoc][%d] restColServiceGetSwaggerDoc2OK  %+v", 200, o.Payload)
 }
 
 func (o *RestColServiceGetSwaggerDoc2OK) String() string {
-	return fmt.Sprintf("[POST /v1/projects/{pid}/apidoc][%d] restColServiceGetSwaggerDoc2OK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /v1/projects/{projectId}/apidoc][%d] restColServiceGetSwaggerDoc2OK  %+v", 200, o.Payload)
 }
 
 func (o *RestColServiceGetSwaggerDoc2OK) GetPayload() *models.APIHTTPBody {
@@ -158,11 +158,11 @@ func (o *RestColServiceGetSwaggerDoc2Default) Code() int {
 }
 
 func (o *RestColServiceGetSwaggerDoc2Default) Error() string {
-	return fmt.Sprintf("[POST /v1/projects/{pid}/apidoc][%d] RestColService_GetSwaggerDoc2 default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[POST /v1/projects/{projectId}/apidoc][%d] RestColService_GetSwaggerDoc2 default  %+v", o._statusCode, o.Payload)
 }
 
 func (o *RestColServiceGetSwaggerDoc2Default) String() string {
-	return fmt.Sprintf("[POST /v1/projects/{pid}/apidoc][%d] RestColService_GetSwaggerDoc2 default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[POST /v1/projects/{projectId}/apidoc][%d] RestColService_GetSwaggerDoc2 default  %+v", o._statusCode, o.Payload)
 }
 
 func (o *RestColServiceGetSwaggerDoc2Default) GetPayload() *models.RPCStatus {

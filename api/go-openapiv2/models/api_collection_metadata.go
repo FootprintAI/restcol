@@ -27,13 +27,13 @@ type APICollectionMetadata struct {
 	// Format: date-time
 	DeletedAt strfmt.DateTime `json:"DeletedAt,omitempty"`
 
-	// cid (aka collectionId) would be used to naming ${cid} field, that field should be url safe
+	// cid (aka collectionId) would be used to naming ${collectionId} field, that field should be url safe
 	// otherwise an error would be returned.
-	// leave it empty would generate a random uuid for ${cid}
-	Cid string `json:"cid,omitempty"`
+	// leave it empty would generate a random uuid for ${collectionId}
+	CollectionID string `json:"collectionId,omitempty"`
 
 	// pid is used to isolate resources (by projects), making the collections are belonged to a specific project
-	Pid string `json:"pid,omitempty"`
+	ProjectID string `json:"projectId,omitempty"`
 }
 
 // Validate validates this api collection metadata

@@ -86,11 +86,11 @@ func (o *RestColServiceCreateDocument3OK) Code() int {
 }
 
 func (o *RestColServiceCreateDocument3OK) Error() string {
-	return fmt.Sprintf("[POST /v1/projects/{pid}/collections/{cid}:newdoc][%d] restColServiceCreateDocument3OK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /v1/projects/{projectId}/collections/{collectionId}:newdoc][%d] restColServiceCreateDocument3OK  %+v", 200, o.Payload)
 }
 
 func (o *RestColServiceCreateDocument3OK) String() string {
-	return fmt.Sprintf("[POST /v1/projects/{pid}/collections/{cid}:newdoc][%d] restColServiceCreateDocument3OK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /v1/projects/{projectId}/collections/{collectionId}:newdoc][%d] restColServiceCreateDocument3OK  %+v", 200, o.Payload)
 }
 
 func (o *RestColServiceCreateDocument3OK) GetPayload() *models.APICreateDocumentResponse {
@@ -158,11 +158,11 @@ func (o *RestColServiceCreateDocument3Default) Code() int {
 }
 
 func (o *RestColServiceCreateDocument3Default) Error() string {
-	return fmt.Sprintf("[POST /v1/projects/{pid}/collections/{cid}:newdoc][%d] RestColService_CreateDocument3 default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[POST /v1/projects/{projectId}/collections/{collectionId}:newdoc][%d] RestColService_CreateDocument3 default  %+v", o._statusCode, o.Payload)
 }
 
 func (o *RestColServiceCreateDocument3Default) String() string {
-	return fmt.Sprintf("[POST /v1/projects/{pid}/collections/{cid}:newdoc][%d] RestColService_CreateDocument3 default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[POST /v1/projects/{projectId}/collections/{collectionId}:newdoc][%d] RestColService_CreateDocument3 default  %+v", o._statusCode, o.Payload)
 }
 
 func (o *RestColServiceCreateDocument3Default) GetPayload() *models.RPCStatus {

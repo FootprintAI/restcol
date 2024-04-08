@@ -84,7 +84,7 @@ func (a *Client) RestColServiceGetSwaggerDoc2(params *RestColServiceGetSwaggerDo
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_GetSwaggerDoc2",
 		Method:             "POST",
-		PathPattern:        "/v1/projects/{pid}/apidoc",
+		PathPattern:        "/v1/projects/{projectId}/apidoc",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},

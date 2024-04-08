@@ -55,7 +55,7 @@ service RestColService {
         option (google.api.http) = {
             get: "/v1/apidoc"
             additional_bindings {
-                post: "/v1/projects/{pid}/apidoc"
+                post: "/v1/projects/{projectId}/apidoc"
             }
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -68,7 +68,7 @@ service RestColService {
             post: "/v1/collections"
             body: "*"
             additional_bindings {
-                post: "/v1/projects/{pid}/collections"
+                post: "/v1/projects/{projectId}/collections"
             }
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -81,7 +81,7 @@ service RestColService {
         option (google.api.http) = {
             get: "/v1/collections"
             additional_bindings {
-                get: "/v1/projects/{pid}/collections"
+                get: "/v1/projects/{projectId}/collections"
             }
 
         };
@@ -94,9 +94,9 @@ service RestColService {
 
     rpc GetCollection(GetCollectionRequest) returns (GetCollectionResponse) {
         option (google.api.http) = {
-            get: "/v1/collections/{cid}"
+            get: "/v1/collections/{collectionId}"
             additional_bindings {
-                get: "/v1/projects/{pid}/collections/{cid}"
+                get: "/v1/projects/{projectId}/collections/{collectionId}"
             }
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -108,9 +108,9 @@ service RestColService {
 
     rpc DeleteCollection(DeleteCollectionRequest) returns (DeleteCollectionResponse) {
         option (google.api.http) = {
-            delete: "/v1/collections/{cid}"
+            delete: "/v1/collections/{collectionId}"
             additional_bindings {
-                delete: "/v1/projects/{pid}/collections/{cid}"
+                delete: "/v1/projects/{projectId}/collections/{collectionId}"
             }
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -124,10 +124,10 @@ service RestColService {
             post: "/v1/newdoc"
             body: "*"
             additional_bindings {
-                post: "/v1/collections/{cid}:newdoc"
+                post: "/v1/collections/{collectionId}:newdoc"
             }
             additional_bindings {
-                post: "/v1/projects/{pid}/collections/{cid}:newdoc"
+                post: "/v1/projects/{projectId}/collections/{collectionId}:newdoc"
             }
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -139,12 +139,12 @@ service RestColService {
     // GetDocument endpoint is a generic endpoint for retrieving data across multiple collections
     rpc GetDocument(GetDocumentRequest) returns (GetDocumentResponse) {
         option (google.api.http) = {
-            get: "/v1/doc/{did}"
+            get: "/v1/doc/{documentId}"
             additional_bindings {
-                get: "/v1/collections/{cid}/{did}"
+                get: "/v1/collections/{collectionId}/{documentId}"
             }
             additional_bindings {
-                get: "/v1/projects/{pid}/collections/{cid}/{did}"
+                get: "/v1/projects/{projectId}/collections/{collectionId}/{documentId}"
             }
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -156,9 +156,9 @@ service RestColService {
     // DeleteDocument endpoint is a generic endpoint for deleting a specific data
     rpc DeleteDocument(DeleteDocumentRequest) returns (DeleteDocumentResponse) {
         option (google.api.http) = {
-            delete: "/v1/collections/{cid}/{did}"
+            delete: "/v1/collections/{collectionId}/{documentId}"
             additional_bindings {
-                delete: "/v1/projects/{pid}/collections/{cid}/{did}"
+                delete: "/v1/projects/{projectId}/collections/{collectionId}/{documentId}"
             }
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -169,7 +169,7 @@ service RestColService {
 }
 
 message GetSwaggerDocRequest {
-    string pid = 1;
+    string projectId = 1;
 }
 
 message SchemaField {
@@ -195,20 +195,20 @@ message SchemaFieldExampleValue {
 
 message CollectionMetadata {
     // pid is used to isolate resources (by projects), making the collections are belonged to a specific project
-    string pid = 1;
+    string projectId = 1;
 
-    // cid (aka collectionId) would be used to naming ${cid} field, that field should be url safe
+    // cid (aka collectionId) would be used to naming ${collectionId} field, that field should be url safe
     // otherwise an error would be returned.
-    // leave it empty would generate a random uuid for ${cid}
-    string cid = 2;
+    // leave it empty would generate a random uuid for ${collectionId}
+    string collectionId = 2;
 
     google.protobuf.Timestamp _createdAt = 10; // ts when the collection was created
     optional google.protobuf.Timestamp _deletedAt = 11; // ts when the collection was deleted
 }
 
 message CreateCollectionRequest {
-    string pid = 1;
-    optional string cid = 2;
+    string projectId = 1;
+    optional string collectionId = 2;
 
     optional string description = 10;
     optional CollectionType collectionType = 11;
@@ -233,14 +233,14 @@ message CreateCollectionResponse {
 }
 
 message ListCollectionsRequest {
-    string pid = 1;
+    string projectId = 1;
 }
 
 message ListCollectionsResponse {}
 
 message GetCollectionRequest{
-    string pid = 1;
-    string cid = 2;
+    string projectId = 1;
+    string collectionId = 2;
 }
 
 message GetCollectionResponse{
@@ -252,8 +252,8 @@ message GetCollectionResponse{
 }
 
 message DeleteCollectionRequest {
-    string pid = 1;
-    string cid = 2;
+    string projectId = 1;
+    string collectionId = 2;
 }
 
 message DeleteCollectionResponse {}
@@ -270,13 +270,13 @@ enum DataFormat {
 
 message DataMetadata {
     // pid is project id
-    string pid = 1;
+    string projectId = 1;
 
     // cid is collection id from collection data
-    string cid = 2;
+    string collectionId = 2;
 
-    // did (aka dataid) would be used to naming ${did} field, that field should be url safe
-    string did = 3;
+    // did (aka dataid) would be used to naming ${documentId} field, that field should be url safe
+    string documentId = 3;
 
     google.protobuf.Timestamp _createdAt = 10; // ts when the record was created
     optional google.protobuf.Timestamp _deletedAt = 11; // ts when the record was deleted
@@ -285,9 +285,9 @@ message DataMetadata {
 
 
 message CreateDocumentRequest {
-    string pid = 1;
-    string cid = 2;
-    optional string did = 3;
+    string projectId = 1;
+    string collectionId = 2;
+    optional string documentId = 3;
 
     bytes data = 10; // data represents rawdata for any kind of formating
     optional DataFormat dataformat = 11;
@@ -298,9 +298,9 @@ message CreateDocumentResponse {
 }
 
 message GetDocumentRequest{
-    string pid = 1;
-    string cid = 2;
-    string did = 3;
+    string projectId = 1;
+    string collectionId = 2;
+    string documentId = 3;
 }
 
 message GetDocumentResponse{
@@ -309,9 +309,9 @@ message GetDocumentResponse{
 }
 
 message DeleteDocumentRequest {
-    string pid = 1;
-    string cid = 2;
-    string did = 3;
+    string projectId = 1;
+    string collectionId = 2;
+    string documentId = 3;
 }
 
 message DeleteDocumentResponse {}

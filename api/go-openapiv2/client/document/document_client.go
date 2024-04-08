@@ -96,7 +96,7 @@ func (a *Client) RestColServiceCreateDocument2(params *RestColServiceCreateDocum
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_CreateDocument2",
 		Method:             "POST",
-		PathPattern:        "/v1/collections/{cid}:newdoc",
+		PathPattern:        "/v1/collections/{collectionId}:newdoc",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},
@@ -134,7 +134,7 @@ func (a *Client) RestColServiceCreateDocument3(params *RestColServiceCreateDocum
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_CreateDocument3",
 		Method:             "POST",
-		PathPattern:        "/v1/projects/{pid}/collections/{cid}:newdoc",
+		PathPattern:        "/v1/projects/{projectId}/collections/{collectionId}:newdoc",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},
@@ -174,7 +174,7 @@ func (a *Client) RestColServiceDeleteDocument(params *RestColServiceDeleteDocume
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_DeleteDocument",
 		Method:             "DELETE",
-		PathPattern:        "/v1/collections/{cid}/{did}",
+		PathPattern:        "/v1/collections/{collectionId}/{documentId}",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},
@@ -214,7 +214,7 @@ func (a *Client) RestColServiceDeleteDocument2(params *RestColServiceDeleteDocum
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_DeleteDocument2",
 		Method:             "DELETE",
-		PathPattern:        "/v1/projects/{pid}/collections/{cid}/{did}",
+		PathPattern:        "/v1/projects/{projectId}/collections/{collectionId}/{documentId}",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},
@@ -254,7 +254,7 @@ func (a *Client) RestColServiceGetDocument(params *RestColServiceGetDocumentPara
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_GetDocument",
 		Method:             "GET",
-		PathPattern:        "/v1/doc/{did}",
+		PathPattern:        "/v1/doc/{documentId}",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},
@@ -294,7 +294,7 @@ func (a *Client) RestColServiceGetDocument2(params *RestColServiceGetDocument2Pa
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_GetDocument2",
 		Method:             "GET",
-		PathPattern:        "/v1/collections/{cid}/{did}",
+		PathPattern:        "/v1/collections/{collectionId}/{documentId}",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},
@@ -334,7 +334,7 @@ func (a *Client) RestColServiceGetDocument3(params *RestColServiceGetDocument3Pa
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_GetDocument3",
 		Method:             "GET",
-		PathPattern:        "/v1/projects/{pid}/collections/{cid}/{did}",
+		PathPattern:        "/v1/projects/{projectId}/collections/{collectionId}/{documentId}",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},

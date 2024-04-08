@@ -27,7 +27,7 @@ type ModelCollection struct {
 }
 
 func NewModelCollection(
-	modelProject *modelprojects.ModelProject,
+	projectId modelprojects.ProjectID,
 	id CollectionID,
 	t apppb.CollectionType,
 	summary string,
@@ -38,7 +38,7 @@ func NewModelCollection(
 		Type:           ModelCollectionType(t),
 		Summary:        summary,
 		Schemas:        schemas,
-		ModelProjectID: modelProject.ID,
+		ModelProjectID: projectId,
 	}
 }
 

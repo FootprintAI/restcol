@@ -11,13 +11,16 @@ import (
 	appauthz "github.com/footprintai/restcol/pkg/authz"
 	dummy "github.com/footprintai/restcol/pkg/dummy"
 	appmiddleware "github.com/footprintai/restcol/pkg/middleware"
+	runtimeprojectgetter "github.com/footprintai/restcol/pkg/runtime/getter"
 	appserver "github.com/footprintai/restcol/pkg/server"
 	collectionsstorage "github.com/footprintai/restcol/pkg/storage/collections"
 	documentsstorage "github.com/footprintai/restcol/pkg/storage/documents"
 	projectsstorage "github.com/footprintai/restcol/pkg/storage/projects"
 	authnmiddleware "github.com/sdinsure/agent/pkg/grpc/server/middleware/authn"
 	authzmiddleware "github.com/sdinsure/agent/pkg/grpc/server/middleware/authz"
+	identitymiddleware "github.com/sdinsure/agent/pkg/grpc/server/middleware/identity"
 	"github.com/sdinsure/agent/pkg/logger"
+	sdinsureruntime "github.com/sdinsure/agent/pkg/runtime"
 	postgresstorage "github.com/sdinsure/agent/pkg/storage/postgres"
 )
 
@@ -71,6 +74,8 @@ func makeServerService(
 		return nil, err
 	}
 
+	projectResolver := sdinsureruntime.NewProjectResolver(log, runtimeprojectgetter.NewRuntimeProjectGetter(projectCURD))
+
 	authNMiddleware := authnmiddleware.NewAuthNMiddleware(
 		log,
 		&appauthn.AnnonymousClaimParser{},
@@ -91,15 +96,18 @@ func makeServerService(
 		//	},
 		//}),
 	)
+	projectIdentityMiddleware := identitymiddleware.NewProjectIdentityMiddleware(projectResolver)
 
 	unaryInterceptors := []grpc.UnaryServerInterceptor{
 		grpc_auth.UnaryServerInterceptor(authNMiddleware.AuthFunc),
 		grpc_auth.UnaryServerInterceptor(authZMiddleware.AuthFunc),
+		projectIdentityMiddleware.UnaryServerInterceptor(),
 	}
 
 	streamInterceptors := []grpc.StreamServerInterceptor{
 		grpc_auth.StreamServerInterceptor(authNMiddleware.AuthFunc),
 		grpc_auth.StreamServerInterceptor(authZMiddleware.AuthFunc),
+		projectIdentityMiddleware.StreamServerInterceptor(),
 	}
 
 	svr, err := appserver.NewServerService(grpcPort, httpPort, log, unaryInterceptors, streamInterceptors)
@@ -111,8 +119,8 @@ func makeServerService(
 		log,
 		collectionCURD,
 		documentCURD,
-		dummyProject,
 	)
+	app.SetDefaultProjectResolver(projectResolver)
 	appserver.RegisterService(svr, app)
 	return svr, nil
 }

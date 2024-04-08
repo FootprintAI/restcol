@@ -6,6 +6,7 @@ import (
 
 	sderrors "github.com/sdinsure/agent/pkg/errors"
 	"github.com/sdinsure/agent/pkg/logger"
+	sdinsureruntime "github.com/sdinsure/agent/pkg/runtime"
 	"google.golang.org/genproto/googleapis/api/httpbody"
 	"gorm.io/datatypes"
 
@@ -23,18 +24,12 @@ func NewRestColServiceServerService(
 	log logger.Logger,
 	collectionCURD *collectionsstorage.CollectionCURD,
 	documentCURD *documentsstorage.DocumentCURD,
-	projectGetter ProjectGetter,
 ) *RestColServiceServerService {
 	return &RestColServiceServerService{
 		log:            log,
 		collectionCURD: collectionCURD,
 		documentCURD:   documentCURD,
-		projectGetter:  projectGetter,
 	}
-}
-
-type ProjectGetter interface {
-	GetProject(ctx context.Context, pid projectsmodel.ProjectID) (*projectsmodel.ModelProject, error)
 }
 
 //type SchemaGetter interface {
@@ -47,13 +42,21 @@ type RestColServiceServerService struct {
 	log            logger.Logger
 	collectionCURD *collectionsstorage.CollectionCURD
 	documentCURD   *documentsstorage.DocumentCURD
-	projectGetter  ProjectGetter
-	//collectionGetter CollectionGetter
+
+	//optional
+	defaultProjectResolver sdinsureruntime.ProjectResolver
+}
+
+func (r *RestColServiceServerService) SetDefaultProjectResolver(projectResolver sdinsureruntime.ProjectResolver) {
+	r.defaultProjectResolver = projectResolver
 }
 
 func (r *RestColServiceServerService) GetSwaggerDoc(ctx context.Context, req *apppb.GetSwaggerDocRequest) (*httpbody.HttpBody, error) {
-	modelProject, err := r.getModelProject(ctx, req.Pid)
-	collectionList, err := r.collectionCURD.ListByProjectID(ctx, "", modelProject.ID)
+	projectId, err := r.getProjectIdFromCtx(ctx)
+	if err != nil {
+		return nil, err
+	}
+	collectionList, err := r.collectionCURD.ListByProjectID(ctx, "", projectId)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +72,7 @@ func (r *RestColServiceServerService) GetSwaggerDoc(ctx context.Context, req *ap
 }
 
 func (r *RestColServiceServerService) CreateCollection(ctx context.Context, req *apppb.CreateCollectionRequest) (*apppb.CreateCollectionResponse, error) {
-	modelProject, err := r.getModelProject(ctx, req.Pid)
+	projectId, err := r.getProjectIdFromCtx(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +101,7 @@ func (r *RestColServiceServerService) CreateCollection(ctx context.Context, req 
 	}
 
 	mc := collectionsmodel.NewModelCollection(
-		modelProject,
+		projectId,
 		cid,
 		collectionType,
 		summary,
@@ -118,17 +121,25 @@ func (r *RestColServiceServerService) CreateCollection(ctx context.Context, req 
 	return resp, nil
 }
 
-func (r *RestColServiceServerService) getModelProject(ctx context.Context, pidStr string) (*projectsmodel.ModelProject, error) {
-	var pid projectsmodel.ProjectID
-	if pidStr == "" {
-		// use default pid
-		pid = projectsmodel.NewProjectID(1001)
-		r.log.Info("no valid project id found, use default: %+v\n", pid)
-	} else {
-		pid = projectsmodel.NewProjectIDStr(pidStr)
+func (r *RestColServiceServerService) getProjectIdFromCtx(ctx context.Context) (pid projectsmodel.ProjectID, reterr error) {
+	if r.defaultProjectResolver == nil {
+		pid = projectsmodel.ProjectID("invalid")
+		reterr = errors.New("no project resolver")
+		return
 	}
-	modelProj, err := r.projectGetter.GetProject(ctx, pid)
-	return modelProj, err
+	projectInfor, found := r.defaultProjectResolver.ProjectInfo(ctx)
+	if !found {
+		r.log.Info("no valid project id found, use default: %+v\n", pid)
+		pid = projectsmodel.NewProjectID(1001)
+		return
+	}
+	rawPid, err := projectInfor.GetProjectID()
+	if err != nil {
+		pid = projectsmodel.ProjectID("invalid")
+		reterr = err
+		return
+	}
+	return projectsmodel.ProjectID(rawPid), nil
 }
 
 // TODO getCollectionIDFromSchemas would lookup collection id with schema list given// This should scan all collections and match by its schema and return the right collection id
@@ -166,7 +177,7 @@ func (r *RestColServiceServerService) DeleteCollection(ctx context.Context, req 
 	return nil, sderrors.NewNotImplError(errors.New("not implemented"))
 }
 func (r *RestColServiceServerService) CreateDocument(ctx context.Context, req *apppb.CreateDocumentRequest) (*apppb.CreateDocumentResponse, error) {
-	modelProject, err := r.getModelProject(ctx, req.Pid)
+	projectId, err := r.getProjectIdFromCtx(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -194,7 +205,7 @@ func (r *RestColServiceServerService) CreateDocument(ctx context.Context, req *a
 		Data:              datatypes.JSON(req.Data),
 		ModelCollectionID: cid,
 		ModelCollection: collectionsmodel.NewModelCollection(
-			modelProject,
+			projectId,
 			cid,
 			apppb.CollectionType_COLLECTION_TYPE_REGULAR_FILES,
 			"auto created collection",
@@ -202,7 +213,7 @@ func (r *RestColServiceServerService) CreateDocument(ctx context.Context, req *a
 				*modelSchema,
 			},
 		),
-		ModelProjectID: modelProject.ID,
+		ModelProjectID: projectId,
 	}
 	if err := r.documentCURD.Write(ctx, "", docModel); err != nil {
 		r.log.Error("failed to write docmodel, err:%+v\n", err)

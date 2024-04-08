@@ -86,11 +86,11 @@ func (o *RestColServiceListCollections2OK) Code() int {
 }
 
 func (o *RestColServiceListCollections2OK) Error() string {
-	return fmt.Sprintf("[GET /v1/projects/{pid}/collections][%d] restColServiceListCollections2OK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections][%d] restColServiceListCollections2OK  %+v", 200, o.Payload)
 }
 
 func (o *RestColServiceListCollections2OK) String() string {
-	return fmt.Sprintf("[GET /v1/projects/{pid}/collections][%d] restColServiceListCollections2OK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections][%d] restColServiceListCollections2OK  %+v", 200, o.Payload)
 }
 
 func (o *RestColServiceListCollections2OK) GetPayload() models.APIListCollectionsResponse {
@@ -156,11 +156,11 @@ func (o *RestColServiceListCollections2Default) Code() int {
 }
 
 func (o *RestColServiceListCollections2Default) Error() string {
-	return fmt.Sprintf("[GET /v1/projects/{pid}/collections][%d] RestColService_ListCollections2 default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections][%d] RestColService_ListCollections2 default  %+v", o._statusCode, o.Payload)
 }
 
 func (o *RestColServiceListCollections2Default) String() string {
-	return fmt.Sprintf("[GET /v1/projects/{pid}/collections][%d] RestColService_ListCollections2 default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections][%d] RestColService_ListCollections2 default  %+v", o._statusCode, o.Payload)
 }
 
 func (o *RestColServiceListCollections2Default) GetPayload() *models.RPCStatus {

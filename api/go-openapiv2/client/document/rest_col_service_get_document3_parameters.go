@@ -61,14 +61,14 @@ RestColServiceGetDocument3Params contains all the parameters to send to the API 
 */
 type RestColServiceGetDocument3Params struct {
 
-	// Cid.
-	Cid string
+	// CollectionID.
+	CollectionID string
 
-	// Did.
-	Did string
+	// DocumentID.
+	DocumentID string
 
-	// Pid.
-	Pid string
+	// ProjectID.
+	ProjectID string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -123,37 +123,37 @@ func (o *RestColServiceGetDocument3Params) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
-// WithCid adds the cid to the rest col service get document3 params
-func (o *RestColServiceGetDocument3Params) WithCid(cid string) *RestColServiceGetDocument3Params {
-	o.SetCid(cid)
+// WithCollectionID adds the collectionID to the rest col service get document3 params
+func (o *RestColServiceGetDocument3Params) WithCollectionID(collectionID string) *RestColServiceGetDocument3Params {
+	o.SetCollectionID(collectionID)
 	return o
 }
 
-// SetCid adds the cid to the rest col service get document3 params
-func (o *RestColServiceGetDocument3Params) SetCid(cid string) {
-	o.Cid = cid
+// SetCollectionID adds the collectionId to the rest col service get document3 params
+func (o *RestColServiceGetDocument3Params) SetCollectionID(collectionID string) {
+	o.CollectionID = collectionID
 }
 
-// WithDid adds the did to the rest col service get document3 params
-func (o *RestColServiceGetDocument3Params) WithDid(did string) *RestColServiceGetDocument3Params {
-	o.SetDid(did)
+// WithDocumentID adds the documentID to the rest col service get document3 params
+func (o *RestColServiceGetDocument3Params) WithDocumentID(documentID string) *RestColServiceGetDocument3Params {
+	o.SetDocumentID(documentID)
 	return o
 }
 
-// SetDid adds the did to the rest col service get document3 params
-func (o *RestColServiceGetDocument3Params) SetDid(did string) {
-	o.Did = did
+// SetDocumentID adds the documentId to the rest col service get document3 params
+func (o *RestColServiceGetDocument3Params) SetDocumentID(documentID string) {
+	o.DocumentID = documentID
 }
 
-// WithPid adds the pid to the rest col service get document3 params
-func (o *RestColServiceGetDocument3Params) WithPid(pid string) *RestColServiceGetDocument3Params {
-	o.SetPid(pid)
+// WithProjectID adds the projectID to the rest col service get document3 params
+func (o *RestColServiceGetDocument3Params) WithProjectID(projectID string) *RestColServiceGetDocument3Params {
+	o.SetProjectID(projectID)
 	return o
 }
 
-// SetPid adds the pid to the rest col service get document3 params
-func (o *RestColServiceGetDocument3Params) SetPid(pid string) {
-	o.Pid = pid
+// SetProjectID adds the projectId to the rest col service get document3 params
+func (o *RestColServiceGetDocument3Params) SetProjectID(projectID string) {
+	o.ProjectID = projectID
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -164,18 +164,18 @@ func (o *RestColServiceGetDocument3Params) WriteToRequest(r runtime.ClientReques
 	}
 	var res []error
 
-	// path param cid
-	if err := r.SetPathParam("cid", o.Cid); err != nil {
+	// path param collectionId
+	if err := r.SetPathParam("collectionId", o.CollectionID); err != nil {
 		return err
 	}
 
-	// path param did
-	if err := r.SetPathParam("did", o.Did); err != nil {
+	// path param documentId
+	if err := r.SetPathParam("documentId", o.DocumentID); err != nil {
 		return err
 	}
 
-	// path param pid
-	if err := r.SetPathParam("pid", o.Pid); err != nil {
+	// path param projectId
+	if err := r.SetPathParam("projectId", o.ProjectID); err != nil {
 		return err
 	}
 

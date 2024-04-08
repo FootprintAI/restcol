@@ -61,8 +61,8 @@ RestColServiceListCollections2Params contains all the parameters to send to the 
 */
 type RestColServiceListCollections2Params struct {
 
-	// Pid.
-	Pid string
+	// ProjectID.
+	ProjectID string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -117,15 +117,15 @@ func (o *RestColServiceListCollections2Params) SetHTTPClient(client *http.Client
 	o.HTTPClient = client
 }
 
-// WithPid adds the pid to the rest col service list collections2 params
-func (o *RestColServiceListCollections2Params) WithPid(pid string) *RestColServiceListCollections2Params {
-	o.SetPid(pid)
+// WithProjectID adds the projectID to the rest col service list collections2 params
+func (o *RestColServiceListCollections2Params) WithProjectID(projectID string) *RestColServiceListCollections2Params {
+	o.SetProjectID(projectID)
 	return o
 }
 
-// SetPid adds the pid to the rest col service list collections2 params
-func (o *RestColServiceListCollections2Params) SetPid(pid string) {
-	o.Pid = pid
+// SetProjectID adds the projectId to the rest col service list collections2 params
+func (o *RestColServiceListCollections2Params) SetProjectID(projectID string) {
+	o.ProjectID = projectID
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -136,8 +136,8 @@ func (o *RestColServiceListCollections2Params) WriteToRequest(r runtime.ClientRe
 	}
 	var res []error
 
-	// path param pid
-	if err := r.SetPathParam("pid", o.Pid); err != nil {
+	// path param projectId
+	if err := r.SetPathParam("projectId", o.ProjectID); err != nil {
 		return err
 	}
 

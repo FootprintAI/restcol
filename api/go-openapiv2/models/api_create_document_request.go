@@ -18,8 +18,8 @@ import (
 // swagger:model apiCreateDocumentRequest
 type APICreateDocumentRequest struct {
 
-	// cid
-	Cid string `json:"cid,omitempty"`
+	// collection Id
+	CollectionID string `json:"collectionId,omitempty"`
 
 	// data represents rawdata for any kind of formating
 	// Format: byte
@@ -28,11 +28,11 @@ type APICreateDocumentRequest struct {
 	// dataformat
 	Dataformat *APIDataFormat `json:"dataformat,omitempty"`
 
-	// did
-	Did string `json:"did,omitempty"`
+	// document Id
+	DocumentID string `json:"documentId,omitempty"`
 
-	// pid
-	Pid string `json:"pid,omitempty"`
+	// project Id
+	ProjectID string `json:"projectId,omitempty"`
 }
 
 // Validate validates this api create document request

@@ -61,8 +61,8 @@ RestColServiceCreateCollection2Params contains all the parameters to send to the
 */
 type RestColServiceCreateCollection2Params struct {
 
-	// Cid.
-	Cid *string
+	// CollectionID.
+	CollectionID *string
 
 	// CollectionType.
 	//
@@ -72,8 +72,8 @@ type RestColServiceCreateCollection2Params struct {
 	// Description.
 	Description *string
 
-	// Pid.
-	Pid string
+	// ProjectID.
+	ProjectID string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -139,15 +139,15 @@ func (o *RestColServiceCreateCollection2Params) SetHTTPClient(client *http.Clien
 	o.HTTPClient = client
 }
 
-// WithCid adds the cid to the rest col service create collection2 params
-func (o *RestColServiceCreateCollection2Params) WithCid(cid *string) *RestColServiceCreateCollection2Params {
-	o.SetCid(cid)
+// WithCollectionID adds the collectionID to the rest col service create collection2 params
+func (o *RestColServiceCreateCollection2Params) WithCollectionID(collectionID *string) *RestColServiceCreateCollection2Params {
+	o.SetCollectionID(collectionID)
 	return o
 }
 
-// SetCid adds the cid to the rest col service create collection2 params
-func (o *RestColServiceCreateCollection2Params) SetCid(cid *string) {
-	o.Cid = cid
+// SetCollectionID adds the collectionId to the rest col service create collection2 params
+func (o *RestColServiceCreateCollection2Params) SetCollectionID(collectionID *string) {
+	o.CollectionID = collectionID
 }
 
 // WithCollectionType adds the collectionType to the rest col service create collection2 params
@@ -172,15 +172,15 @@ func (o *RestColServiceCreateCollection2Params) SetDescription(description *stri
 	o.Description = description
 }
 
-// WithPid adds the pid to the rest col service create collection2 params
-func (o *RestColServiceCreateCollection2Params) WithPid(pid string) *RestColServiceCreateCollection2Params {
-	o.SetPid(pid)
+// WithProjectID adds the projectID to the rest col service create collection2 params
+func (o *RestColServiceCreateCollection2Params) WithProjectID(projectID string) *RestColServiceCreateCollection2Params {
+	o.SetProjectID(projectID)
 	return o
 }
 
-// SetPid adds the pid to the rest col service create collection2 params
-func (o *RestColServiceCreateCollection2Params) SetPid(pid string) {
-	o.Pid = pid
+// SetProjectID adds the projectId to the rest col service create collection2 params
+func (o *RestColServiceCreateCollection2Params) SetProjectID(projectID string) {
+	o.ProjectID = projectID
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -191,18 +191,18 @@ func (o *RestColServiceCreateCollection2Params) WriteToRequest(r runtime.ClientR
 	}
 	var res []error
 
-	if o.Cid != nil {
+	if o.CollectionID != nil {
 
-		// query param cid
-		var qrCid string
+		// query param collectionId
+		var qrCollectionID string
 
-		if o.Cid != nil {
-			qrCid = *o.Cid
+		if o.CollectionID != nil {
+			qrCollectionID = *o.CollectionID
 		}
-		qCid := qrCid
-		if qCid != "" {
+		qCollectionID := qrCollectionID
+		if qCollectionID != "" {
 
-			if err := r.SetQueryParam("cid", qCid); err != nil {
+			if err := r.SetQueryParam("collectionId", qCollectionID); err != nil {
 				return err
 			}
 		}
@@ -242,8 +242,8 @@ func (o *RestColServiceCreateCollection2Params) WriteToRequest(r runtime.ClientR
 		}
 	}
 
-	// path param pid
-	if err := r.SetPathParam("pid", o.Pid); err != nil {
+	// path param projectId
+	if err := r.SetPathParam("projectId", o.ProjectID); err != nil {
 		return err
 	}
 

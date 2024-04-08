@@ -96,7 +96,7 @@ func (a *Client) RestColServiceCreateCollection2(params *RestColServiceCreateCol
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_CreateCollection2",
 		Method:             "POST",
-		PathPattern:        "/v1/projects/{pid}/collections",
+		PathPattern:        "/v1/projects/{projectId}/collections",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},
@@ -134,7 +134,7 @@ func (a *Client) RestColServiceDeleteCollection(params *RestColServiceDeleteColl
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_DeleteCollection",
 		Method:             "DELETE",
-		PathPattern:        "/v1/collections/{cid}",
+		PathPattern:        "/v1/collections/{collectionId}",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},
@@ -172,7 +172,7 @@ func (a *Client) RestColServiceDeleteCollection2(params *RestColServiceDeleteCol
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_DeleteCollection2",
 		Method:             "DELETE",
-		PathPattern:        "/v1/projects/{pid}/collections/{cid}",
+		PathPattern:        "/v1/projects/{projectId}/collections/{collectionId}",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},
@@ -210,7 +210,7 @@ func (a *Client) RestColServiceGetCollection(params *RestColServiceGetCollection
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_GetCollection",
 		Method:             "GET",
-		PathPattern:        "/v1/collections/{cid}",
+		PathPattern:        "/v1/collections/{collectionId}",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},
@@ -248,7 +248,7 @@ func (a *Client) RestColServiceGetCollection2(params *RestColServiceGetCollectio
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_GetCollection2",
 		Method:             "GET",
-		PathPattern:        "/v1/projects/{pid}/collections/{cid}",
+		PathPattern:        "/v1/projects/{projectId}/collections/{collectionId}",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},
@@ -324,7 +324,7 @@ func (a *Client) RestColServiceListCollections2(params *RestColServiceListCollec
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_ListCollections2",
 		Method:             "GET",
-		PathPattern:        "/v1/projects/{pid}/collections",
+		PathPattern:        "/v1/projects/{projectId}/collections",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},

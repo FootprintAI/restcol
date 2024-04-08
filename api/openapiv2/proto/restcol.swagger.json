@@ -47,7 +47,7 @@
         },
         "parameters": [
           {
-            "name": "pid",
+            "name": "projectId",
             "in": "query",
             "required": false,
             "type": "string"
@@ -78,7 +78,7 @@
         },
         "parameters": [
           {
-            "name": "pid",
+            "name": "projectId",
             "in": "query",
             "required": false,
             "type": "string"
@@ -120,7 +120,7 @@
         ]
       }
     },
-    "/v1/collections/{cid}": {
+    "/v1/collections/{collectionId}": {
       "get": {
         "description": "retrieve an individual collection information and document keys assocaited with it",
         "operationId": "RestColService_GetCollection",
@@ -140,13 +140,13 @@
         },
         "parameters": [
           {
-            "name": "cid",
+            "name": "collectionId",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "pid",
+            "name": "projectId",
             "in": "query",
             "required": false,
             "type": "string"
@@ -175,13 +175,13 @@
         },
         "parameters": [
           {
-            "name": "cid",
+            "name": "collectionId",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "pid",
+            "name": "projectId",
             "in": "query",
             "required": false,
             "type": "string"
@@ -192,7 +192,7 @@
         ]
       }
     },
-    "/v1/collections/{cid}/{did}": {
+    "/v1/collections/{collectionId}/{documentId}": {
       "get": {
         "summary": "GetDocument endpoint is a generic endpoint for retrieving data across multiple collections",
         "description": "retrieve a document information from the collection.",
@@ -213,19 +213,19 @@
         },
         "parameters": [
           {
-            "name": "cid",
+            "name": "collectionId",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "did",
+            "name": "documentId",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "pid",
+            "name": "projectId",
             "in": "query",
             "required": false,
             "type": "string"
@@ -255,19 +255,19 @@
         },
         "parameters": [
           {
-            "name": "cid",
+            "name": "collectionId",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "did",
+            "name": "documentId",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "pid",
+            "name": "projectId",
             "in": "query",
             "required": false,
             "type": "string"
@@ -278,7 +278,7 @@
         ]
       }
     },
-    "/v1/collections/{cid}:newdoc": {
+    "/v1/collections/{collectionId}:newdoc": {
       "post": {
         "description": "create a document to the collection",
         "operationId": "RestColService_CreateDocument2",
@@ -298,19 +298,19 @@
         },
         "parameters": [
           {
-            "name": "cid",
+            "name": "collectionId",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "pid",
+            "name": "projectId",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "did",
+            "name": "documentId",
             "in": "query",
             "required": false,
             "type": "string"
@@ -345,7 +345,7 @@
         ]
       }
     },
-    "/v1/doc/{did}": {
+    "/v1/doc/{documentId}": {
       "get": {
         "summary": "GetDocument endpoint is a generic endpoint for retrieving data across multiple collections",
         "description": "retrieve a document information from the collection.",
@@ -366,19 +366,19 @@
         },
         "parameters": [
           {
-            "name": "did",
+            "name": "documentId",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "pid",
+            "name": "projectId",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "cid",
+            "name": "collectionId",
             "in": "query",
             "required": false,
             "type": "string"
@@ -422,7 +422,7 @@
         ]
       }
     },
-    "/v1/projects/{pid}/apidoc": {
+    "/v1/projects/{projectId}/apidoc": {
       "post": {
         "summary": "Return API Doc in Swagger",
         "operationId": "RestColService_GetSwaggerDoc2",
@@ -442,7 +442,7 @@
         },
         "parameters": [
           {
-            "name": "pid",
+            "name": "projectId",
             "in": "path",
             "required": true,
             "type": "string"
@@ -453,7 +453,7 @@
         ]
       }
     },
-    "/v1/projects/{pid}/collections": {
+    "/v1/projects/{projectId}/collections": {
       "get": {
         "summary": "list collections endpoint",
         "operationId": "RestColService_ListCollections2",
@@ -473,7 +473,7 @@
         },
         "parameters": [
           {
-            "name": "pid",
+            "name": "projectId",
             "in": "path",
             "required": true,
             "type": "string"
@@ -502,13 +502,13 @@
         },
         "parameters": [
           {
-            "name": "pid",
+            "name": "projectId",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "cid",
+            "name": "collectionId",
             "in": "query",
             "required": false,
             "type": "string"
@@ -540,7 +540,7 @@
         ]
       }
     },
-    "/v1/projects/{pid}/collections/{cid}": {
+    "/v1/projects/{projectId}/collections/{collectionId}": {
       "get": {
         "description": "retrieve an individual collection information and document keys assocaited with it",
         "operationId": "RestColService_GetCollection2",
@@ -560,13 +560,13 @@
         },
         "parameters": [
           {
-            "name": "pid",
+            "name": "projectId",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "cid",
+            "name": "collectionId",
             "in": "path",
             "required": true,
             "type": "string"
@@ -595,13 +595,13 @@
         },
         "parameters": [
           {
-            "name": "pid",
+            "name": "projectId",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "cid",
+            "name": "collectionId",
             "in": "path",
             "required": true,
             "type": "string"
@@ -612,7 +612,7 @@
         ]
       }
     },
-    "/v1/projects/{pid}/collections/{cid}/{did}": {
+    "/v1/projects/{projectId}/collections/{collectionId}/{documentId}": {
       "get": {
         "summary": "GetDocument endpoint is a generic endpoint for retrieving data across multiple collections",
         "description": "retrieve a document information from the collection.",
@@ -633,19 +633,19 @@
         },
         "parameters": [
           {
-            "name": "pid",
+            "name": "projectId",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "cid",
+            "name": "collectionId",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "did",
+            "name": "documentId",
             "in": "path",
             "required": true,
             "type": "string"
@@ -675,19 +675,19 @@
         },
         "parameters": [
           {
-            "name": "pid",
+            "name": "projectId",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "cid",
+            "name": "collectionId",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "did",
+            "name": "documentId",
             "in": "path",
             "required": true,
             "type": "string"
@@ -698,7 +698,7 @@
         ]
       }
     },
-    "/v1/projects/{pid}/collections/{cid}:newdoc": {
+    "/v1/projects/{projectId}/collections/{collectionId}:newdoc": {
       "post": {
         "description": "create a document to the collection",
         "operationId": "RestColService_CreateDocument3",
@@ -718,19 +718,19 @@
         },
         "parameters": [
           {
-            "name": "pid",
+            "name": "projectId",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "cid",
+            "name": "collectionId",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "did",
+            "name": "documentId",
             "in": "query",
             "required": false,
             "type": "string"
@@ -770,13 +770,13 @@
     "apiCollectionMetadata": {
       "type": "object",
       "properties": {
-        "pid": {
+        "projectId": {
           "type": "string",
           "title": "pid is used to isolate resources (by projects), making the collections are belonged to a specific project"
         },
-        "cid": {
+        "collectionId": {
           "type": "string",
-          "title": "cid (aka collectionId) would be used to naming ${cid} field, that field should be url safe\notherwise an error would be returned.\nleave it empty would generate a random uuid for ${cid}"
+          "title": "cid (aka collectionId) would be used to naming ${collectionId} field, that field should be url safe\notherwise an error would be returned.\nleave it empty would generate a random uuid for ${collectionId}"
         },
         "CreatedAt": {
           "type": "string",
@@ -805,10 +805,10 @@
     "apiCreateCollectionRequest": {
       "type": "object",
       "properties": {
-        "pid": {
+        "projectId": {
           "type": "string"
         },
-        "cid": {
+        "collectionId": {
           "type": "string"
         },
         "description": {
@@ -850,13 +850,13 @@
     "apiCreateDocumentRequest": {
       "type": "object",
       "properties": {
-        "pid": {
+        "projectId": {
           "type": "string"
         },
-        "cid": {
+        "collectionId": {
           "type": "string"
         },
-        "did": {
+        "documentId": {
           "type": "string"
         },
         "data": {
@@ -893,17 +893,17 @@
     "apiDataMetadata": {
       "type": "object",
       "properties": {
-        "pid": {
+        "projectId": {
           "type": "string",
           "title": "pid is project id"
         },
-        "cid": {
+        "collectionId": {
           "type": "string",
           "title": "cid is collection id from collection data"
         },
-        "did": {
+        "documentId": {
           "type": "string",
-          "title": "did (aka dataid) would be used to naming ${did} field, that field should be url safe"
+          "title": "did (aka dataid) would be used to naming ${documentId} field, that field should be url safe"
         },
         "CreatedAt": {
           "type": "string",

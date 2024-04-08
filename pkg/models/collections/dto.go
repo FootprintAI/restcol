@@ -9,9 +9,9 @@ import (
 
 func NewPbCollectionMetadata(mc *ModelCollection) *apppb.CollectionMetadata {
 	metadata := &apppb.CollectionMetadata{
-		Pid:        mc.ModelProjectID.String(),
-		Cid:        mc.ID.String(),
-		XCreatedAt: timestamppb.New(mc.CreatedAt),
+		ProjectId:    mc.ModelProjectID.String(),
+		CollectionId: mc.ID.String(),
+		XCreatedAt:   timestamppb.New(mc.CreatedAt),
 	}
 	if deletedAt, _ := mc.DeletedAt.Value(); deletedAt != nil {
 		metadata.XDeletedAt = timestamppb.New(deletedAt.(time.Time))

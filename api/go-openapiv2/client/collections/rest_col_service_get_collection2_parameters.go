@@ -61,11 +61,11 @@ RestColServiceGetCollection2Params contains all the parameters to send to the AP
 */
 type RestColServiceGetCollection2Params struct {
 
-	// Cid.
-	Cid string
+	// CollectionID.
+	CollectionID string
 
-	// Pid.
-	Pid string
+	// ProjectID.
+	ProjectID string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -120,26 +120,26 @@ func (o *RestColServiceGetCollection2Params) SetHTTPClient(client *http.Client) 
 	o.HTTPClient = client
 }
 
-// WithCid adds the cid to the rest col service get collection2 params
-func (o *RestColServiceGetCollection2Params) WithCid(cid string) *RestColServiceGetCollection2Params {
-	o.SetCid(cid)
+// WithCollectionID adds the collectionID to the rest col service get collection2 params
+func (o *RestColServiceGetCollection2Params) WithCollectionID(collectionID string) *RestColServiceGetCollection2Params {
+	o.SetCollectionID(collectionID)
 	return o
 }
 
-// SetCid adds the cid to the rest col service get collection2 params
-func (o *RestColServiceGetCollection2Params) SetCid(cid string) {
-	o.Cid = cid
+// SetCollectionID adds the collectionId to the rest col service get collection2 params
+func (o *RestColServiceGetCollection2Params) SetCollectionID(collectionID string) {
+	o.CollectionID = collectionID
 }
 
-// WithPid adds the pid to the rest col service get collection2 params
-func (o *RestColServiceGetCollection2Params) WithPid(pid string) *RestColServiceGetCollection2Params {
-	o.SetPid(pid)
+// WithProjectID adds the projectID to the rest col service get collection2 params
+func (o *RestColServiceGetCollection2Params) WithProjectID(projectID string) *RestColServiceGetCollection2Params {
+	o.SetProjectID(projectID)
 	return o
 }
 
-// SetPid adds the pid to the rest col service get collection2 params
-func (o *RestColServiceGetCollection2Params) SetPid(pid string) {
-	o.Pid = pid
+// SetProjectID adds the projectId to the rest col service get collection2 params
+func (o *RestColServiceGetCollection2Params) SetProjectID(projectID string) {
+	o.ProjectID = projectID
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -150,13 +150,13 @@ func (o *RestColServiceGetCollection2Params) WriteToRequest(r runtime.ClientRequ
 	}
 	var res []error
 
-	// path param cid
-	if err := r.SetPathParam("cid", o.Cid); err != nil {
+	// path param collectionId
+	if err := r.SetPathParam("collectionId", o.CollectionID); err != nil {
 		return err
 	}
 
-	// path param pid
-	if err := r.SetPathParam("pid", o.Pid); err != nil {
+	// path param projectId
+	if err := r.SetPathParam("projectId", o.ProjectID); err != nil {
 		return err
 	}
 

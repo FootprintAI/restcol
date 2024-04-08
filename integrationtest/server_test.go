@@ -47,22 +47,22 @@ func TestIntegrationTest(t *testing.T) {
 	// post /api/newdoc
 	createDocumentParam := &restcolopenapidocument.RestColServiceCreateDocumentParams{
 		Body: &restcolopenapimodel.APICreateDocumentRequest{
-			Cid:        "", // empty cid, would create a new collection
-			Did:        "",
-			Pid:        "",  // empty pid, would use default pid
-			Dataformat: nil, // use auto infer
-			Data:       []byte(jsonData),
+			CollectionID: "", // empty cid, would create a new collection
+			DocumentID:   "",
+			ProjectID:    "",  // empty pid, would use default pid
+			Dataformat:   nil, // use auto infer
+			Data:         []byte(jsonData),
 		},
 	}
 	restcolCreateDocumentOk, err := client.Document.RestColServiceCreateDocument(createDocumentParam, noAuthInfo())
 	assert.NoError(t, err)
 	//	createdDid := restcolCreateDocumentOk.Payload.Metadata.Did
 	//	createdPid := restcolCreateDocumentOk.Payload.Metadata.Pid
-	createdCid := restcolCreateDocumentOk.Payload.Metadata.Cid
+	createdCid := restcolCreateDocumentOk.Payload.Metadata.CollectionID
 
 	// get /api/collections/{cid}
 	getCollectionParams := &restcolopenapicollections.RestColServiceGetCollectionParams{
-		Cid: createdCid,
+		CollectionID: createdCid,
 	}
 	restcolGetCollectionOk, err := client.Collections.RestColServiceGetCollection(getCollectionParams, noAuthInfo())
 	assert.NoError(t, err)

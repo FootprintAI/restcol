@@ -22,7 +22,7 @@ func TestCollectionSuite(
 
 	cid := appmodelcollections.NewCollectionID()
 	mc := appmodelcollections.NewModelCollection(
-		modelProject,
+		modelProject.ID,
 		cid,
 		apppb.CollectionType_COLLECTION_TYPE_REGULAR_FILES,
 		"from testsuite",

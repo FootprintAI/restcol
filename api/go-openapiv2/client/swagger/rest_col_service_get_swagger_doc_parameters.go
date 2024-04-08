@@ -61,8 +61,8 @@ RestColServiceGetSwaggerDocParams contains all the parameters to send to the API
 */
 type RestColServiceGetSwaggerDocParams struct {
 
-	// Pid.
-	Pid *string
+	// ProjectID.
+	ProjectID *string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -117,15 +117,15 @@ func (o *RestColServiceGetSwaggerDocParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
-// WithPid adds the pid to the rest col service get swagger doc params
-func (o *RestColServiceGetSwaggerDocParams) WithPid(pid *string) *RestColServiceGetSwaggerDocParams {
-	o.SetPid(pid)
+// WithProjectID adds the projectID to the rest col service get swagger doc params
+func (o *RestColServiceGetSwaggerDocParams) WithProjectID(projectID *string) *RestColServiceGetSwaggerDocParams {
+	o.SetProjectID(projectID)
 	return o
 }
 
-// SetPid adds the pid to the rest col service get swagger doc params
-func (o *RestColServiceGetSwaggerDocParams) SetPid(pid *string) {
-	o.Pid = pid
+// SetProjectID adds the projectId to the rest col service get swagger doc params
+func (o *RestColServiceGetSwaggerDocParams) SetProjectID(projectID *string) {
+	o.ProjectID = projectID
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -136,18 +136,18 @@ func (o *RestColServiceGetSwaggerDocParams) WriteToRequest(r runtime.ClientReque
 	}
 	var res []error
 
-	if o.Pid != nil {
+	if o.ProjectID != nil {
 
-		// query param pid
-		var qrPid string
+		// query param projectId
+		var qrProjectID string
 
-		if o.Pid != nil {
-			qrPid = *o.Pid
+		if o.ProjectID != nil {
+			qrProjectID = *o.ProjectID
 		}
-		qPid := qrPid
-		if qPid != "" {
+		qProjectID := qrProjectID
+		if qProjectID != "" {
 
-			if err := r.SetQueryParam("pid", qPid); err != nil {
+			if err := r.SetQueryParam("projectId", qProjectID); err != nil {
 				return err
 			}
 		}

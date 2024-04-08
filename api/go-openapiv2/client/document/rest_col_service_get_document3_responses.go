@@ -86,11 +86,11 @@ func (o *RestColServiceGetDocument3OK) Code() int {
 }
 
 func (o *RestColServiceGetDocument3OK) Error() string {
-	return fmt.Sprintf("[GET /v1/projects/{pid}/collections/{cid}/{did}][%d] restColServiceGetDocument3OK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/{documentId}][%d] restColServiceGetDocument3OK  %+v", 200, o.Payload)
 }
 
 func (o *RestColServiceGetDocument3OK) String() string {
-	return fmt.Sprintf("[GET /v1/projects/{pid}/collections/{cid}/{did}][%d] restColServiceGetDocument3OK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/{documentId}][%d] restColServiceGetDocument3OK  %+v", 200, o.Payload)
 }
 
 func (o *RestColServiceGetDocument3OK) GetPayload() *models.APIGetDocumentResponse {
@@ -158,11 +158,11 @@ func (o *RestColServiceGetDocument3Default) Code() int {
 }
 
 func (o *RestColServiceGetDocument3Default) Error() string {
-	return fmt.Sprintf("[GET /v1/projects/{pid}/collections/{cid}/{did}][%d] RestColService_GetDocument3 default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/{documentId}][%d] RestColService_GetDocument3 default  %+v", o._statusCode, o.Payload)
 }
 
 func (o *RestColServiceGetDocument3Default) String() string {
-	return fmt.Sprintf("[GET /v1/projects/{pid}/collections/{cid}/{did}][%d] RestColService_GetDocument3 default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/{documentId}][%d] RestColService_GetDocument3 default  %+v", o._statusCode, o.Payload)
 }
 
 func (o *RestColServiceGetDocument3Default) GetPayload() *models.RPCStatus {

@@ -9,9 +9,9 @@ import (
 
 func NewPbDocumentMetadata(md *ModelDocument) *apppb.DataMetadata {
 	metadata := &apppb.DataMetadata{
-		Pid: md.ModelProjectID.String(),
-		Cid: md.ModelCollectionID.String(),
-		Did: md.ID.String(),
+		ProjectId:    md.ModelProjectID.String(),
+		CollectionId: md.ModelCollectionID.String(),
+		DocumentId:   md.ID.String(),
 		//Dataformat: nil;
 		// FIXME(hsiny): need to fix dataformat
 		XCreatedAt: timestamppb.New(md.CreatedAt),

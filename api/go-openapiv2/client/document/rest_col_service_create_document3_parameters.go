@@ -61,8 +61,8 @@ RestColServiceCreateDocument3Params contains all the parameters to send to the A
 */
 type RestColServiceCreateDocument3Params struct {
 
-	// Cid.
-	Cid string
+	// CollectionID.
+	CollectionID string
 
 	/* Data.
 
@@ -77,11 +77,11 @@ type RestColServiceCreateDocument3Params struct {
 	// Default: "DATA_FORMAT_UNKNOWN"
 	Dataformat *string
 
-	// Did.
-	Did *string
+	// DocumentID.
+	DocumentID *string
 
-	// Pid.
-	Pid string
+	// ProjectID.
+	ProjectID string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -147,15 +147,15 @@ func (o *RestColServiceCreateDocument3Params) SetHTTPClient(client *http.Client)
 	o.HTTPClient = client
 }
 
-// WithCid adds the cid to the rest col service create document3 params
-func (o *RestColServiceCreateDocument3Params) WithCid(cid string) *RestColServiceCreateDocument3Params {
-	o.SetCid(cid)
+// WithCollectionID adds the collectionID to the rest col service create document3 params
+func (o *RestColServiceCreateDocument3Params) WithCollectionID(collectionID string) *RestColServiceCreateDocument3Params {
+	o.SetCollectionID(collectionID)
 	return o
 }
 
-// SetCid adds the cid to the rest col service create document3 params
-func (o *RestColServiceCreateDocument3Params) SetCid(cid string) {
-	o.Cid = cid
+// SetCollectionID adds the collectionId to the rest col service create document3 params
+func (o *RestColServiceCreateDocument3Params) SetCollectionID(collectionID string) {
+	o.CollectionID = collectionID
 }
 
 // WithData adds the data to the rest col service create document3 params
@@ -180,26 +180,26 @@ func (o *RestColServiceCreateDocument3Params) SetDataformat(dataformat *string) 
 	o.Dataformat = dataformat
 }
 
-// WithDid adds the did to the rest col service create document3 params
-func (o *RestColServiceCreateDocument3Params) WithDid(did *string) *RestColServiceCreateDocument3Params {
-	o.SetDid(did)
+// WithDocumentID adds the documentID to the rest col service create document3 params
+func (o *RestColServiceCreateDocument3Params) WithDocumentID(documentID *string) *RestColServiceCreateDocument3Params {
+	o.SetDocumentID(documentID)
 	return o
 }
 
-// SetDid adds the did to the rest col service create document3 params
-func (o *RestColServiceCreateDocument3Params) SetDid(did *string) {
-	o.Did = did
+// SetDocumentID adds the documentId to the rest col service create document3 params
+func (o *RestColServiceCreateDocument3Params) SetDocumentID(documentID *string) {
+	o.DocumentID = documentID
 }
 
-// WithPid adds the pid to the rest col service create document3 params
-func (o *RestColServiceCreateDocument3Params) WithPid(pid string) *RestColServiceCreateDocument3Params {
-	o.SetPid(pid)
+// WithProjectID adds the projectID to the rest col service create document3 params
+func (o *RestColServiceCreateDocument3Params) WithProjectID(projectID string) *RestColServiceCreateDocument3Params {
+	o.SetProjectID(projectID)
 	return o
 }
 
-// SetPid adds the pid to the rest col service create document3 params
-func (o *RestColServiceCreateDocument3Params) SetPid(pid string) {
-	o.Pid = pid
+// SetProjectID adds the projectId to the rest col service create document3 params
+func (o *RestColServiceCreateDocument3Params) SetProjectID(projectID string) {
+	o.ProjectID = projectID
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -210,8 +210,8 @@ func (o *RestColServiceCreateDocument3Params) WriteToRequest(r runtime.ClientReq
 	}
 	var res []error
 
-	// path param cid
-	if err := r.SetPathParam("cid", o.Cid); err != nil {
+	// path param collectionId
+	if err := r.SetPathParam("collectionId", o.CollectionID); err != nil {
 		return err
 	}
 
@@ -249,25 +249,25 @@ func (o *RestColServiceCreateDocument3Params) WriteToRequest(r runtime.ClientReq
 		}
 	}
 
-	if o.Did != nil {
+	if o.DocumentID != nil {
 
-		// query param did
-		var qrDid string
+		// query param documentId
+		var qrDocumentID string
 
-		if o.Did != nil {
-			qrDid = *o.Did
+		if o.DocumentID != nil {
+			qrDocumentID = *o.DocumentID
 		}
-		qDid := qrDid
-		if qDid != "" {
+		qDocumentID := qrDocumentID
+		if qDocumentID != "" {
 
-			if err := r.SetQueryParam("did", qDid); err != nil {
+			if err := r.SetQueryParam("documentId", qDocumentID); err != nil {
 				return err
 			}
 		}
 	}
 
-	// path param pid
-	if err := r.SetPathParam("pid", o.Pid); err != nil {
+	// path param projectId
+	if err := r.SetPathParam("projectId", o.ProjectID); err != nil {
 		return err
 	}
 

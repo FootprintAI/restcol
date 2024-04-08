@@ -19,8 +19,8 @@ import (
 // swagger:model apiCreateCollectionRequest
 type APICreateCollectionRequest struct {
 
-	// cid
-	Cid string `json:"cid,omitempty"`
+	// collection Id
+	CollectionID string `json:"collectionId,omitempty"`
 
 	// collection type
 	CollectionType *APICollectionType `json:"collectionType,omitempty"`
@@ -28,8 +28,8 @@ type APICreateCollectionRequest struct {
 	// description
 	Description string `json:"description,omitempty"`
 
-	// pid
-	Pid string `json:"pid,omitempty"`
+	// project Id
+	ProjectID string `json:"projectId,omitempty"`
 
 	// schemas
 	Schemas []*APISchemaField `json:"schemas"`

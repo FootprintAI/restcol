@@ -61,14 +61,14 @@ RestColServiceDeleteDocumentParams contains all the parameters to send to the AP
 */
 type RestColServiceDeleteDocumentParams struct {
 
-	// Cid.
-	Cid string
+	// CollectionID.
+	CollectionID string
 
-	// Did.
-	Did string
+	// DocumentID.
+	DocumentID string
 
-	// Pid.
-	Pid *string
+	// ProjectID.
+	ProjectID *string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -123,37 +123,37 @@ func (o *RestColServiceDeleteDocumentParams) SetHTTPClient(client *http.Client) 
 	o.HTTPClient = client
 }
 
-// WithCid adds the cid to the rest col service delete document params
-func (o *RestColServiceDeleteDocumentParams) WithCid(cid string) *RestColServiceDeleteDocumentParams {
-	o.SetCid(cid)
+// WithCollectionID adds the collectionID to the rest col service delete document params
+func (o *RestColServiceDeleteDocumentParams) WithCollectionID(collectionID string) *RestColServiceDeleteDocumentParams {
+	o.SetCollectionID(collectionID)
 	return o
 }
 
-// SetCid adds the cid to the rest col service delete document params
-func (o *RestColServiceDeleteDocumentParams) SetCid(cid string) {
-	o.Cid = cid
+// SetCollectionID adds the collectionId to the rest col service delete document params
+func (o *RestColServiceDeleteDocumentParams) SetCollectionID(collectionID string) {
+	o.CollectionID = collectionID
 }
 
-// WithDid adds the did to the rest col service delete document params
-func (o *RestColServiceDeleteDocumentParams) WithDid(did string) *RestColServiceDeleteDocumentParams {
-	o.SetDid(did)
+// WithDocumentID adds the documentID to the rest col service delete document params
+func (o *RestColServiceDeleteDocumentParams) WithDocumentID(documentID string) *RestColServiceDeleteDocumentParams {
+	o.SetDocumentID(documentID)
 	return o
 }
 
-// SetDid adds the did to the rest col service delete document params
-func (o *RestColServiceDeleteDocumentParams) SetDid(did string) {
-	o.Did = did
+// SetDocumentID adds the documentId to the rest col service delete document params
+func (o *RestColServiceDeleteDocumentParams) SetDocumentID(documentID string) {
+	o.DocumentID = documentID
 }
 
-// WithPid adds the pid to the rest col service delete document params
-func (o *RestColServiceDeleteDocumentParams) WithPid(pid *string) *RestColServiceDeleteDocumentParams {
-	o.SetPid(pid)
+// WithProjectID adds the projectID to the rest col service delete document params
+func (o *RestColServiceDeleteDocumentParams) WithProjectID(projectID *string) *RestColServiceDeleteDocumentParams {
+	o.SetProjectID(projectID)
 	return o
 }
 
-// SetPid adds the pid to the rest col service delete document params
-func (o *RestColServiceDeleteDocumentParams) SetPid(pid *string) {
-	o.Pid = pid
+// SetProjectID adds the projectId to the rest col service delete document params
+func (o *RestColServiceDeleteDocumentParams) SetProjectID(projectID *string) {
+	o.ProjectID = projectID
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -164,28 +164,28 @@ func (o *RestColServiceDeleteDocumentParams) WriteToRequest(r runtime.ClientRequ
 	}
 	var res []error
 
-	// path param cid
-	if err := r.SetPathParam("cid", o.Cid); err != nil {
+	// path param collectionId
+	if err := r.SetPathParam("collectionId", o.CollectionID); err != nil {
 		return err
 	}
 
-	// path param did
-	if err := r.SetPathParam("did", o.Did); err != nil {
+	// path param documentId
+	if err := r.SetPathParam("documentId", o.DocumentID); err != nil {
 		return err
 	}
 
-	if o.Pid != nil {
+	if o.ProjectID != nil {
 
-		// query param pid
-		var qrPid string
+		// query param projectId
+		var qrProjectID string
 
-		if o.Pid != nil {
-			qrPid = *o.Pid
+		if o.ProjectID != nil {
+			qrProjectID = *o.ProjectID
 		}
-		qPid := qrPid
-		if qPid != "" {
+		qProjectID := qrProjectID
+		if qProjectID != "" {
 
-			if err := r.SetQueryParam("pid", qPid); err != nil {
+			if err := r.SetQueryParam("projectId", qProjectID); err != nil {
 				return err
 			}
 		}

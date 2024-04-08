@@ -42,7 +42,7 @@ func TestStorage(t *testing.T) {
 	assert.Nil(t, err)
 
 	mc := appmodelcollections.NewModelCollection(
-		regularProject,
+		regularProject.ID,
 		cid,
 		apppb.CollectionType_COLLECTION_TYPE_REGULAR_FILES,
 		"test description",
@@ -81,7 +81,7 @@ func TestStorage(t *testing.T) {
 
 	// change schema and desc
 	mc2 := appmodelcollections.NewModelCollection(
-		regularProject,
+		regularProject.ID,
 		cid,
 		apppb.CollectionType_COLLECTION_TYPE_REGULAR_FILES,
 		"test description - part 2",

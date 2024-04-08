@@ -86,11 +86,11 @@ func (o *RestColServiceDeleteCollectionOK) Code() int {
 }
 
 func (o *RestColServiceDeleteCollectionOK) Error() string {
-	return fmt.Sprintf("[DELETE /v1/collections/{cid}][%d] restColServiceDeleteCollectionOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[DELETE /v1/collections/{collectionId}][%d] restColServiceDeleteCollectionOK  %+v", 200, o.Payload)
 }
 
 func (o *RestColServiceDeleteCollectionOK) String() string {
-	return fmt.Sprintf("[DELETE /v1/collections/{cid}][%d] restColServiceDeleteCollectionOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[DELETE /v1/collections/{collectionId}][%d] restColServiceDeleteCollectionOK  %+v", 200, o.Payload)
 }
 
 func (o *RestColServiceDeleteCollectionOK) GetPayload() models.APIDeleteCollectionResponse {
@@ -156,11 +156,11 @@ func (o *RestColServiceDeleteCollectionDefault) Code() int {
 }
 
 func (o *RestColServiceDeleteCollectionDefault) Error() string {
-	return fmt.Sprintf("[DELETE /v1/collections/{cid}][%d] RestColService_DeleteCollection default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[DELETE /v1/collections/{collectionId}][%d] RestColService_DeleteCollection default  %+v", o._statusCode, o.Payload)
 }
 
 func (o *RestColServiceDeleteCollectionDefault) String() string {
-	return fmt.Sprintf("[DELETE /v1/collections/{cid}][%d] RestColService_DeleteCollection default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[DELETE /v1/collections/{collectionId}][%d] RestColService_DeleteCollection default  %+v", o._statusCode, o.Payload)
 }
 
 func (o *RestColServiceDeleteCollectionDefault) GetPayload() *models.RPCStatus {

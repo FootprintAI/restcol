@@ -267,7 +267,6 @@ function doconvert(input) {
     }
   }
 
-  console.log(input)
   document = mockDucument(input)
   convert()
   return document.getElementById("Swagger").value

@@ -5,28 +5,25 @@ import (
 	"path/filepath"
 	"strings"
 
-	v8 "rogchap.com/v8go"
+	"github.com/dop251/goja"
 )
 
 func NewJSRuntime(name string) *JSRuntime {
 
-	env := v8.NewIsolate()
+	vm := goja.New()
 	return &JSRuntime{
 		name: name,
-		env:  env,
-		ctx:  v8.NewContext(env),
+		vm:   vm,
 	}
 }
 
 type JSRuntime struct {
-	env *v8.Isolate
-	ctx *v8.Context
+	vm *goja.Runtime
 
 	name string
 }
 
 func (j *JSRuntime) Close() error {
-	j.env.Dispose()
 	return nil
 }
 
@@ -36,7 +33,7 @@ func (j *JSRuntime) Load(modules ...string) error {
 		if err != nil {
 			return err
 		}
-		_, err = j.ctx.RunScript(string(jsScript), j.name)
+		_, err = j.vm.RunScript(j.name, string(jsScript))
 		if err != nil {
 			return err
 		}
@@ -53,9 +50,9 @@ func normalizedModulePath(moduleFile string) string {
 }
 
 func (j *JSRuntime) Run(execScript string) (string, error) {
-	v, err := j.ctx.RunScript(execScript, j.name)
+	v, err := j.vm.RunScript(j.name, execScript)
 	if err != nil {
 		return "", err
 	}
-	return v.String(), nil
+	return v.Export().(string), nil
 }

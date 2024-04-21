@@ -166,6 +166,39 @@ service RestColService {
             tags: "document"
         };
     }
+
+    rpc QueryDocumentsStream(QueryDocumentStreamRequest) returns (stream GetDocumentResponse) {
+        option (google.api.http) = {
+            get: "/v1/docstream"
+            additional_bindings {
+                get: "/v1/collections/{collectionId}:docstream"
+            }
+            additional_bindings {
+                get: "/v1/projects/{projectId}/collections/{collectionId}:docstream"
+            }
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "run query against a collection, return documents in streaming which matched the query"
+            tags: "document"
+        };
+    }
+
+    rpc QueryDocument(QueryDocumentRequest) returns (QueryDocumentResponse) {
+        option (google.api.http) = {
+            get: "/v1/query"
+            additional_bindings {
+                get: "/v1/collections/{collectionId}:query"
+            }
+            additional_bindings {
+                get: "/v1/projects/{projectId}/collections/{collectionId}:query"
+            }
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "run query against a collection, return documents matched the query"
+            tags: "document"
+        };
+    }
+
 }
 
 message GetSwaggerDocRequest {
@@ -315,3 +348,25 @@ message DeleteDocumentRequest {
 }
 
 message DeleteDocumentResponse {}
+
+message QueryDocumentStreamRequest{
+    string projectId = 1;
+    string collectionId = 2;
+    google.protobuf.Timestamp sinceTs = 3;
+    optional google.protobuf.Timestamp endedAt = 4; // endedAt specifies when is the ended timeframe of the query
+    string queryfields = 5; // dot-concatenated fields, ex: fielda.fieldb.fieldc
+    optional bool followUpMode = 6; // if on, the service would keep watch new coming docs
+}
+
+message QueryDocumentRequest {
+    string projectId = 1;
+    string collectionId = 2;
+    google.protobuf.Timestamp sinceTs = 3;
+    optional google.protobuf.Timestamp endedAt = 4; // endedAt specifies when is the ended timeframe of the query
+    string queryfields = 5; // dot-concatenated fields, ex: fielda.fieldb.fieldc
+    optional int32 limitCount = 6;
+}
+
+message QueryDocumentResponse {
+    GetDocumentResponse docs = 1;
+}

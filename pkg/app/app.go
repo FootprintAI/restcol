@@ -3,11 +3,15 @@ package app
 import (
 	"context"
 	"errors"
+	"time"
 
 	sderrors "github.com/sdinsure/agent/pkg/errors"
 	"github.com/sdinsure/agent/pkg/logger"
 	sdinsureruntime "github.com/sdinsure/agent/pkg/runtime"
 	"google.golang.org/genproto/googleapis/api/httpbody"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/datatypes"
 
 	apppb "github.com/footprintai/restcol/api/pb/proto"
@@ -168,6 +172,7 @@ func (r *RestColServiceServerService) GetCollection(ctx context.Context, req *ap
 	}
 	return resp, nil
 }
+
 func (r *RestColServiceServerService) DeleteCollection(ctx context.Context, req *apppb.DeleteCollectionRequest) (*apppb.DeleteCollectionResponse, error) {
 	return nil, sderrors.NewNotImplError(errors.New("not implemented"))
 }
@@ -238,4 +243,99 @@ func (r *RestColServiceServerService) GetDocument(ctx context.Context, req *appp
 }
 func (r *RestColServiceServerService) DeleteDocument(ctx context.Context, req *apppb.DeleteDocumentRequest) (*apppb.DeleteDocumentResponse, error) {
 	return nil, sderrors.NewNotImplError(errors.New("not implemented"))
+}
+
+func (r *RestColServiceServerService) QueryDocumentsStream(req *apppb.QueryDocumentStreamRequest, stream apppb.RestColService_QueryDocumentsStreamServer) error {
+	ctx := stream.Context()
+	projectId, err := r.getProjectIdFromCtx(ctx)
+	if err != nil {
+		return err
+	}
+	cid, err := collectionsmodel.Parse(req.CollectionId)
+	if err != nil {
+		return err
+	}
+	startedAt := req.SinceTs
+	endedAt := req.EndedAt
+
+	needsFollowUp := false
+	if req.FollowUpMode != nil && *req.FollowUpMode {
+		needsFollowUp = true
+	}
+
+	if !needsFollowUp {
+		queryDocs, err := r.documentCURD.Query(
+			ctx,
+			"",
+			projectId,
+			cid,
+			makeQueryConditioner(startedAt, endedAt)...,
+		)
+		if err != nil {
+			return err
+		}
+		// TODO: apply field selector
+		for _, doc := range queryDocs {
+			if err := stream.Send(&apppb.GetDocumentResponse{
+				XMetadata: documentsmodel.NewPbDocumentMetadata(doc),
+				Data:      []byte(doc.Data),
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+	// enter followup mode, keep looking data
+	sendingCount := 0
+	for {
+		r.log.Info("query with time range[%+v -> %+v], cid:%+v\n", startedAt.AsTime(), endedAt.AsTime(), cid)
+		queryDocs, err := r.documentCURD.Query(
+			ctx,
+			"",
+			projectId,
+			cid,
+			makeQueryConditioner(startedAt, endedAt)...,
+		)
+		if err != nil {
+			return err
+		}
+		// TODO: apply field selector
+		for _, doc := range queryDocs {
+			sendingCount = sendingCount + 1
+			if err := stream.Send(&apppb.GetDocumentResponse{
+				XMetadata: documentsmodel.NewPbDocumentMetadata(doc),
+				Data:      []byte(doc.Data),
+			}); err != nil {
+				return err
+			}
+		}
+		// update startedAt to be the last record of previous query
+		if len(queryDocs) > 0 {
+			startedAt = timestamppb.New(queryDocs[len(queryDocs)-1].CreatedAt)
+		}
+
+		// take a nap and would query again
+		select {
+		case <-ctx.Done():
+			r.log.Info("query is done as ctx is done\n")
+			return nil
+		case <-time.After(1 * time.Second):
+		}
+	}
+	return nil
+}
+
+func makeQueryConditioner(startedAt *timestamppb.Timestamp, endedAt *timestamppb.Timestamp) []documentsstorage.QueryConditioner {
+	var cnds []documentsstorage.QueryConditioner
+	if startedAt != nil {
+		cnds = append(cnds, documentsstorage.WithStartedAt(startedAt.AsTime()))
+	}
+	if endedAt != nil {
+		cnds = append(cnds, documentsstorage.WithEndedAt(endedAt.AsTime()))
+	}
+	return cnds
+}
+
+func (r *RestColServiceServerService) QueryDocument(ctx context.Context, req *apppb.QueryDocumentRequest) (*apppb.QueryDocumentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QueryDocument not implemented")
 }

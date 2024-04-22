@@ -20,14 +20,16 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	RestColService_GetSwaggerDoc_FullMethodName    = "/restcol.api.RestColService/GetSwaggerDoc"
-	RestColService_CreateCollection_FullMethodName = "/restcol.api.RestColService/CreateCollection"
-	RestColService_ListCollections_FullMethodName  = "/restcol.api.RestColService/ListCollections"
-	RestColService_GetCollection_FullMethodName    = "/restcol.api.RestColService/GetCollection"
-	RestColService_DeleteCollection_FullMethodName = "/restcol.api.RestColService/DeleteCollection"
-	RestColService_CreateDocument_FullMethodName   = "/restcol.api.RestColService/CreateDocument"
-	RestColService_GetDocument_FullMethodName      = "/restcol.api.RestColService/GetDocument"
-	RestColService_DeleteDocument_FullMethodName   = "/restcol.api.RestColService/DeleteDocument"
+	RestColService_GetSwaggerDoc_FullMethodName        = "/restcol.api.RestColService/GetSwaggerDoc"
+	RestColService_CreateCollection_FullMethodName     = "/restcol.api.RestColService/CreateCollection"
+	RestColService_ListCollections_FullMethodName      = "/restcol.api.RestColService/ListCollections"
+	RestColService_GetCollection_FullMethodName        = "/restcol.api.RestColService/GetCollection"
+	RestColService_DeleteCollection_FullMethodName     = "/restcol.api.RestColService/DeleteCollection"
+	RestColService_CreateDocument_FullMethodName       = "/restcol.api.RestColService/CreateDocument"
+	RestColService_GetDocument_FullMethodName          = "/restcol.api.RestColService/GetDocument"
+	RestColService_DeleteDocument_FullMethodName       = "/restcol.api.RestColService/DeleteDocument"
+	RestColService_QueryDocumentsStream_FullMethodName = "/restcol.api.RestColService/QueryDocumentsStream"
+	RestColService_QueryDocument_FullMethodName        = "/restcol.api.RestColService/QueryDocument"
 )
 
 // RestColServiceClient is the client API for RestColService service.
@@ -44,6 +46,8 @@ type RestColServiceClient interface {
 	GetDocument(ctx context.Context, in *GetDocumentRequest, opts ...grpc.CallOption) (*GetDocumentResponse, error)
 	// DeleteDocument endpoint is a generic endpoint for deleting a specific data
 	DeleteDocument(ctx context.Context, in *DeleteDocumentRequest, opts ...grpc.CallOption) (*DeleteDocumentResponse, error)
+	QueryDocumentsStream(ctx context.Context, in *QueryDocumentStreamRequest, opts ...grpc.CallOption) (RestColService_QueryDocumentsStreamClient, error)
+	QueryDocument(ctx context.Context, in *QueryDocumentRequest, opts ...grpc.CallOption) (*QueryDocumentResponse, error)
 }
 
 type restColServiceClient struct {
@@ -126,6 +130,47 @@ func (c *restColServiceClient) DeleteDocument(ctx context.Context, in *DeleteDoc
 	return out, nil
 }
 
+func (c *restColServiceClient) QueryDocumentsStream(ctx context.Context, in *QueryDocumentStreamRequest, opts ...grpc.CallOption) (RestColService_QueryDocumentsStreamClient, error) {
+	stream, err := c.cc.NewStream(ctx, &RestColService_ServiceDesc.Streams[0], RestColService_QueryDocumentsStream_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &restColServiceQueryDocumentsStreamClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type RestColService_QueryDocumentsStreamClient interface {
+	Recv() (*GetDocumentResponse, error)
+	grpc.ClientStream
+}
+
+type restColServiceQueryDocumentsStreamClient struct {
+	grpc.ClientStream
+}
+
+func (x *restColServiceQueryDocumentsStreamClient) Recv() (*GetDocumentResponse, error) {
+	m := new(GetDocumentResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *restColServiceClient) QueryDocument(ctx context.Context, in *QueryDocumentRequest, opts ...grpc.CallOption) (*QueryDocumentResponse, error) {
+	out := new(QueryDocumentResponse)
+	err := c.cc.Invoke(ctx, RestColService_QueryDocument_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RestColServiceServer is the server API for RestColService service.
 // All implementations must embed UnimplementedRestColServiceServer
 // for forward compatibility
@@ -140,6 +185,8 @@ type RestColServiceServer interface {
 	GetDocument(context.Context, *GetDocumentRequest) (*GetDocumentResponse, error)
 	// DeleteDocument endpoint is a generic endpoint for deleting a specific data
 	DeleteDocument(context.Context, *DeleteDocumentRequest) (*DeleteDocumentResponse, error)
+	QueryDocumentsStream(*QueryDocumentStreamRequest, RestColService_QueryDocumentsStreamServer) error
+	QueryDocument(context.Context, *QueryDocumentRequest) (*QueryDocumentResponse, error)
 	mustEmbedUnimplementedRestColServiceServer()
 }
 
@@ -170,6 +217,12 @@ func (UnimplementedRestColServiceServer) GetDocument(context.Context, *GetDocume
 }
 func (UnimplementedRestColServiceServer) DeleteDocument(context.Context, *DeleteDocumentRequest) (*DeleteDocumentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteDocument not implemented")
+}
+func (UnimplementedRestColServiceServer) QueryDocumentsStream(*QueryDocumentStreamRequest, RestColService_QueryDocumentsStreamServer) error {
+	return status.Errorf(codes.Unimplemented, "method QueryDocumentsStream not implemented")
+}
+func (UnimplementedRestColServiceServer) QueryDocument(context.Context, *QueryDocumentRequest) (*QueryDocumentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QueryDocument not implemented")
 }
 func (UnimplementedRestColServiceServer) mustEmbedUnimplementedRestColServiceServer() {}
 
@@ -328,6 +381,45 @@ func _RestColService_DeleteDocument_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RestColService_QueryDocumentsStream_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(QueryDocumentStreamRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(RestColServiceServer).QueryDocumentsStream(m, &restColServiceQueryDocumentsStreamServer{stream})
+}
+
+type RestColService_QueryDocumentsStreamServer interface {
+	Send(*GetDocumentResponse) error
+	grpc.ServerStream
+}
+
+type restColServiceQueryDocumentsStreamServer struct {
+	grpc.ServerStream
+}
+
+func (x *restColServiceQueryDocumentsStreamServer) Send(m *GetDocumentResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _RestColService_QueryDocument_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryDocumentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RestColServiceServer).QueryDocument(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RestColService_QueryDocument_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RestColServiceServer).QueryDocument(ctx, req.(*QueryDocumentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RestColService_ServiceDesc is the grpc.ServiceDesc for RestColService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -367,7 +459,17 @@ var RestColService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "DeleteDocument",
 			Handler:    _RestColService_DeleteDocument_Handler,
 		},
+		{
+			MethodName: "QueryDocument",
+			Handler:    _RestColService_QueryDocument_Handler,
+		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "QueryDocumentsStream",
+			Handler:       _RestColService_QueryDocumentsStream_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "proto/restcol.proto",
 }

@@ -44,6 +44,18 @@ type ClientService interface {
 
 	RestColServiceGetDocument3(params *RestColServiceGetDocument3Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceGetDocument3OK, error)
 
+	RestColServiceQueryDocument(params *RestColServiceQueryDocumentParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceQueryDocumentOK, error)
+
+	RestColServiceQueryDocument2(params *RestColServiceQueryDocument2Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceQueryDocument2OK, error)
+
+	RestColServiceQueryDocument3(params *RestColServiceQueryDocument3Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceQueryDocument3OK, error)
+
+	RestColServiceQueryDocumentsStream(params *RestColServiceQueryDocumentsStreamParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceQueryDocumentsStreamOK, error)
+
+	RestColServiceQueryDocumentsStream2(params *RestColServiceQueryDocumentsStream2Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceQueryDocumentsStream2OK, error)
+
+	RestColServiceQueryDocumentsStream3(params *RestColServiceQueryDocumentsStream3Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceQueryDocumentsStream3OK, error)
+
 	SetTransport(transport runtime.ClientTransport)
 }
 
@@ -358,6 +370,234 @@ func (a *Client) RestColServiceGetDocument3(params *RestColServiceGetDocument3Pa
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*RestColServiceGetDocument3Default)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+RestColServiceQueryDocument run query against a collection, return documents matched the query
+*/
+func (a *Client) RestColServiceQueryDocument(params *RestColServiceQueryDocumentParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceQueryDocumentOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewRestColServiceQueryDocumentParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "RestColService_QueryDocument",
+		Method:             "GET",
+		PathPattern:        "/v1/query",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &RestColServiceQueryDocumentReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*RestColServiceQueryDocumentOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*RestColServiceQueryDocumentDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+RestColServiceQueryDocument2 run query against a collection, return documents matched the query
+*/
+func (a *Client) RestColServiceQueryDocument2(params *RestColServiceQueryDocument2Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceQueryDocument2OK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewRestColServiceQueryDocument2Params()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "RestColService_QueryDocument2",
+		Method:             "GET",
+		PathPattern:        "/v1/collections/{collectionId}:query",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &RestColServiceQueryDocument2Reader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*RestColServiceQueryDocument2OK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*RestColServiceQueryDocument2Default)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+RestColServiceQueryDocument3 run query against a collection, return documents matched the query
+*/
+func (a *Client) RestColServiceQueryDocument3(params *RestColServiceQueryDocument3Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceQueryDocument3OK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewRestColServiceQueryDocument3Params()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "RestColService_QueryDocument3",
+		Method:             "GET",
+		PathPattern:        "/v1/projects/{projectId}/collections/{collectionId}:query",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &RestColServiceQueryDocument3Reader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*RestColServiceQueryDocument3OK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*RestColServiceQueryDocument3Default)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+RestColServiceQueryDocumentsStream run query against a collection, return documents in streaming which matched the query
+*/
+func (a *Client) RestColServiceQueryDocumentsStream(params *RestColServiceQueryDocumentsStreamParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceQueryDocumentsStreamOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewRestColServiceQueryDocumentsStreamParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "RestColService_QueryDocumentsStream",
+		Method:             "GET",
+		PathPattern:        "/v1/docstream",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &RestColServiceQueryDocumentsStreamReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*RestColServiceQueryDocumentsStreamOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*RestColServiceQueryDocumentsStreamDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+RestColServiceQueryDocumentsStream2 run query against a collection, return documents in streaming which matched the query
+*/
+func (a *Client) RestColServiceQueryDocumentsStream2(params *RestColServiceQueryDocumentsStream2Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceQueryDocumentsStream2OK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewRestColServiceQueryDocumentsStream2Params()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "RestColService_QueryDocumentsStream2",
+		Method:             "GET",
+		PathPattern:        "/v1/collections/{collectionId}:docstream",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &RestColServiceQueryDocumentsStream2Reader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*RestColServiceQueryDocumentsStream2OK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*RestColServiceQueryDocumentsStream2Default)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+RestColServiceQueryDocumentsStream3 run query against a collection, return documents in streaming which matched the query
+*/
+func (a *Client) RestColServiceQueryDocumentsStream3(params *RestColServiceQueryDocumentsStream3Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceQueryDocumentsStream3OK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewRestColServiceQueryDocumentsStream3Params()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "RestColService_QueryDocumentsStream3",
+		Method:             "GET",
+		PathPattern:        "/v1/projects/{projectId}/collections/{collectionId}:docstream",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &RestColServiceQueryDocumentsStream3Reader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*RestColServiceQueryDocumentsStream3OK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*RestColServiceQueryDocumentsStream3Default)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 

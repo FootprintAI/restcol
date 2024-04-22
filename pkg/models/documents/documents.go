@@ -1,6 +1,9 @@
 package modeldocuments
 
 import (
+	"database/sql"
+	"database/sql/driver"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -31,6 +34,28 @@ type DocumentID uuid.UUID
 
 func (d DocumentID) String() string {
 	return uuid.UUID(d).String()
+}
+
+var (
+	_ driver.Valuer = DocumentID{}
+	_ sql.Scanner   = &DocumentID{}
+)
+
+func (d DocumentID) Value() (driver.Value, error) {
+	return d.String(), nil
+}
+
+func (d *DocumentID) Scan(value interface{}) error {
+	_, isStringType := value.(string)
+	if !isStringType {
+		return fmt.Errorf("db.model: invalid type, expect string")
+	}
+	did, err := Parse(value.(string))
+	if err != nil {
+		return err
+	}
+	(*d) = did
+	return nil
 }
 
 func Parse(s string) (DocumentID, error) {

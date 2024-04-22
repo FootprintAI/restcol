@@ -27,8 +27,9 @@ func (p ProjectType) String() string {
 }
 
 var (
-	ProxyProjectType   ProjectType = "proxy"
-	RegularProjectType ProjectType = "regular"
+	ProxyProjectType    ProjectType = "proxy"
+	RegularProjectType  ProjectType = "regular"
+	ExternalProjectType ProjectType = "external"
 )
 
 type ModelProject struct {

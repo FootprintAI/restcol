@@ -2,14 +2,10 @@ package integrationtest
 
 import (
 	"encoding/json"
-	"fmt"
 	"testing"
-	"time"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
-	"github.com/sdinsure/agent/pkg/logger"
-	storagetestutils "github.com/sdinsure/agent/pkg/storage/testutils"
 	"github.com/stretchr/testify/assert"
 
 	restcolopenapicollections "github.com/footprintai/restcol/api/go-openapiv2/client/collections"
@@ -17,7 +13,6 @@ import (
 	restcolopenapiswagger "github.com/footprintai/restcol/api/go-openapiv2/client/swagger"
 	restcolopenapimodel "github.com/footprintai/restcol/api/go-openapiv2/models"
 	integrationtestclient "github.com/footprintai/restcol/integrationtest/client"
-	integrationtestserver "github.com/footprintai/restcol/integrationtest/server"
 )
 
 func TestIntegrationTest(t *testing.T) {
@@ -26,23 +21,10 @@ func TestIntegrationTest(t *testing.T) {
 		return
 	}
 
-	log := logger.NewLogger()
-	postgresDb, err := storagetestutils.NewTestPostgresCli(log)
-	if err != nil {
-		assert.NoError(t, err)
-	}
-	svr, err := integrationtestserver.NewServer(50050, 50051, postgresDb, log)
-	if err != nil {
-		log.Fatal("%+v", err)
-	}
-	defer svr.Stop()
+	suite := SetupTest(t)
+	defer suite.Close()
 
-	fmt.Print("integrationtest about to start\n")
-	go svr.Start()
-
-	time.Sleep(1 * time.Second)
-
-	client := integrationtestclient.MustNewClient("localhost:50051")
+	client := suite.NewClient()
 
 	// post /api/newdoc
 	createDocumentParam := &restcolopenapidocument.RestColServiceCreateDocumentParams{
@@ -56,8 +38,6 @@ func TestIntegrationTest(t *testing.T) {
 	}
 	restcolCreateDocumentOk, err := client.Document.RestColServiceCreateDocument(createDocumentParam, noAuthInfo())
 	assert.NoError(t, err)
-	//	createdDid := restcolCreateDocumentOk.Payload.Metadata.Did
-	//	createdPid := restcolCreateDocumentOk.Payload.Metadata.Pid
 	createdCid := restcolCreateDocumentOk.Payload.Metadata.CollectionID
 
 	// get /api/collections/{cid}

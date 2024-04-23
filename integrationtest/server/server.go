@@ -110,7 +110,7 @@ func makeServerService(
 		projectIdentityMiddleware.StreamServerInterceptor(),
 	}
 
-	svr, err := appserver.NewServerService(grpcPort, httpPort, log, unaryInterceptors, streamInterceptors)
+	svr, err := appserver.NewServerService(grpcPort, httpPort, log, appserver.WithMiddlewareConfigure(unaryInterceptors, streamInterceptors))
 	if err != nil {
 		return nil, err
 	}

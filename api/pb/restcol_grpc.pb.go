@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             (unknown)
-// source: proto/restcol.proto
+// source: restcol.proto
 
 package pb
 
@@ -471,5 +471,5 @@ var RestColService_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "proto/restcol.proto",
+	Metadata: "restcol.proto",
 }

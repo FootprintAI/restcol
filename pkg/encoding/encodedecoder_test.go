@@ -3,7 +3,7 @@ package encoding
 import (
 	"testing"
 
-	pb "github.com/footprintai/restcol/api/pb/proto"
+	pb "github.com/footprintai/restcol/api/pb"
 	"github.com/stretchr/testify/assert"
 )
 

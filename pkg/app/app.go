@@ -14,7 +14,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/datatypes"
 
-	apppb "github.com/footprintai/restcol/api/pb/proto"
+	apppb "github.com/footprintai/restcol/api/pb"
 	collectionsmodel "github.com/footprintai/restcol/pkg/models/collections"
 	documentsmodel "github.com/footprintai/restcol/pkg/models/documents"
 	projectsmodel "github.com/footprintai/restcol/pkg/models/projects"

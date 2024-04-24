@@ -7,7 +7,7 @@ import (
 
 	"gorm.io/gorm"
 
-	apppb "github.com/footprintai/restcol/api/pb/proto"
+	apppb "github.com/footprintai/restcol/api/pb"
 	modelprojects "github.com/footprintai/restcol/pkg/models/projects"
 )
 

@@ -9,7 +9,7 @@ import (
 
 	"github.com/clbanning/mxj/v2"
 
-	pb "github.com/footprintai/restcol/api/pb/proto"
+	pb "github.com/footprintai/restcol/api/pb"
 	sderrors "github.com/sdinsure/agent/pkg/errors"
 )
 

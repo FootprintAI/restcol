@@ -3,7 +3,7 @@ package modelcollections
 import (
 	"time"
 
-	apppb "github.com/footprintai/restcol/api/pb/proto"
+	apppb "github.com/footprintai/restcol/api/pb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 )
 

@@ -5,7 +5,7 @@ import (
 	"slices"
 	"strings"
 
-	apppb "github.com/footprintai/restcol/api/pb/proto"
+	apppb "github.com/footprintai/restcol/api/pb"
 
 	encoding "github.com/footprintai/restcol/pkg/encoding"
 	appmodelcollections "github.com/footprintai/restcol/pkg/models/collections"

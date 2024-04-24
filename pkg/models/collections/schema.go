@@ -12,7 +12,7 @@ import (
 	"github.com/cthulhu/jsonpath"
 	"gorm.io/gorm"
 
-	apppb "github.com/footprintai/restcol/api/pb/proto"
+	apppb "github.com/footprintai/restcol/api/pb"
 )
 
 type SchemaID int

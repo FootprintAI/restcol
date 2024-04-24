@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	apppb "github.com/footprintai/restcol/api/pb/proto"
+	apppb "github.com/footprintai/restcol/api/pb"
 	appmodelcollections "github.com/footprintai/restcol/pkg/models/collections"
 	storageprojects "github.com/footprintai/restcol/pkg/storage/projects"
 	"github.com/sdinsure/agent/pkg/logger"

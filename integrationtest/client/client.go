@@ -3,22 +3,11 @@ package integrationtestclient
 import (
 	"io"
 
-	restcolopenapi "github.com/footprintai/restcol/api/go-openapiv2/client"
+	"github.com/go-openapi/runtime"
+
 	restcolopenapiswagger "github.com/footprintai/restcol/api/go-openapiv2/client/swagger"
 	restcolopenapimodel "github.com/footprintai/restcol/api/go-openapiv2/models"
-	"github.com/go-openapi/runtime"
-	"github.com/sdinsure/agent/pkg/http/openapi"
 )
-
-func MustNewClient(endpoint string) *restcolopenapi.RestColAPIDocumentations {
-	return restcolopenapi.New(
-		openapi.MustNew(
-			endpoint,
-			restcolopenapi.DefaultBasePath,
-		),
-		nil,
-	)
-}
 
 type RawSwaggerDocReader struct {
 	restColServiceGetSwaggerDocReader restcolopenapiswagger.RestColServiceGetSwaggerDocReader

@@ -3,7 +3,7 @@ package storagecollections
 import (
 	"context"
 
-	apppb "github.com/footprintai/restcol/api/pb/proto"
+	apppb "github.com/footprintai/restcol/api/pb"
 	appmodelcollections "github.com/footprintai/restcol/pkg/models/collections"
 	appmodelprojects "github.com/footprintai/restcol/pkg/models/projects"
 	storagepostgres "github.com/sdinsure/agent/pkg/storage/postgres"

@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
-	pb "github.com/footprintai/restcol/api/pb/proto"
+	pb "github.com/footprintai/restcol/api/pb"
 	appapp "github.com/footprintai/restcol/pkg/app"
 )
 

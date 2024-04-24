@@ -36,7 +36,7 @@ func (c *CollectionSwaggerDoc) RenderDoc() (string, error) {
 
 	newSwagDoc := func() (*spec.Swagger, error) {
 		swagDoc, err := openapiloads.Spec(
-			"openapiv2/proto/restcol.swagger.json",
+			"openapiv2/restcol.swagger.json",
 			openapiloads.WithDocLoader(
 				embedFsLoader,
 			),

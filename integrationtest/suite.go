@@ -9,8 +9,8 @@ import (
 	storagetestutils "github.com/sdinsure/agent/pkg/storage/testutils"
 	"github.com/stretchr/testify/assert"
 
+	restcolgohttpclient "github.com/footprintai/restcol/api/go-http-client"
 	restcolopenapi "github.com/footprintai/restcol/api/go-openapiv2/client"
-	integrationtestclient "github.com/footprintai/restcol/integrationtest/client"
 	integrationtestserver "github.com/footprintai/restcol/integrationtest/server"
 )
 
@@ -27,7 +27,7 @@ func (s *suite) Close() error {
 }
 
 func (s *suite) NewClient() *restcolopenapi.RestColAPIDocumentations {
-	return integrationtestclient.MustNewClient("localhost:50051")
+	return restcolgohttpclient.MustNewClient("localhost:50051")
 }
 
 func SetupTest(t *testing.T) *suite {

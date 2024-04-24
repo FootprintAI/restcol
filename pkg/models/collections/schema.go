@@ -3,13 +3,13 @@ package modelcollections
 import (
 	"database/sql"
 	"database/sql/driver"
-	"encoding/json"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
 
 	"github.com/cthulhu/jsonpath"
+	"google.golang.org/protobuf/types/known/structpb"
+	_ "google.golang.org/protobuf/types/known/structpb"
 	"gorm.io/gorm"
 
 	apppb "github.com/footprintai/restcol/api/pb"
@@ -57,10 +57,13 @@ func (f SwagValueType) valueType() string {
 
 var (
 	NoneSwagValueType    SwagValueType = "none"
+	NullSwagValueType    SwagValueType = "null"
 	StringSwagValueType  SwagValueType = "string"
 	NumberSwagValueType  SwagValueType = "number"
 	IntegerSwagValueType SwagValueType = "integer"
 	BoolSwagValueType    SwagValueType = "bool"
+	ObjectSwagValueType  SwagValueType = "object"
+	ArraySwagValueType   SwagValueType = "array"
 )
 
 func (f SwagValueType) Proto() apppb.SchemaFieldDataType {
@@ -73,6 +76,10 @@ func (f SwagValueType) Proto() apppb.SchemaFieldDataType {
 		return apppb.SchemaFieldDataType_SCHEMA_FIELD_DATA_TYPE_INTEGER
 	case BoolSwagValueType:
 		return apppb.SchemaFieldDataType_SCHEMA_FIELD_DATA_TYPE_BOOL
+	case ObjectSwagValueType:
+		return apppb.SchemaFieldDataType_SCHEMA_FIELD_DATA_TYPE_OBJECT
+	case ArraySwagValueType:
+		return apppb.SchemaFieldDataType_SCHEMA_FIELD_DATA_TYPE_ARRAY
 	default:
 		return apppb.SchemaFieldDataType_SCHEMA_FIELD_DATA_TYPE_NONE
 	}
@@ -91,14 +98,19 @@ func NewSwaggerValueType(pbDataType apppb.SchemaFieldDataType) SwagValueType {
 	if pbDataType == apppb.SchemaFieldDataType_SCHEMA_FIELD_DATA_TYPE_BOOL {
 		return BoolSwagValueType
 	}
+	if pbDataType == apppb.SchemaFieldDataType_SCHEMA_FIELD_DATA_TYPE_OBJECT {
+		return ObjectSwagValueType
+	}
+	if pbDataType == apppb.SchemaFieldDataType_SCHEMA_FIELD_DATA_TYPE_ARRAY {
+		return ArraySwagValueType
+	}
 	return NoneSwagValueType
 }
 
-type SwagValueValue struct {
-	StringValue  *string  `json:"str,omitempty"`
-	NumberValue  *float64 `json:"num,omitempty"`
-	IntegerValue *int64   `json:"int,omitempty"`
-	BoolValue    *bool    `json:"bool,omitempty"`
+type SwagValueValue structpb.Value
+
+func (s SwagValueValue) Interface() interface{} {
+	return s.Proto().AsInterface()
 }
 
 func Must(s SwagValueValue, e error) SwagValueValue {
@@ -109,76 +121,36 @@ func Must(s SwagValueValue, e error) SwagValueValue {
 }
 
 func NewSwagValue(v any) (SwagValueValue, error) {
-	switch v.(type) {
-	case int, int64, int32:
-		i := int64(v.(int))
-		return SwagValueValue{
-			IntegerValue: &i,
-		}, nil
-	case float64:
-		f := v.(float64)
-		return SwagValueValue{
-			NumberValue: &f,
-		}, nil
-	case bool:
-		b := v.(bool)
-		return SwagValueValue{
-			BoolValue: &b,
-		}, nil
-	case string:
-		s := v.(string)
-		return SwagValueValue{
-			StringValue: &s,
-		}, nil
-	case *apppb.SchemaFieldExampleValue:
-		pbValue := v.(*apppb.SchemaFieldExampleValue)
-		if pbValue.StringValue != nil {
-			return SwagValueValue{
-				StringValue: pbValue.StringValue,
-			}, nil
-		}
-		if pbValue.NumberValue != nil {
-			return SwagValueValue{
-				NumberValue: pbValue.NumberValue,
-			}, nil
-		}
-		if pbValue.IntegerValue != nil {
-			return SwagValueValue{
-				IntegerValue: pbValue.IntegerValue,
-			}, nil
-		}
-		if pbValue.BoolValue != nil {
-			return SwagValueValue{
-				BoolValue: pbValue.BoolValue,
-			}, nil
-		}
+	pbValue, err := structpb.NewValue(v)
+	if err != nil {
+		return SwagValueValue{}, err
 	}
-	return SwagValueValue{}, errors.New("Schema: no available type for swag value")
+	return SwagValueValue(*pbValue), nil
 }
 
-func (s SwagValueValue) Proto() *apppb.SchemaFieldExampleValue {
-	return &apppb.SchemaFieldExampleValue{
-		StringValue:  s.StringValue,
-		NumberValue:  s.NumberValue,
-		IntegerValue: s.IntegerValue,
-		BoolValue:    s.BoolValue,
-	}
+func (s SwagValueValue) Proto() *structpb.Value {
+	pbValue := structpb.Value(s)
+	return &pbValue
 }
 
 func (s SwagValueValue) Type() SwagValueType {
-	if s.StringValue != nil {
-		return StringSwagValueType
-	}
-	if s.NumberValue != nil {
-		return NumberSwagValueType
-	}
-	if s.IntegerValue != nil {
-		return IntegerSwagValueType
-	}
-	if s.BoolValue != nil {
+	pbValue := structpb.Value(s)
+	switch pbValue.Kind.(type) {
+	case *structpb.Value_NullValue:
+		return NullSwagValueType
+	case *structpb.Value_BoolValue:
 		return BoolSwagValueType
+	case *structpb.Value_NumberValue:
+		return NumberSwagValueType
+	case *structpb.Value_StringValue:
+		return StringSwagValueType
+	case *structpb.Value_StructValue:
+		return ObjectSwagValueType
+	case *structpb.Value_ListValue:
+		return ArraySwagValueType
+	default:
+		return NoneSwagValueType
 	}
-	return NoneSwagValueType
 }
 
 var (
@@ -187,15 +159,16 @@ var (
 )
 
 func (s *SwagValueValue) Scan(in any) error {
-	if _, isBytes := in.([]byte); isBytes {
-		return json.Unmarshal(in.([]byte), s)
+	pbValue := &structpb.Value{}
+	if err := pbValue.UnmarshalJSON(in.([]byte)); err != nil {
+		return err
 	}
-	return errors.New("shema: require []bytes")
-
+	(*s) = SwagValueValue(*pbValue)
+	return nil
 }
 
 func (s SwagValueValue) Value() (driver.Value, error) {
-	return json.Marshal(s)
+	return s.Proto().MarshalJSON()
 }
 
 type ModelFieldSchema struct {
@@ -231,16 +204,14 @@ func (m ModelFieldsSchema) ToJSON(dotPrefixs ...string) ([]byte, error) {
 	fieldsMap := make(map[string]string)
 	for _, field := range m {
 		fieldName := withPrefix(field.FieldName)
-		if field.FieldValueType == NumberSwagValueType && field.FieldExample.NumberValue != nil {
-			fieldsMap[fmt.Sprintf("%s.num()", fieldName)] = fmt.Sprintf("%f", *field.FieldExample.NumberValue)
-		} else if field.FieldValueType == IntegerSwagValueType && field.FieldExample.IntegerValue != nil {
-			fieldsMap[fmt.Sprintf("%s.num()", fieldName)] = fmt.Sprintf("%d", *field.FieldExample.IntegerValue)
-		} else if field.FieldValueType == BoolSwagValueType && field.FieldExample.BoolValue != nil {
-			fieldsMap[fmt.Sprintf("%s.bool()", fieldName)] = fmt.Sprintf("%t", *field.FieldExample.BoolValue)
-		} else if field.FieldValueType == StringSwagValueType && field.FieldExample.StringValue != nil {
-			fieldsMap[fieldName] = *field.FieldExample.StringValue
+		if field.FieldValueType == NumberSwagValueType {
+			fieldsMap[fmt.Sprintf("%s.num()", fieldName)] = fmt.Sprintf("%f", field.FieldExample.Interface())
+		} else if field.FieldValueType == IntegerSwagValueType {
+			fieldsMap[fmt.Sprintf("%s.num()", fieldName)] = fmt.Sprintf("%d", field.FieldExample.Interface())
+		} else if field.FieldValueType == BoolSwagValueType {
+			fieldsMap[fmt.Sprintf("%s.bool()", fieldName)] = fmt.Sprintf("%t", field.FieldExample.Interface())
 		} else {
-			return nil, errors.New("fieldschema: invalid condition")
+			fieldsMap[fieldName] = fmt.Sprintf("%v", field.FieldExample.Interface())
 		}
 	}
 	return jsonpath.Marshal(fieldsMap)

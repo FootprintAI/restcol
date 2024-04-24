@@ -76,14 +76,9 @@ func (r *RestColServiceServerService) CreateCollection(ctx context.Context, req 
 	if err != nil {
 		return nil, err
 	}
-	var cid collectionsmodel.CollectionID
-	if req.CollectionId == nil {
-		cid = collectionsmodel.NewCollectionID()
-	} else {
-		cid, err = collectionsmodel.Parse(*req.CollectionId)
-		if err != nil {
-			return nil, err
-		}
+	var cid collectionsmodel.CollectionID = collectionsmodel.NewCollectionID()
+	if req.CollectionId != nil {
+		cid = collectionsmodel.NewCollectionIDFromStr(*req.CollectionId)
 	}
 	collectionType := apppb.CollectionType_COLLECTION_TYPE_REGULAR_FILES
 	if req.CollectionType != nil {
@@ -115,7 +110,9 @@ func (r *RestColServiceServerService) CreateCollection(ctx context.Context, req 
 		XMetadata:      collectionsmodel.NewPbCollectionMetadata(&mc),
 		Description:    mc.Summary,
 		CollectionType: mc.Type.Proto(),
-		Schemas:        collectionsmodel.NewPbSchemaFields(mc.Schemas[0]),
+	}
+	if len(mc.Schemas) > 0 {
+		resp.Schemas = collectionsmodel.NewPbSchemaFields(mc.Schemas[0])
 	}
 
 	return resp, nil
@@ -125,23 +122,24 @@ func (r *RestColServiceServerService) getProjectIdFromCtx(ctx context.Context) (
 	if r.defaultProjectResolver == nil {
 		pid = projectsmodel.ProjectID("invalid")
 		reterr = errors.New("no project resolver")
+		r.log.Error("getProjectIdFromCtx: no valid project resolver\n")
 		return
 	}
 	projectInfor, found := r.defaultProjectResolver.ProjectInfo(ctx)
 	if !found {
 		r.log.Info("no valid project id found, use default: %+v\n", pid)
-		pid = projectsmodel.NewProjectID(1001)
 		return
 	}
 	rawPid, err := projectInfor.GetProjectID()
 	if err != nil {
-		pid = projectsmodel.NewProjectID(1001)
+		r.log.Error("getProjectIdFromCtx: get projectid failed, err:%+v\n", err)
 		return
 	}
 	return projectsmodel.ProjectID(rawPid), nil
 }
 
-// TODO getCollectionIDFromSchemas would lookup collection id with schema list given// This should scan all collections and match by its schema and return the right collection id
+// TODO getCollectionIDFromSchemas would lookup collection id with schema list given
+// This should scan all collections and match by its schema and return the right collection id
 // For now, we do nothing but return a new one
 func (r *RestColServiceServerService) getCollectionIDFromSchemas() (collectionsmodel.CollectionID, error) {
 	return collectionsmodel.NewCollectionID(), nil
@@ -156,10 +154,7 @@ func (r *RestColServiceServerService) GetCollection(ctx context.Context, req *ap
 	if len(req.CollectionId) == 0 {
 		return nil, sderrors.NewBadParamsError(errors.New("missing required field"))
 	}
-	cid, err := collectionsmodel.Parse(req.CollectionId)
-	if err != nil {
-		return nil, err
-	}
+	cid = collectionsmodel.NewCollectionIDFromStr(req.CollectionId)
 	mc, err := r.collectionCURD.GetLatestSchema(ctx, "", cid)
 	if err != nil {
 		return nil, err
@@ -183,10 +178,7 @@ func (r *RestColServiceServerService) CreateDocument(ctx context.Context, req *a
 	}
 	var cid collectionsmodel.CollectionID
 	if req.CollectionId != "" {
-		cid, err = collectionsmodel.Parse(req.CollectionId)
-		if err != nil {
-			return nil, err
-		}
+		cid = collectionsmodel.NewCollectionIDFromStr(req.CollectionId)
 	} else {
 		cid, err = r.getCollectionIDFromSchemas()
 		if err != nil {
@@ -194,7 +186,7 @@ func (r *RestColServiceServerService) CreateDocument(ctx context.Context, req *a
 		}
 	}
 	// auto detect schema
-	schemaBuilder := schemafinder.NewSchemaBuilder()
+	schemaBuilder := schemafinder.NewSchemaBuilder(r.log)
 	_, modelSchema, err := schemaBuilder.Parse(req.Data)
 	if err != nil {
 		r.log.Error("failed to convert into modelschema, err:%+v\n", err)
@@ -251,10 +243,7 @@ func (r *RestColServiceServerService) QueryDocumentsStream(req *apppb.QueryDocum
 	if err != nil {
 		return err
 	}
-	cid, err := collectionsmodel.Parse(req.CollectionId)
-	if err != nil {
-		return err
-	}
+	cid := collectionsmodel.NewCollectionIDFromStr(req.CollectionId)
 	startedAt := req.SinceTs
 	endedAt := req.EndedAt
 

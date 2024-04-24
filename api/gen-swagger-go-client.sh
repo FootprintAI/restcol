@@ -6,4 +6,4 @@
 # chmod +x swagger
 
 mkdir go-openapiv2
-swagger generate client -f openapiv2/proto/*.swagger.json --target go-openapiv2
+swagger generate client -f openapiv2/*.swagger.json --target go-openapiv2

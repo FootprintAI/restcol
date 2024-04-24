@@ -1,55 +1,21 @@
 package modelcollections
 
 import (
-	"database/sql"
-	"database/sql/driver"
-	"fmt"
-
 	"github.com/google/uuid"
 )
 
-type CollectionID uuid.UUID
+type CollectionID string
 
-var (
-	_ fmt.Stringer = CollectionID{}
-)
+func NewCollectionIDFromStr(s string) CollectionID {
+	return CollectionID(s)
+}
 
 func (c CollectionID) String() string {
 	// TODO maybe add some prefix like "c:"
-	return uuid.UUID(c).String()
-}
-
-var (
-	_ driver.Valuer = CollectionID{}
-	_ sql.Scanner   = &CollectionID{}
-)
-
-func (c CollectionID) Value() (driver.Value, error) {
-	return c.String(), nil
-}
-
-func (c *CollectionID) Scan(value interface{}) error {
-	_, isStringType := value.(string)
-	if !isStringType {
-		return fmt.Errorf("db.model: invalid type, expect string")
-	}
-	cid, err := Parse(value.(string))
-	if err != nil {
-		return err
-	}
-	(*c) = cid
-	return nil
+	return string(c)
 }
 
 func NewCollectionID() CollectionID {
 	uid, _ := uuid.NewV7()
-	return CollectionID(uid)
-}
-
-func Parse(s string) (CollectionID, error) {
-	innerUuid, err := uuid.Parse(s)
-	if err != nil {
-		return CollectionID{}, err
-	}
-	return CollectionID(innerUuid), nil
+	return CollectionID(uid.String())
 }

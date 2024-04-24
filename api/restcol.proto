@@ -8,6 +8,7 @@ import "google/api/httpbody.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
@@ -55,7 +56,7 @@ service RestColService {
         option (google.api.http) = {
             get: "/v1/apidoc"
             additional_bindings {
-                post: "/v1/projects/{projectId}/apidoc"
+                get: "/v1/projects/{projectId}/apidoc"
             }
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -69,6 +70,7 @@ service RestColService {
             body: "*"
             additional_bindings {
                 post: "/v1/projects/{projectId}/collections"
+                body: "*"
             }
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -125,9 +127,11 @@ service RestColService {
             body: "*"
             additional_bindings {
                 post: "/v1/collections/{collectionId}:newdoc"
+                body: "*"
             }
             additional_bindings {
                 post: "/v1/projects/{projectId}/collections/{collectionId}:newdoc"
+                body: "*"
             }
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -208,7 +212,7 @@ message GetSwaggerDocRequest {
 message SchemaField {
     string name = 1;
     SchemaFieldDataType datatype = 2; 
-    optional SchemaFieldExampleValue example = 3;
+    optional google.protobuf.Value example = 3;
 }
 
 enum SchemaFieldDataType {
@@ -217,13 +221,8 @@ enum SchemaFieldDataType {
     SCHEMA_FIELD_DATA_TYPE_NUMBER = 2;
     SCHEMA_FIELD_DATA_TYPE_INTEGER = 3;
     SCHEMA_FIELD_DATA_TYPE_BOOL = 4;
-}
-
-message SchemaFieldExampleValue {
-    optional string stringValue = 1;
-    optional double numberValue = 2;
-    optional int64 integerValue = 3;
-    optional bool boolValue = 4;
+    SCHEMA_FIELD_DATA_TYPE_OBJECT = 5;
+    SCHEMA_FIELD_DATA_TYPE_ARRAY = 6;
 }
 
 message CollectionMetadata {

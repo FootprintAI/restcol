@@ -61,6 +61,7 @@ func (d *DocumentID) Scan(value interface{}) error {
 func Parse(s string) (DocumentID, error) {
 	innerUuid, err := uuid.Parse(s)
 	if err != nil {
+		fmt.Printf("parse doc uuid failed, err:+%v, s:%s\n", err, s)
 		return DocumentID{}, err
 	}
 	return DocumentID(innerUuid), nil

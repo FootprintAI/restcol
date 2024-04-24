@@ -22,7 +22,7 @@ type APISchemaField struct {
 	Datatype *APISchemaFieldDataType `json:"datatype,omitempty"`
 
 	// example
-	Example *APISchemaFieldExampleValue `json:"example,omitempty"`
+	Example interface{} `json:"example,omitempty"`
 
 	// name
 	Name string `json:"name,omitempty"`
@@ -33,10 +33,6 @@ func (m *APISchemaField) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateDatatype(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateExample(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -65,34 +61,11 @@ func (m *APISchemaField) validateDatatype(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *APISchemaField) validateExample(formats strfmt.Registry) error {
-	if swag.IsZero(m.Example) { // not required
-		return nil
-	}
-
-	if m.Example != nil {
-		if err := m.Example.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("example")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("example")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
 // ContextValidate validate this api schema field based on the context it is used
 func (m *APISchemaField) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.contextValidateDatatype(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.contextValidateExample(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -115,27 +88,6 @@ func (m *APISchemaField) contextValidateDatatype(ctx context.Context, formats st
 				return ve.ValidateName("datatype")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("datatype")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *APISchemaField) contextValidateExample(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.Example != nil {
-
-		if swag.IsZero(m.Example) { // not required
-			return nil
-		}
-
-		if err := m.Example.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("example")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("example")
 			}
 			return err
 		}

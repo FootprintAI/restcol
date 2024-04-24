@@ -6,6 +6,7 @@ import (
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"google.golang.org/grpc"
 
+	apppb "github.com/footprintai/restcol/api/pb"
 	appapp "github.com/footprintai/restcol/pkg/app"
 	appauthn "github.com/footprintai/restcol/pkg/authn"
 	appauthz "github.com/footprintai/restcol/pkg/authz"
@@ -19,6 +20,7 @@ import (
 	authnmiddleware "github.com/sdinsure/agent/pkg/grpc/server/middleware/authn"
 	authzmiddleware "github.com/sdinsure/agent/pkg/grpc/server/middleware/authz"
 	identitymiddleware "github.com/sdinsure/agent/pkg/grpc/server/middleware/identity"
+	serverservice "github.com/sdinsure/agent/pkg/grpc/server/service"
 	"github.com/sdinsure/agent/pkg/logger"
 	sdinsureruntime "github.com/sdinsure/agent/pkg/runtime"
 	postgresstorage "github.com/sdinsure/agent/pkg/storage/postgres"
@@ -55,7 +57,7 @@ func makeServerService(
 	httpPort int,
 	postgresDb *postgresstorage.PostgresDb,
 	log logger.Logger,
-) (*appserver.ServerService, error) {
+) (*serverservice.ServerService, error) {
 	projectCURD := projectsstorage.NewProjectCURD(postgresDb)
 	if err := projectCURD.AutoMigrate(); err != nil {
 		return nil, err
@@ -110,23 +112,31 @@ func makeServerService(
 		projectIdentityMiddleware.StreamServerInterceptor(),
 	}
 
-	svr, err := appserver.NewServerService(grpcPort, httpPort, log, appserver.WithMiddlewareConfigure(unaryInterceptors, streamInterceptors))
+	svr, err := serverservice.NewServerService(
+		grpcPort,
+		httpPort,
+		serverservice.WithLogger(log),
+		serverservice.WithMiddlewareConfigure(unaryInterceptors, streamInterceptors),
+	)
 	if err != nil {
 		return nil, err
 	}
-	svr.AddGatewayRoutes()
+	if err := appserver.AddSwaggerRoutes(svr); err != nil {
+		return nil, err
+	}
+
 	app := appapp.NewRestColServiceServerService(
 		log,
 		collectionCURD,
 		documentCURD,
 	)
 	app.SetDefaultProjectResolver(projectResolver)
-	appserver.RegisterService(svr, app)
+	svr.RegisterService(&apppb.RestColService_ServiceDesc, app, apppb.RegisterRestColServiceHandler)
 	return svr, nil
 }
 
 type Server struct {
-	server   *appserver.ServerService
+	server   *serverservice.ServerService
 	httpPort int
 }
 

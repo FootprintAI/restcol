@@ -4,13 +4,15 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/sdinsure/agent/pkg/logger"
+
 	"github.com/stretchr/testify/assert"
 )
 
 func TestTraverseMap(t *testing.T) {
 
 	traversedMap := make(map[string]interface{})
-	TraverseMap(m1, []string{}, func(prefixes []string, current string, val any) error {
+	TraverseMap(logger.NewLogger(), m1, []string{}, func(prefixes []string, current string, val any) error {
 		path := strings.Join(append(prefixes, current), ".")
 		traversedMap[path] = val
 		return nil

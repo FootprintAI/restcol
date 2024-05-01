@@ -14,6 +14,8 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+
+	"github.com/footprintai/restcol/api/go-openapiv2/models"
 )
 
 // NewRestColServiceCreateCollection2Params creates a new RestColServiceCreateCollection2Params object,
@@ -61,16 +63,8 @@ RestColServiceCreateCollection2Params contains all the parameters to send to the
 */
 type RestColServiceCreateCollection2Params struct {
 
-	// CollectionID.
-	CollectionID *string
-
-	// CollectionType.
-	//
-	// Default: "COLLECTION_TYPE_NONE"
-	CollectionType *string
-
-	// Description.
-	Description *string
+	// Body.
+	Body *models.RestColServiceCreateCollectionBody
 
 	// ProjectID.
 	ProjectID string
@@ -92,18 +86,7 @@ func (o *RestColServiceCreateCollection2Params) WithDefaults() *RestColServiceCr
 //
 // All values with no default are reset to their zero value.
 func (o *RestColServiceCreateCollection2Params) SetDefaults() {
-	var (
-		collectionTypeDefault = string("COLLECTION_TYPE_NONE")
-	)
-
-	val := RestColServiceCreateCollection2Params{
-		CollectionType: &collectionTypeDefault,
-	}
-
-	val.timeout = o.timeout
-	val.Context = o.Context
-	val.HTTPClient = o.HTTPClient
-	*o = val
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the rest col service create collection2 params
@@ -139,37 +122,15 @@ func (o *RestColServiceCreateCollection2Params) SetHTTPClient(client *http.Clien
 	o.HTTPClient = client
 }
 
-// WithCollectionID adds the collectionID to the rest col service create collection2 params
-func (o *RestColServiceCreateCollection2Params) WithCollectionID(collectionID *string) *RestColServiceCreateCollection2Params {
-	o.SetCollectionID(collectionID)
+// WithBody adds the body to the rest col service create collection2 params
+func (o *RestColServiceCreateCollection2Params) WithBody(body *models.RestColServiceCreateCollectionBody) *RestColServiceCreateCollection2Params {
+	o.SetBody(body)
 	return o
 }
 
-// SetCollectionID adds the collectionId to the rest col service create collection2 params
-func (o *RestColServiceCreateCollection2Params) SetCollectionID(collectionID *string) {
-	o.CollectionID = collectionID
-}
-
-// WithCollectionType adds the collectionType to the rest col service create collection2 params
-func (o *RestColServiceCreateCollection2Params) WithCollectionType(collectionType *string) *RestColServiceCreateCollection2Params {
-	o.SetCollectionType(collectionType)
-	return o
-}
-
-// SetCollectionType adds the collectionType to the rest col service create collection2 params
-func (o *RestColServiceCreateCollection2Params) SetCollectionType(collectionType *string) {
-	o.CollectionType = collectionType
-}
-
-// WithDescription adds the description to the rest col service create collection2 params
-func (o *RestColServiceCreateCollection2Params) WithDescription(description *string) *RestColServiceCreateCollection2Params {
-	o.SetDescription(description)
-	return o
-}
-
-// SetDescription adds the description to the rest col service create collection2 params
-func (o *RestColServiceCreateCollection2Params) SetDescription(description *string) {
-	o.Description = description
+// SetBody adds the body to the rest col service create collection2 params
+func (o *RestColServiceCreateCollection2Params) SetBody(body *models.RestColServiceCreateCollectionBody) {
+	o.Body = body
 }
 
 // WithProjectID adds the projectID to the rest col service create collection2 params
@@ -190,55 +151,9 @@ func (o *RestColServiceCreateCollection2Params) WriteToRequest(r runtime.ClientR
 		return err
 	}
 	var res []error
-
-	if o.CollectionID != nil {
-
-		// query param collectionId
-		var qrCollectionID string
-
-		if o.CollectionID != nil {
-			qrCollectionID = *o.CollectionID
-		}
-		qCollectionID := qrCollectionID
-		if qCollectionID != "" {
-
-			if err := r.SetQueryParam("collectionId", qCollectionID); err != nil {
-				return err
-			}
-		}
-	}
-
-	if o.CollectionType != nil {
-
-		// query param collectionType
-		var qrCollectionType string
-
-		if o.CollectionType != nil {
-			qrCollectionType = *o.CollectionType
-		}
-		qCollectionType := qrCollectionType
-		if qCollectionType != "" {
-
-			if err := r.SetQueryParam("collectionType", qCollectionType); err != nil {
-				return err
-			}
-		}
-	}
-
-	if o.Description != nil {
-
-		// query param description
-		var qrDescription string
-
-		if o.Description != nil {
-			qrDescription = *o.Description
-		}
-		qDescription := qrDescription
-		if qDescription != "" {
-
-			if err := r.SetQueryParam("description", qDescription); err != nil {
-				return err
-			}
+	if o.Body != nil {
+		if err := r.SetBodyParam(o.Body); err != nil {
+			return err
 		}
 	}
 

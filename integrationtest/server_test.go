@@ -2,6 +2,7 @@ package integrationtest
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/go-openapi/runtime"
@@ -49,27 +50,22 @@ func TestIntegrationTest(t *testing.T) {
 	expectedSchema := []*restcolopenapimodel.APISchemaField{
 		&restcolopenapimodel.APISchemaField{
 			Datatype: restcolopenapimodel.APISchemaFieldDataTypeSCHEMAFIELDDATATYPESTRING.Pointer(),
-			Example: &restcolopenapimodel.APISchemaFieldExampleValue{
-				StringValue: "bar",
-			},
-			Name: "foo",
+			Example:  "bar",
+			Name:     "foo",
 		},
 		&restcolopenapimodel.APISchemaField{
 			Datatype: restcolopenapimodel.APISchemaFieldDataTypeSCHEMAFIELDDATATYPESTRING.Pointer(),
-			Example: &restcolopenapimodel.APISchemaFieldExampleValue{
-				StringValue: "foo2bar",
-			},
-			Name: "foo2.foo2foo",
+			Example:  "foo2bar",
+			Name:     "foo2.foo2foo",
 		},
 		&restcolopenapimodel.APISchemaField{
 			Datatype: restcolopenapimodel.APISchemaFieldDataTypeSCHEMAFIELDDATATYPENUMBER.Pointer(),
-			Example: &restcolopenapimodel.APISchemaFieldExampleValue{
-				NumberValue: 123,
-			},
-			Name: "foo3.foo3foo",
+			Example:  json.Number("123"),
+			Name:     "foo3.foo3foo",
 		},
 	}
-	assert.EqualValues(t, restcolGetCollectionOk.Payload.Schemas, expectedSchema)
+	fmt.Printf("%+v\n", restcolGetCollectionOk.Payload.Schemas[2].Example)
+	assert.EqualValues(t, expectedSchema, restcolGetCollectionOk.Payload.Schemas)
 
 	// get /apidoc
 	getSwaggerDocParams := &restcolopenapiswagger.RestColServiceGetSwaggerDocParams{}

@@ -27,7 +27,7 @@ var (
 func (p *RuntimeProjectGetter) GetProject(ctx context.Context, projectId string) (sdinsureruntime.ProjectInfor, error) {
 	modelProject, err := p.projectCURD.Get(ctx, "", projectsmodels.ProjectID(projectId))
 	if err != nil {
-		return sdinsureruntime.NewInvalidProjectInfor(projectId), err
+		return sdinsureruntime.NewInvalidProjectInfor(), err
 	}
 	return projectInfor{modleProject: modelProject}, nil
 }

@@ -14,6 +14,8 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+
+	"github.com/footprintai/restcol/api/go-openapiv2/models"
 )
 
 // NewRestColServiceCreateDocument3Params creates a new RestColServiceCreateDocument3Params object,
@@ -61,24 +63,11 @@ RestColServiceCreateDocument3Params contains all the parameters to send to the A
 */
 type RestColServiceCreateDocument3Params struct {
 
+	// Body.
+	Body *models.RestColServiceCreateDocumentBody
+
 	// CollectionID.
 	CollectionID string
-
-	/* Data.
-
-	   data represents rawdata for any kind of formating
-
-	   Format: byte
-	*/
-	Data *strfmt.Base64
-
-	// Dataformat.
-	//
-	// Default: "DATA_FORMAT_UNKNOWN"
-	Dataformat *string
-
-	// DocumentID.
-	DocumentID *string
 
 	// ProjectID.
 	ProjectID string
@@ -100,18 +89,7 @@ func (o *RestColServiceCreateDocument3Params) WithDefaults() *RestColServiceCrea
 //
 // All values with no default are reset to their zero value.
 func (o *RestColServiceCreateDocument3Params) SetDefaults() {
-	var (
-		dataformatDefault = string("DATA_FORMAT_UNKNOWN")
-	)
-
-	val := RestColServiceCreateDocument3Params{
-		Dataformat: &dataformatDefault,
-	}
-
-	val.timeout = o.timeout
-	val.Context = o.Context
-	val.HTTPClient = o.HTTPClient
-	*o = val
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the rest col service create document3 params
@@ -147,6 +125,17 @@ func (o *RestColServiceCreateDocument3Params) SetHTTPClient(client *http.Client)
 	o.HTTPClient = client
 }
 
+// WithBody adds the body to the rest col service create document3 params
+func (o *RestColServiceCreateDocument3Params) WithBody(body *models.RestColServiceCreateDocumentBody) *RestColServiceCreateDocument3Params {
+	o.SetBody(body)
+	return o
+}
+
+// SetBody adds the body to the rest col service create document3 params
+func (o *RestColServiceCreateDocument3Params) SetBody(body *models.RestColServiceCreateDocumentBody) {
+	o.Body = body
+}
+
 // WithCollectionID adds the collectionID to the rest col service create document3 params
 func (o *RestColServiceCreateDocument3Params) WithCollectionID(collectionID string) *RestColServiceCreateDocument3Params {
 	o.SetCollectionID(collectionID)
@@ -156,39 +145,6 @@ func (o *RestColServiceCreateDocument3Params) WithCollectionID(collectionID stri
 // SetCollectionID adds the collectionId to the rest col service create document3 params
 func (o *RestColServiceCreateDocument3Params) SetCollectionID(collectionID string) {
 	o.CollectionID = collectionID
-}
-
-// WithData adds the data to the rest col service create document3 params
-func (o *RestColServiceCreateDocument3Params) WithData(data *strfmt.Base64) *RestColServiceCreateDocument3Params {
-	o.SetData(data)
-	return o
-}
-
-// SetData adds the data to the rest col service create document3 params
-func (o *RestColServiceCreateDocument3Params) SetData(data *strfmt.Base64) {
-	o.Data = data
-}
-
-// WithDataformat adds the dataformat to the rest col service create document3 params
-func (o *RestColServiceCreateDocument3Params) WithDataformat(dataformat *string) *RestColServiceCreateDocument3Params {
-	o.SetDataformat(dataformat)
-	return o
-}
-
-// SetDataformat adds the dataformat to the rest col service create document3 params
-func (o *RestColServiceCreateDocument3Params) SetDataformat(dataformat *string) {
-	o.Dataformat = dataformat
-}
-
-// WithDocumentID adds the documentID to the rest col service create document3 params
-func (o *RestColServiceCreateDocument3Params) WithDocumentID(documentID *string) *RestColServiceCreateDocument3Params {
-	o.SetDocumentID(documentID)
-	return o
-}
-
-// SetDocumentID adds the documentId to the rest col service create document3 params
-func (o *RestColServiceCreateDocument3Params) SetDocumentID(documentID *string) {
-	o.DocumentID = documentID
 }
 
 // WithProjectID adds the projectID to the rest col service create document3 params
@@ -209,61 +165,15 @@ func (o *RestColServiceCreateDocument3Params) WriteToRequest(r runtime.ClientReq
 		return err
 	}
 	var res []error
+	if o.Body != nil {
+		if err := r.SetBodyParam(o.Body); err != nil {
+			return err
+		}
+	}
 
 	// path param collectionId
 	if err := r.SetPathParam("collectionId", o.CollectionID); err != nil {
 		return err
-	}
-
-	if o.Data != nil {
-
-		// query param data
-		var qrData strfmt.Base64
-
-		if o.Data != nil {
-			qrData = *o.Data
-		}
-		qData := qrData.String()
-		if qData != "" {
-
-			if err := r.SetQueryParam("data", qData); err != nil {
-				return err
-			}
-		}
-	}
-
-	if o.Dataformat != nil {
-
-		// query param dataformat
-		var qrDataformat string
-
-		if o.Dataformat != nil {
-			qrDataformat = *o.Dataformat
-		}
-		qDataformat := qrDataformat
-		if qDataformat != "" {
-
-			if err := r.SetQueryParam("dataformat", qDataformat); err != nil {
-				return err
-			}
-		}
-	}
-
-	if o.DocumentID != nil {
-
-		// query param documentId
-		var qrDocumentID string
-
-		if o.DocumentID != nil {
-			qrDocumentID = *o.DocumentID
-		}
-		qDocumentID := qrDocumentID
-		if qDocumentID != "" {
-
-			if err := r.SetQueryParam("documentId", qDocumentID); err != nil {
-				return err
-			}
-		}
 	}
 
 	// path param projectId

@@ -27,7 +27,7 @@ func (s *suite) Close() error {
 }
 
 func (s *suite) NewClient() *restcolopenapi.RestColAPIDocumentations {
-	return restcolgohttpclient.MustNewClient("localhost:50051")
+	return restcolgohttpclient.MustNewClient("localhost:50051", nil)
 }
 
 func SetupTest(t *testing.T) *suite {

@@ -6,8 +6,12 @@ import (
 	api "github.com/footprintai/restcol/api"
 )
 
-func (s *ServerService) AddGatewayRoutes() error {
-	return s.httpGateway.AddRoutes(
+type GatewayRouteAdder interface {
+	AddGatewayRoutes(routes ...*grpchttpgatewayserver.Route) error
+}
+
+func AddSwaggerRoutes(s GatewayRouteAdder) error {
+	return s.AddGatewayRoutes(
 		grpchttpgatewayserver.NewSwaggerRoute(),
 		grpchttpgatewayserver.NewOpenAPIV2Route("/openapiv2/", api.OpenApiV2HttpHandler),
 	)

@@ -5,31 +5,19 @@ import (
 	"slices"
 	"strings"
 
-	apppb "github.com/footprintai/restcol/api/pb"
+	sdinsurelogger "github.com/sdinsure/agent/pkg/logger"
 
+	apppb "github.com/footprintai/restcol/api/pb"
 	encoding "github.com/footprintai/restcol/pkg/encoding"
 	appmodelcollections "github.com/footprintai/restcol/pkg/models/collections"
 )
 
-//
-//import "context"
-//
-//type SchemaFinder struct {
-//	collectionCURD *collectionsstorage.CollectionCURD
-//}
-//
-//func NewSchemaFinder(collectionCURD *collectionsstorage.CollectionCURD) *SchemaFinder {
-//	return &SchemaFinder{
-//		collectionCURD: collectionCURD,
-//	}
-//}
-//
-//func (s *SchemaFinder) GetCollection(ctx context.Context)
+type SchemaBuilder struct {
+	log sdinsurelogger.Logger
+}
 
-type SchemaBuilder struct{}
-
-func NewSchemaBuilder() *SchemaBuilder {
-	return &SchemaBuilder{}
+func NewSchemaBuilder(log sdinsurelogger.Logger) *SchemaBuilder {
+	return &SchemaBuilder{log: log}
 }
 
 func (s *SchemaBuilder) Parse(rawByte []byte) (apppb.DataFormat, *appmodelcollections.ModelSchema, error) {
@@ -46,6 +34,7 @@ func (s *SchemaBuilder) Parse(rawByte []byte) (apppb.DataFormat, *appmodelcollec
 
 	dotNotationMap := make(map[string]interface{})
 	if err := TraverseMap(
+		s.log,
 		placeHolder,
 		nil,
 		func(prefixes []string, current string, val any) error {
@@ -85,12 +74,16 @@ func (s *SchemaBuilder) Parse(rawByte []byte) (apppb.DataFormat, *appmodelcollec
 
 type CallbackFunc func(prefixes []string, current string, value interface{}) error
 
-func TraverseMap(m map[string]interface{}, prefixes []string, callback CallbackFunc) error {
+func TraverseMap(log sdinsurelogger.Logger, m map[string]interface{}, prefixes []string, callback CallbackFunc) error {
 	for key := range m {
 		valueOf := reflect.ValueOf(m[key])
 		switch valueOf.Kind() {
+		case reflect.Invalid:
+			log.Warn("schemafinder: skipped field: %s as the value is invalid\n", key)
+			continue
+
 		case reflect.Map:
-			if err := TraverseMap(m[key].(map[string]interface{}), append(prefixes, key), callback); err != nil {
+			if err := TraverseMap(log, m[key].(map[string]interface{}), append(prefixes, key), callback); err != nil {
 				return err
 			}
 		default:

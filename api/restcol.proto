@@ -54,9 +54,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 service RestColService {
     rpc GetSwaggerDoc(GetSwaggerDocRequest) returns (google.api.HttpBody) {
         option (google.api.http) = {
-            get: "/v1/apidoc"
+            get: "/v1/projects/{projectId}/apidoc"
             additional_bindings {
-                get: "/v1/projects/{projectId}/apidoc"
+                get: "/v1/projects/{projectId}/collections/{collectionId}/apidoc"
             }
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -66,12 +66,8 @@ service RestColService {
     }
     rpc CreateCollection(CreateCollectionRequest) returns (CreateCollectionResponse) {
         option (google.api.http) = {
-            post: "/v1/collections"
+            post: "/v1/projects/{projectId}/collections"
             body: "*"
-            additional_bindings {
-                post: "/v1/projects/{projectId}/collections"
-                body: "*"
-            }
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Add collection endpoint, a collection is a set of documents with scheme-free."
@@ -81,11 +77,7 @@ service RestColService {
 
     rpc ListCollections(ListCollectionsRequest) returns (ListCollectionsResponse) {
         option (google.api.http) = {
-            get: "/v1/collections"
-            additional_bindings {
-                get: "/v1/projects/{projectId}/collections"
-            }
-
+            get: "/v1/projects/{projectId}/collections"
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "list collections endpoint"
@@ -96,10 +88,7 @@ service RestColService {
 
     rpc GetCollection(GetCollectionRequest) returns (GetCollectionResponse) {
         option (google.api.http) = {
-            get: "/v1/collections/{collectionId}"
-            additional_bindings {
-                get: "/v1/projects/{projectId}/collections/{collectionId}"
-            }
+            get: "/v1/projects/{projectId}/collections/{collectionId}"
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "retrieve an individual collection information and document keys assocaited with it"
@@ -110,10 +99,7 @@ service RestColService {
 
     rpc DeleteCollection(DeleteCollectionRequest) returns (DeleteCollectionResponse) {
         option (google.api.http) = {
-            delete: "/v1/collections/{collectionId}"
-            additional_bindings {
-                delete: "/v1/projects/{projectId}/collections/{collectionId}"
-            }
+            delete: "/v1/projects/{projectId}/collections/{collectionId}"
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "remove an individual collection and its associated doc"
@@ -123,12 +109,8 @@ service RestColService {
 
     rpc CreateDocument(CreateDocumentRequest) returns (CreateDocumentResponse) {
         option (google.api.http) = {
-            post: "/v1/newdoc"
+            post: "/v1/projects/{projectId}/newdoc"
             body: "*"
-            additional_bindings {
-                post: "/v1/collections/{collectionId}:newdoc"
-                body: "*"
-            }
             additional_bindings {
                 post: "/v1/projects/{projectId}/collections/{collectionId}:newdoc"
                 body: "*"
@@ -143,13 +125,7 @@ service RestColService {
     // GetDocument endpoint is a generic endpoint for retrieving data across multiple collections
     rpc GetDocument(GetDocumentRequest) returns (GetDocumentResponse) {
         option (google.api.http) = {
-            get: "/v1/doc/{documentId}"
-            additional_bindings {
-                get: "/v1/collections/{collectionId}/{documentId}"
-            }
-            additional_bindings {
-                get: "/v1/projects/{projectId}/collections/{collectionId}/{documentId}"
-            }
+            get: "/v1/projects/{projectId}/collections/{collectionId}/docs/{documentId}"
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "retrieve a document information from the collection."
@@ -160,10 +136,7 @@ service RestColService {
     // DeleteDocument endpoint is a generic endpoint for deleting a specific data
     rpc DeleteDocument(DeleteDocumentRequest) returns (DeleteDocumentResponse) {
         option (google.api.http) = {
-            delete: "/v1/collections/{collectionId}/{documentId}"
-            additional_bindings {
-                delete: "/v1/projects/{projectId}/collections/{collectionId}/{documentId}"
-            }
+            delete: "/v1/projects/{projectId}/collections/{collectionId}/docs/{documentId}"
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "Remove the specific document from the collection"
@@ -173,13 +146,7 @@ service RestColService {
 
     rpc QueryDocumentsStream(QueryDocumentStreamRequest) returns (stream GetDocumentResponse) {
         option (google.api.http) = {
-            get: "/v1/docstream"
-            additional_bindings {
-                get: "/v1/collections/{collectionId}:docstream"
-            }
-            additional_bindings {
-                get: "/v1/projects/{projectId}/collections/{collectionId}:docstream"
-            }
+            get: "/v1/projects/{projectId}/collections/{collectionId}/docs:stream"
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "run query against a collection, return documents in streaming which matched the query"
@@ -189,13 +156,7 @@ service RestColService {
 
     rpc QueryDocument(QueryDocumentRequest) returns (QueryDocumentResponse) {
         option (google.api.http) = {
-            get: "/v1/query"
-            additional_bindings {
-                get: "/v1/collections/{collectionId}:query"
-            }
-            additional_bindings {
-                get: "/v1/projects/{projectId}/collections/{collectionId}:query"
-            }
+            get: "/v1/projects/{projectId}/collections/{collectionId}/docs"
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "run query against a collection, return documents matched the query"
@@ -207,6 +168,7 @@ service RestColService {
 
 message GetSwaggerDocRequest {
     string projectId = 1;
+    string collectionId = 2;
 }
 
 message SchemaField {
@@ -333,11 +295,12 @@ message GetDocumentRequest{
     string projectId = 1;
     string collectionId = 2;
     string documentId = 3;
+    repeated string fieldSelectors = 4; // dot-concatenated fields, ex: fielda.fieldb.fieldc
 }
 
 message GetDocumentResponse{
     DataMetadata _metadata = 1;
-    bytes data = 2;
+    google.protobuf.Value data = 2;
 }
 
 message DeleteDocumentRequest {
@@ -353,7 +316,7 @@ message QueryDocumentStreamRequest{
     string collectionId = 2;
     google.protobuf.Timestamp sinceTs = 3;
     optional google.protobuf.Timestamp endedAt = 4; // endedAt specifies when is the ended timeframe of the query
-    string queryfields = 5; // dot-concatenated fields, ex: fielda.fieldb.fieldc
+    repeated string fieldSelectors = 5; // dot-concatenated fields, ex: fielda.fieldb.fieldc
     optional bool followUpMode = 6; // if on, the service would keep watch new coming docs
 }
 
@@ -362,10 +325,10 @@ message QueryDocumentRequest {
     string collectionId = 2;
     google.protobuf.Timestamp sinceTs = 3;
     optional google.protobuf.Timestamp endedAt = 4; // endedAt specifies when is the ended timeframe of the query
-    string queryfields = 5; // dot-concatenated fields, ex: fielda.fieldb.fieldc
+    repeated string fieldSelectors = 5; // dot-concatenated fields, ex: fielda.fieldb.fieldc
     optional int32 limitCount = 6;
 }
 
 message QueryDocumentResponse {
-    GetDocumentResponse docs = 1;
+    repeated GetDocumentResponse docs = 1;
 }

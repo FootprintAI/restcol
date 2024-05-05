@@ -64,7 +64,10 @@ RestColServiceCreateCollectionParams contains all the parameters to send to the 
 type RestColServiceCreateCollectionParams struct {
 
 	// Body.
-	Body *models.APICreateCollectionRequest
+	Body *models.RestColServiceCreateCollectionBody
+
+	// ProjectID.
+	ProjectID string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -120,14 +123,25 @@ func (o *RestColServiceCreateCollectionParams) SetHTTPClient(client *http.Client
 }
 
 // WithBody adds the body to the rest col service create collection params
-func (o *RestColServiceCreateCollectionParams) WithBody(body *models.APICreateCollectionRequest) *RestColServiceCreateCollectionParams {
+func (o *RestColServiceCreateCollectionParams) WithBody(body *models.RestColServiceCreateCollectionBody) *RestColServiceCreateCollectionParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the rest col service create collection params
-func (o *RestColServiceCreateCollectionParams) SetBody(body *models.APICreateCollectionRequest) {
+func (o *RestColServiceCreateCollectionParams) SetBody(body *models.RestColServiceCreateCollectionBody) {
 	o.Body = body
+}
+
+// WithProjectID adds the projectID to the rest col service create collection params
+func (o *RestColServiceCreateCollectionParams) WithProjectID(projectID string) *RestColServiceCreateCollectionParams {
+	o.SetProjectID(projectID)
+	return o
+}
+
+// SetProjectID adds the projectId to the rest col service create collection params
+func (o *RestColServiceCreateCollectionParams) SetProjectID(projectID string) {
+	o.ProjectID = projectID
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -141,6 +155,11 @@ func (o *RestColServiceCreateCollectionParams) WriteToRequest(r runtime.ClientRe
 		if err := r.SetBodyParam(o.Body); err != nil {
 			return err
 		}
+	}
+
+	// path param projectId
+	if err := r.SetPathParam("projectId", o.ProjectID); err != nil {
+		return err
 	}
 
 	if len(res) > 0 {

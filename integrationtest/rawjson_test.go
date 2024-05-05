@@ -18,19 +18,19 @@ func TestRawJSONData(t *testing.T) {
 	suite := SetupTest(t)
 	defer suite.Close()
 
+	SetupCollection(t, suite)
+
 	client := suite.NewClient()
 
 	// post /api/newdoc with raw json
-	createDocumentParam := &restcolopenapidocument.RestColServiceCreateDocumentParams{
-		Body: &restcolopenapimodel.APICreateDocumentRequest{
-			CollectionID: "", // empty cid, would create a new collection
-			DocumentID:   "",
-			ProjectID:    "",  // empty pid, would use default pid
-			Dataformat:   nil, // use auto infer
-			Data:         []byte(makeRawJson()),
+	createDocumentParam := &restcolopenapidocument.RestColServiceCreateDocument2Params{
+		Body: &restcolopenapimodel.RestColServiceCreateDocumentBody{
+			Data: []byte(makeRawJson()),
 		},
+		CollectionID: cid,
+		ProjectID:    projectId,
 	}
-	restcolCreateDocumentOk, err := client.Document.RestColServiceCreateDocument(createDocumentParam, noAuthInfo())
+	restcolCreateDocumentOk, err := client.Document.RestColServiceCreateDocument2(createDocumentParam, noAuthInfo())
 	assert.NoError(t, err)
 	assert.True(t, restcolCreateDocumentOk.Payload.Metadata.DocumentID != "")
 }

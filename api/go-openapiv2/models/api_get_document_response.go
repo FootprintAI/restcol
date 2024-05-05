@@ -22,8 +22,7 @@ type APIGetDocumentResponse struct {
 	Metadata *APIDataMetadata `json:"Metadata,omitempty"`
 
 	// data
-	// Format: byte
-	Data strfmt.Base64 `json:"data,omitempty"`
+	Data interface{} `json:"data,omitempty"`
 }
 
 // Validate validates this api get document response

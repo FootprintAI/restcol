@@ -4,6 +4,7 @@ import (
 	"time"
 
 	apppb "github.com/footprintai/restcol/api/pb"
+	dotnotation "github.com/footprintai/restcol/pkg/notation/dot"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -20,7 +21,7 @@ func NewPbCollectionMetadata(mc *ModelCollection) *apppb.CollectionMetadata {
 }
 
 func NewModelSchema(reqSchemas []*apppb.SchemaField) (ModelSchema, error) {
-	var fields []ModelFieldSchema
+	var fields []*ModelFieldSchema
 
 	for _, reqSchema := range reqSchemas {
 		valType := NewSwaggerValueType(reqSchema.Datatype)
@@ -28,8 +29,8 @@ func NewModelSchema(reqSchemas []*apppb.SchemaField) (ModelSchema, error) {
 		if err != nil {
 			return ModelSchema{}, err
 		}
-		fields = append(fields, ModelFieldSchema{
-			FieldName:      reqSchema.Name,
+		fields = append(fields, &ModelFieldSchema{
+			FieldName:      dotnotation.Parse(reqSchema.Name),
 			FieldValueType: valType,
 			FieldExample:   valueValue,
 		})
@@ -45,7 +46,7 @@ func NewPbSchemaFields(m ModelSchema) []*apppb.SchemaField {
 
 	for _, field := range m.Fields {
 		pbfields = append(pbfields, &apppb.SchemaField{
-			Name:     field.FieldName,
+			Name:     field.FieldName.String(),
 			Datatype: field.FieldValueType.Proto(),
 			Example:  field.FieldExample.Proto(),
 		})

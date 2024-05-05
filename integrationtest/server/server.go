@@ -13,6 +13,7 @@ import (
 	dummy "github.com/footprintai/restcol/pkg/dummy"
 	appmiddleware "github.com/footprintai/restcol/pkg/middleware"
 	runtimeprojectgetter "github.com/footprintai/restcol/pkg/runtime/getter"
+	schemafinder "github.com/footprintai/restcol/pkg/schema"
 	appserver "github.com/footprintai/restcol/pkg/server"
 	collectionsstorage "github.com/footprintai/restcol/pkg/storage/collections"
 	documentsstorage "github.com/footprintai/restcol/pkg/storage/documents"
@@ -125,10 +126,13 @@ func makeServerService(
 		return nil, err
 	}
 
+	schemaBuilder := schemafinder.NewSchemaBuilder(log)
+
 	app := appapp.NewRestColServiceServerService(
 		log,
 		collectionCURD,
 		documentCURD,
+		schemaBuilder,
 	)
 	app.SetDefaultProjectResolver(projectResolver)
 	svr.RegisterService(&apppb.RestColService_ServiceDesc, app, apppb.RegisterRestColServiceHandler)

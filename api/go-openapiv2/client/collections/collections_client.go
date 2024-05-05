@@ -30,19 +30,11 @@ type ClientOption func(*runtime.ClientOperation)
 type ClientService interface {
 	RestColServiceCreateCollection(params *RestColServiceCreateCollectionParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceCreateCollectionOK, error)
 
-	RestColServiceCreateCollection2(params *RestColServiceCreateCollection2Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceCreateCollection2OK, error)
-
 	RestColServiceDeleteCollection(params *RestColServiceDeleteCollectionParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceDeleteCollectionOK, error)
-
-	RestColServiceDeleteCollection2(params *RestColServiceDeleteCollection2Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceDeleteCollection2OK, error)
 
 	RestColServiceGetCollection(params *RestColServiceGetCollectionParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceGetCollectionOK, error)
 
-	RestColServiceGetCollection2(params *RestColServiceGetCollection2Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceGetCollection2OK, error)
-
 	RestColServiceListCollections(params *RestColServiceListCollectionsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceListCollectionsOK, error)
-
-	RestColServiceListCollections2(params *RestColServiceListCollections2Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceListCollections2OK, error)
 
 	SetTransport(transport runtime.ClientTransport)
 }
@@ -58,7 +50,7 @@ func (a *Client) RestColServiceCreateCollection(params *RestColServiceCreateColl
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_CreateCollection",
 		Method:             "POST",
-		PathPattern:        "/v1/collections",
+		PathPattern:        "/v1/projects/{projectId}/collections",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},
@@ -86,44 +78,6 @@ func (a *Client) RestColServiceCreateCollection(params *RestColServiceCreateColl
 }
 
 /*
-RestColServiceCreateCollection2 adds collection endpoint a collection is a set of documents with scheme free
-*/
-func (a *Client) RestColServiceCreateCollection2(params *RestColServiceCreateCollection2Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceCreateCollection2OK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewRestColServiceCreateCollection2Params()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "RestColService_CreateCollection2",
-		Method:             "POST",
-		PathPattern:        "/v1/projects/{projectId}/collections",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"https"},
-		Params:             params,
-		Reader:             &RestColServiceCreateCollection2Reader{formats: a.formats},
-		AuthInfo:           authInfo,
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*RestColServiceCreateCollection2OK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	unexpectedSuccess := result.(*RestColServiceCreateCollection2Default)
-	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
-}
-
-/*
 RestColServiceDeleteCollection remove an individual collection and its associated doc
 */
 func (a *Client) RestColServiceDeleteCollection(params *RestColServiceDeleteCollectionParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceDeleteCollectionOK, error) {
@@ -134,7 +88,7 @@ func (a *Client) RestColServiceDeleteCollection(params *RestColServiceDeleteColl
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_DeleteCollection",
 		Method:             "DELETE",
-		PathPattern:        "/v1/collections/{collectionId}",
+		PathPattern:        "/v1/projects/{projectId}/collections/{collectionId}",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},
@@ -162,44 +116,6 @@ func (a *Client) RestColServiceDeleteCollection(params *RestColServiceDeleteColl
 }
 
 /*
-RestColServiceDeleteCollection2 remove an individual collection and its associated doc
-*/
-func (a *Client) RestColServiceDeleteCollection2(params *RestColServiceDeleteCollection2Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceDeleteCollection2OK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewRestColServiceDeleteCollection2Params()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "RestColService_DeleteCollection2",
-		Method:             "DELETE",
-		PathPattern:        "/v1/projects/{projectId}/collections/{collectionId}",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"https"},
-		Params:             params,
-		Reader:             &RestColServiceDeleteCollection2Reader{formats: a.formats},
-		AuthInfo:           authInfo,
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*RestColServiceDeleteCollection2OK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	unexpectedSuccess := result.(*RestColServiceDeleteCollection2Default)
-	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
-}
-
-/*
 RestColServiceGetCollection retrieve an individual collection information and document keys assocaited with it
 */
 func (a *Client) RestColServiceGetCollection(params *RestColServiceGetCollectionParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceGetCollectionOK, error) {
@@ -210,7 +126,7 @@ func (a *Client) RestColServiceGetCollection(params *RestColServiceGetCollection
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_GetCollection",
 		Method:             "GET",
-		PathPattern:        "/v1/collections/{collectionId}",
+		PathPattern:        "/v1/projects/{projectId}/collections/{collectionId}",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},
@@ -238,44 +154,6 @@ func (a *Client) RestColServiceGetCollection(params *RestColServiceGetCollection
 }
 
 /*
-RestColServiceGetCollection2 retrieve an individual collection information and document keys assocaited with it
-*/
-func (a *Client) RestColServiceGetCollection2(params *RestColServiceGetCollection2Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceGetCollection2OK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewRestColServiceGetCollection2Params()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "RestColService_GetCollection2",
-		Method:             "GET",
-		PathPattern:        "/v1/projects/{projectId}/collections/{collectionId}",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"https"},
-		Params:             params,
-		Reader:             &RestColServiceGetCollection2Reader{formats: a.formats},
-		AuthInfo:           authInfo,
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*RestColServiceGetCollection2OK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	unexpectedSuccess := result.(*RestColServiceGetCollection2Default)
-	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
-}
-
-/*
 RestColServiceListCollections lists collections endpoint
 */
 func (a *Client) RestColServiceListCollections(params *RestColServiceListCollectionsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceListCollectionsOK, error) {
@@ -286,7 +164,7 @@ func (a *Client) RestColServiceListCollections(params *RestColServiceListCollect
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_ListCollections",
 		Method:             "GET",
-		PathPattern:        "/v1/collections",
+		PathPattern:        "/v1/projects/{projectId}/collections",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},
@@ -310,44 +188,6 @@ func (a *Client) RestColServiceListCollections(params *RestColServiceListCollect
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*RestColServiceListCollectionsDefault)
-	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
-}
-
-/*
-RestColServiceListCollections2 lists collections endpoint
-*/
-func (a *Client) RestColServiceListCollections2(params *RestColServiceListCollections2Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceListCollections2OK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewRestColServiceListCollections2Params()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "RestColService_ListCollections2",
-		Method:             "GET",
-		PathPattern:        "/v1/projects/{projectId}/collections",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"https"},
-		Params:             params,
-		Reader:             &RestColServiceListCollections2Reader{formats: a.formats},
-		AuthInfo:           authInfo,
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*RestColServiceListCollections2OK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	unexpectedSuccess := result.(*RestColServiceListCollections2Default)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 

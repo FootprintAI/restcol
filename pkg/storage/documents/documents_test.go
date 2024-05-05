@@ -50,6 +50,7 @@ func TestDocument(t *testing.T) {
 		ID:                appmodeldocuments.NewDocumentID(),
 		Data:              datatypes.JSON("{\"foo\": \"bar\"}"),
 		ModelCollectionID: modelCollection.ID,
+		ModelProjectID:    regularProject.ID,
 	}
 	assert.Nil(t, dcrud.Write(ctx, "", record))
 

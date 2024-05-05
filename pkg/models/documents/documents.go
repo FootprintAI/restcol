@@ -3,11 +3,11 @@ package modeldocuments
 import (
 	"database/sql"
 	"database/sql/driver"
+	"encoding/json"
 	"fmt"
 	"time"
 
 	"github.com/google/uuid"
-	"gorm.io/datatypes"
 	"gorm.io/gorm"
 
 	modelcollections "github.com/footprintai/restcol/pkg/models/collections"
@@ -21,13 +21,17 @@ type ModelDocument struct {
 	UpdatedAt time.Time      `gorm:"column:updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at"`
 
-	Data datatypes.JSON `gorm:"column:data"`
+	Data *ModelDocumentData `gorm:"column:data;type:jsonb"`
 
 	ModelCollectionID modelcollections.CollectionID // foreign key to model collection
 	ModelCollection   modelcollections.ModelCollection
 
 	ModelProjectID modelprojects.ProjectID // foreigh key to model project
 	ModelProject   modelprojects.ModelProject
+}
+
+func (m ModelDocument) TableName() string {
+	return "restcol-documents"
 }
 
 type DocumentID uuid.UUID
@@ -71,4 +75,31 @@ func Parse(s string) (DocumentID, error) {
 func NewDocumentID() DocumentID {
 	uid, _ := uuid.NewV7()
 	return DocumentID(uid)
+}
+
+type ModelDocumentData struct {
+	MapValue map[string]interface{} `json:"json_value"`
+}
+
+func NewModelDocumentData(v map[string]interface{}) *ModelDocumentData {
+	return &ModelDocumentData{
+		MapValue: v,
+	}
+}
+
+var (
+	_ driver.Valuer = ModelDocumentData{}
+	_ sql.Scanner   = &ModelDocumentData{}
+)
+
+func (d ModelDocumentData) Value() (driver.Value, error) {
+	return json.Marshal(d)
+}
+
+func (d *ModelDocumentData) Scan(value interface{}) error {
+	_, isByte := value.([]byte)
+	if !isByte {
+		return fmt.Errorf("db.model: invalid type, expect []byte")
+	}
+	return json.Unmarshal(value.([]byte), d)
 }

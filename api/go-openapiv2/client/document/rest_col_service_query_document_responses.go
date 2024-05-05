@@ -86,11 +86,11 @@ func (o *RestColServiceQueryDocumentOK) Code() int {
 }
 
 func (o *RestColServiceQueryDocumentOK) Error() string {
-	return fmt.Sprintf("[GET /v1/query][%d] restColServiceQueryDocumentOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs][%d] restColServiceQueryDocumentOK  %+v", 200, o.Payload)
 }
 
 func (o *RestColServiceQueryDocumentOK) String() string {
-	return fmt.Sprintf("[GET /v1/query][%d] restColServiceQueryDocumentOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs][%d] restColServiceQueryDocumentOK  %+v", 200, o.Payload)
 }
 
 func (o *RestColServiceQueryDocumentOK) GetPayload() *models.APIQueryDocumentResponse {
@@ -158,11 +158,11 @@ func (o *RestColServiceQueryDocumentDefault) Code() int {
 }
 
 func (o *RestColServiceQueryDocumentDefault) Error() string {
-	return fmt.Sprintf("[GET /v1/query][%d] RestColService_QueryDocument default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs][%d] RestColService_QueryDocument default  %+v", o._statusCode, o.Payload)
 }
 
 func (o *RestColServiceQueryDocumentDefault) String() string {
-	return fmt.Sprintf("[GET /v1/query][%d] RestColService_QueryDocument default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs][%d] RestColService_QueryDocument default  %+v", o._statusCode, o.Payload)
 }
 
 func (o *RestColServiceQueryDocumentDefault) GetPayload() *models.RPCStatus {

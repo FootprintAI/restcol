@@ -63,7 +63,7 @@ RestColServiceQueryDocumentsStreamParams contains all the parameters to send to 
 type RestColServiceQueryDocumentsStreamParams struct {
 
 	// CollectionID.
-	CollectionID *string
+	CollectionID string
 
 	/* EndedAt.
 
@@ -73,6 +73,12 @@ type RestColServiceQueryDocumentsStreamParams struct {
 	*/
 	EndedAt *strfmt.DateTime
 
+	/* FieldSelectors.
+
+	   dot-concatenated fields, ex: fielda.fieldb.fieldc
+	*/
+	FieldSelectors []string
+
 	/* FollowUpMode.
 
 	   if on, the service would keep watch new coming docs
@@ -80,13 +86,7 @@ type RestColServiceQueryDocumentsStreamParams struct {
 	FollowUpMode *bool
 
 	// ProjectID.
-	ProjectID *string
-
-	/* Queryfields.
-
-	   dot-concatenated fields, ex: fielda.fieldb.fieldc
-	*/
-	Queryfields *string
+	ProjectID string
 
 	// SinceTs.
 	//
@@ -147,13 +147,13 @@ func (o *RestColServiceQueryDocumentsStreamParams) SetHTTPClient(client *http.Cl
 }
 
 // WithCollectionID adds the collectionID to the rest col service query documents stream params
-func (o *RestColServiceQueryDocumentsStreamParams) WithCollectionID(collectionID *string) *RestColServiceQueryDocumentsStreamParams {
+func (o *RestColServiceQueryDocumentsStreamParams) WithCollectionID(collectionID string) *RestColServiceQueryDocumentsStreamParams {
 	o.SetCollectionID(collectionID)
 	return o
 }
 
 // SetCollectionID adds the collectionId to the rest col service query documents stream params
-func (o *RestColServiceQueryDocumentsStreamParams) SetCollectionID(collectionID *string) {
+func (o *RestColServiceQueryDocumentsStreamParams) SetCollectionID(collectionID string) {
 	o.CollectionID = collectionID
 }
 
@@ -168,6 +168,17 @@ func (o *RestColServiceQueryDocumentsStreamParams) SetEndedAt(endedAt *strfmt.Da
 	o.EndedAt = endedAt
 }
 
+// WithFieldSelectors adds the fieldSelectors to the rest col service query documents stream params
+func (o *RestColServiceQueryDocumentsStreamParams) WithFieldSelectors(fieldSelectors []string) *RestColServiceQueryDocumentsStreamParams {
+	o.SetFieldSelectors(fieldSelectors)
+	return o
+}
+
+// SetFieldSelectors adds the fieldSelectors to the rest col service query documents stream params
+func (o *RestColServiceQueryDocumentsStreamParams) SetFieldSelectors(fieldSelectors []string) {
+	o.FieldSelectors = fieldSelectors
+}
+
 // WithFollowUpMode adds the followUpMode to the rest col service query documents stream params
 func (o *RestColServiceQueryDocumentsStreamParams) WithFollowUpMode(followUpMode *bool) *RestColServiceQueryDocumentsStreamParams {
 	o.SetFollowUpMode(followUpMode)
@@ -180,25 +191,14 @@ func (o *RestColServiceQueryDocumentsStreamParams) SetFollowUpMode(followUpMode 
 }
 
 // WithProjectID adds the projectID to the rest col service query documents stream params
-func (o *RestColServiceQueryDocumentsStreamParams) WithProjectID(projectID *string) *RestColServiceQueryDocumentsStreamParams {
+func (o *RestColServiceQueryDocumentsStreamParams) WithProjectID(projectID string) *RestColServiceQueryDocumentsStreamParams {
 	o.SetProjectID(projectID)
 	return o
 }
 
 // SetProjectID adds the projectId to the rest col service query documents stream params
-func (o *RestColServiceQueryDocumentsStreamParams) SetProjectID(projectID *string) {
+func (o *RestColServiceQueryDocumentsStreamParams) SetProjectID(projectID string) {
 	o.ProjectID = projectID
-}
-
-// WithQueryfields adds the queryfields to the rest col service query documents stream params
-func (o *RestColServiceQueryDocumentsStreamParams) WithQueryfields(queryfields *string) *RestColServiceQueryDocumentsStreamParams {
-	o.SetQueryfields(queryfields)
-	return o
-}
-
-// SetQueryfields adds the queryfields to the rest col service query documents stream params
-func (o *RestColServiceQueryDocumentsStreamParams) SetQueryfields(queryfields *string) {
-	o.Queryfields = queryfields
 }
 
 // WithSinceTs adds the sinceTs to the rest col service query documents stream params
@@ -220,21 +220,9 @@ func (o *RestColServiceQueryDocumentsStreamParams) WriteToRequest(r runtime.Clie
 	}
 	var res []error
 
-	if o.CollectionID != nil {
-
-		// query param collectionId
-		var qrCollectionID string
-
-		if o.CollectionID != nil {
-			qrCollectionID = *o.CollectionID
-		}
-		qCollectionID := qrCollectionID
-		if qCollectionID != "" {
-
-			if err := r.SetQueryParam("collectionId", qCollectionID); err != nil {
-				return err
-			}
-		}
+	// path param collectionId
+	if err := r.SetPathParam("collectionId", o.CollectionID); err != nil {
+		return err
 	}
 
 	if o.EndedAt != nil {
@@ -251,6 +239,17 @@ func (o *RestColServiceQueryDocumentsStreamParams) WriteToRequest(r runtime.Clie
 			if err := r.SetQueryParam("endedAt", qEndedAt); err != nil {
 				return err
 			}
+		}
+	}
+
+	if o.FieldSelectors != nil {
+
+		// binding items for fieldSelectors
+		joinedFieldSelectors := o.bindParamFieldSelectors(reg)
+
+		// query array param fieldSelectors
+		if err := r.SetQueryParam("fieldSelectors", joinedFieldSelectors...); err != nil {
+			return err
 		}
 	}
 
@@ -271,38 +270,9 @@ func (o *RestColServiceQueryDocumentsStreamParams) WriteToRequest(r runtime.Clie
 		}
 	}
 
-	if o.ProjectID != nil {
-
-		// query param projectId
-		var qrProjectID string
-
-		if o.ProjectID != nil {
-			qrProjectID = *o.ProjectID
-		}
-		qProjectID := qrProjectID
-		if qProjectID != "" {
-
-			if err := r.SetQueryParam("projectId", qProjectID); err != nil {
-				return err
-			}
-		}
-	}
-
-	if o.Queryfields != nil {
-
-		// query param queryfields
-		var qrQueryfields string
-
-		if o.Queryfields != nil {
-			qrQueryfields = *o.Queryfields
-		}
-		qQueryfields := qrQueryfields
-		if qQueryfields != "" {
-
-			if err := r.SetQueryParam("queryfields", qQueryfields); err != nil {
-				return err
-			}
-		}
+	// path param projectId
+	if err := r.SetPathParam("projectId", o.ProjectID); err != nil {
+		return err
 	}
 
 	if o.SinceTs != nil {
@@ -326,4 +296,21 @@ func (o *RestColServiceQueryDocumentsStreamParams) WriteToRequest(r runtime.Clie
 		return errors.CompositeValidationError(res...)
 	}
 	return nil
+}
+
+// bindParamRestColServiceQueryDocumentsStream binds the parameter fieldSelectors
+func (o *RestColServiceQueryDocumentsStreamParams) bindParamFieldSelectors(formats strfmt.Registry) []string {
+	fieldSelectorsIR := o.FieldSelectors
+
+	var fieldSelectorsIC []string
+	for _, fieldSelectorsIIR := range fieldSelectorsIR { // explode []string
+
+		fieldSelectorsIIV := fieldSelectorsIIR // string as string
+		fieldSelectorsIC = append(fieldSelectorsIC, fieldSelectorsIIV)
+	}
+
+	// items.CollectionFormat: "multi"
+	fieldSelectorsIS := swag.JoinByFormat(fieldSelectorsIC, "multi")
+
+	return fieldSelectorsIS
 }

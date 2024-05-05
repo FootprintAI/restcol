@@ -16,7 +16,7 @@ type RawSwaggerDocReader struct {
 func (r *RawSwaggerDocReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
 	case 200:
-		result := restcolopenapiswagger.NewRestColServiceGetSwaggerDocOK()
+		result := restcolopenapiswagger.NewRestColServiceGetSwaggerDoc2OK()
 		result.Payload = new(restcolopenapimodel.APIHTTPBody)
 		result.Payload.Data, _ = io.ReadAll(response.Body())
 		result.Payload.ContentType = response.GetHeader("content-type")

@@ -61,8 +61,11 @@ RestColServiceGetSwaggerDocParams contains all the parameters to send to the API
 */
 type RestColServiceGetSwaggerDocParams struct {
 
+	// CollectionID.
+	CollectionID *string
+
 	// ProjectID.
-	ProjectID *string
+	ProjectID string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -117,14 +120,25 @@ func (o *RestColServiceGetSwaggerDocParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
+// WithCollectionID adds the collectionID to the rest col service get swagger doc params
+func (o *RestColServiceGetSwaggerDocParams) WithCollectionID(collectionID *string) *RestColServiceGetSwaggerDocParams {
+	o.SetCollectionID(collectionID)
+	return o
+}
+
+// SetCollectionID adds the collectionId to the rest col service get swagger doc params
+func (o *RestColServiceGetSwaggerDocParams) SetCollectionID(collectionID *string) {
+	o.CollectionID = collectionID
+}
+
 // WithProjectID adds the projectID to the rest col service get swagger doc params
-func (o *RestColServiceGetSwaggerDocParams) WithProjectID(projectID *string) *RestColServiceGetSwaggerDocParams {
+func (o *RestColServiceGetSwaggerDocParams) WithProjectID(projectID string) *RestColServiceGetSwaggerDocParams {
 	o.SetProjectID(projectID)
 	return o
 }
 
 // SetProjectID adds the projectId to the rest col service get swagger doc params
-func (o *RestColServiceGetSwaggerDocParams) SetProjectID(projectID *string) {
+func (o *RestColServiceGetSwaggerDocParams) SetProjectID(projectID string) {
 	o.ProjectID = projectID
 }
 
@@ -136,21 +150,26 @@ func (o *RestColServiceGetSwaggerDocParams) WriteToRequest(r runtime.ClientReque
 	}
 	var res []error
 
-	if o.ProjectID != nil {
+	if o.CollectionID != nil {
 
-		// query param projectId
-		var qrProjectID string
+		// query param collectionId
+		var qrCollectionID string
 
-		if o.ProjectID != nil {
-			qrProjectID = *o.ProjectID
+		if o.CollectionID != nil {
+			qrCollectionID = *o.CollectionID
 		}
-		qProjectID := qrProjectID
-		if qProjectID != "" {
+		qCollectionID := qrCollectionID
+		if qCollectionID != "" {
 
-			if err := r.SetQueryParam("projectId", qProjectID); err != nil {
+			if err := r.SetQueryParam("collectionId", qCollectionID); err != nil {
 				return err
 			}
 		}
+	}
+
+	// path param projectId
+	if err := r.SetPathParam("projectId", o.ProjectID); err != nil {
+		return err
 	}
 
 	if len(res) > 0 {

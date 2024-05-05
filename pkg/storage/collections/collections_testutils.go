@@ -6,6 +6,7 @@ import (
 	apppb "github.com/footprintai/restcol/api/pb"
 	appmodelcollections "github.com/footprintai/restcol/pkg/models/collections"
 	appmodelprojects "github.com/footprintai/restcol/pkg/models/projects"
+	dotnotation "github.com/footprintai/restcol/pkg/notation/dot"
 	storagepostgres "github.com/sdinsure/agent/pkg/storage/postgres"
 )
 
@@ -28,13 +29,13 @@ func TestCollectionSuite(
 		"from testsuite",
 		[]appmodelcollections.ModelSchema{
 			appmodelcollections.ModelSchema{
-				Fields: []appmodelcollections.ModelFieldSchema{
-					appmodelcollections.ModelFieldSchema{
-						FieldName:      "foo",
+				Fields: []*appmodelcollections.ModelFieldSchema{
+					&appmodelcollections.ModelFieldSchema{
+						FieldName:      dotnotation.New("foo"),
 						FieldValueType: "string",
 					},
-					appmodelcollections.ModelFieldSchema{
-						FieldName:      "bar",
+					&appmodelcollections.ModelFieldSchema{
+						FieldName:      dotnotation.New("bar"),
 						FieldValueType: "string",
 					},
 				},

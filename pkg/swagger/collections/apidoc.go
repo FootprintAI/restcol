@@ -3,13 +3,16 @@ package collectiondoc
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"regexp"
 	"strings"
 
 	openapiloads "github.com/go-openapi/loads"
 	"github.com/go-openapi/spec"
+	"github.com/google/uuid"
 
 	api "github.com/footprintai/restcol/api"
+	restcolconfig "github.com/footprintai/restcol/pkg/config"
 	modelcollections "github.com/footprintai/restcol/pkg/models/collections"
 	swagdef "github.com/footprintai/restcol/pkg/runtime/swagdef"
 )
@@ -44,7 +47,11 @@ func (c *CollectionSwaggerDoc) RenderDoc() (string, error) {
 		if err != nil {
 			return nil, err
 		}
-		return swagDoc.Spec(), nil
+		swagSpec := swagDoc.Spec()
+		swagSpec.SwaggerProps.BasePath = restcolconfig.SwagBasePath()
+		swagSpec.SwaggerProps.Host = restcolconfig.SwagHostPath()
+
+		return swagSpec, nil
 	}
 
 	var pathSpec []*spec.Swagger
@@ -114,28 +121,44 @@ func copyPathsWithFilter(origSpec *spec.Swagger, pathFilter PathFilterFunc, tagF
 		}
 		if pathItem.PathItemProps.Get != nil {
 			if tagFilter(pathItem.PathItemProps.Get.OperationProps.Tags) {
-				retSpec.SwaggerProps.Paths.Paths[path] = pathItem
+				retSpec.SwaggerProps.Paths.Paths[path] = makeUniqueOperatorId(pathItem)
 			}
 		}
 		if pathItem.PathItemProps.Put != nil {
 			if tagFilter(pathItem.PathItemProps.Put.OperationProps.Tags) {
-				retSpec.SwaggerProps.Paths.Paths[path] = pathItem
+				retSpec.SwaggerProps.Paths.Paths[path] = makeUniqueOperatorId(pathItem)
 			}
 		}
 		if pathItem.PathItemProps.Post != nil {
 			if tagFilter(pathItem.PathItemProps.Post.OperationProps.Tags) {
-				retSpec.SwaggerProps.Paths.Paths[path] = pathItem
+				retSpec.SwaggerProps.Paths.Paths[path] = makeUniqueOperatorId(pathItem)
 			}
 		}
 		if pathItem.PathItemProps.Delete != nil {
 			if tagFilter(pathItem.PathItemProps.Delete.OperationProps.Tags) {
-				retSpec.SwaggerProps.Paths.Paths[path] = pathItem
+				retSpec.SwaggerProps.Paths.Paths[path] = makeUniqueOperatorId(pathItem)
 			}
 		}
 
 	}
 
 	return retSpec, nil
+}
+
+func makeUniqueOperatorId(pathItem spec.PathItem) spec.PathItem {
+	if pathItem.Get != nil {
+		pathItem.Get.OperationProps.ID = fmt.Sprintf("%s-%s", pathItem.Get.OperationProps.ID, uuid.NewString())
+	}
+	if pathItem.Put != nil {
+		pathItem.Put.OperationProps.ID = fmt.Sprintf("%s-%s", pathItem.Put.OperationProps.ID, uuid.NewString())
+	}
+	if pathItem.Post != nil {
+		pathItem.Post.OperationProps.ID = fmt.Sprintf("%s-%s", pathItem.Post.OperationProps.ID, uuid.NewString())
+	}
+	if pathItem.Delete != nil {
+		pathItem.Delete.OperationProps.ID = fmt.Sprintf("%s-%s", pathItem.Delete.OperationProps.ID, uuid.NewString())
+	}
+	return pathItem
 }
 
 // replacePathsWithCollection expands $cid, $pid with values defined in col

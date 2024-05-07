@@ -69,7 +69,7 @@ func TestStorage(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, m)
 
-	assert.EqualValues(t, m.Summary, mc.Summary)
+	assert.EqualValues(t, mc.Summary, m.Summary)
 	assert.EqualValues(t, len(m.Schemas), 1)
 	assert.EqualValues(t, len(m.Schemas[0].Fields), 2)
 	assert.True(t, m.Schemas[0].ID > 0)

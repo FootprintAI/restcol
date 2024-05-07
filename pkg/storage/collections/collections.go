@@ -73,9 +73,9 @@ func (c *CollectionCURD) Get(ctx context.Context, tableName string, cid appmodel
 	if sid != appmodelcollections.NullSchemaID {
 		db = db.Preload("Schemas", func(db *gorm.DB) *gorm.DB {
 			return db.Where(&appmodelcollections.ModelSchema{ID: sid})
-		})
+		}).Preload("Schemas.Fields")
 	}
-	if err := db.Preload("Schemas.Fields").
+	if err := db.
 		Where("id = ?", cid.String()).
 		Find(record).Error; err != nil {
 		return nil, storage.WrapStorageError(err)

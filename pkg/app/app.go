@@ -317,7 +317,7 @@ func (r *RestColServiceServerService) QueryDocumentsStream(req *apppb.QueryDocum
 			"",
 			projectId,
 			cid,
-			makeQueryConditioner(startedAt, endedAt)...,
+			makeQueryConditioner(startedAt, endedAt, req.LimitCount)...,
 		)
 		if err != nil {
 			return err
@@ -347,7 +347,7 @@ func (r *RestColServiceServerService) QueryDocumentsStream(req *apppb.QueryDocum
 			"",
 			projectId,
 			cid,
-			makeQueryConditioner(startedAt, endedAt)...,
+			makeQueryConditioner(startedAt, endedAt, req.LimitCount)...,
 		)
 		if err != nil {
 			return err
@@ -383,13 +383,16 @@ func (r *RestColServiceServerService) QueryDocumentsStream(req *apppb.QueryDocum
 	return nil
 }
 
-func makeQueryConditioner(startedAt *timestamppb.Timestamp, endedAt *timestamppb.Timestamp) []documentsstorage.QueryConditioner {
+func makeQueryConditioner(startedAt *timestamppb.Timestamp, endedAt *timestamppb.Timestamp, limitCount *int32) []documentsstorage.QueryConditioner {
 	var cnds []documentsstorage.QueryConditioner
 	if startedAt != nil {
 		cnds = append(cnds, documentsstorage.WithStartedAt(startedAt.AsTime()))
 	}
 	if endedAt != nil {
 		cnds = append(cnds, documentsstorage.WithEndedAt(endedAt.AsTime()))
+	}
+	if limitCount != nil {
+		cnds = append(cnds, documentsstorage.WithLimitCount(*limitCount))
 	}
 	return cnds
 }
@@ -405,7 +408,7 @@ func (r *RestColServiceServerService) QueryDocument(ctx context.Context, req *ap
 		"",
 		projectId,
 		cid,
-		makeQueryConditioner(req.SinceTs, req.EndedAt)...,
+		makeQueryConditioner(req.SinceTs, req.EndedAt, req.LimitCount)...,
 	)
 	if err != nil {
 		return nil, err

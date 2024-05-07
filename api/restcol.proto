@@ -318,6 +318,7 @@ message QueryDocumentStreamRequest{
     optional google.protobuf.Timestamp endedAt = 4; // endedAt specifies when is the ended timeframe of the query
     repeated string fieldSelectors = 5; // dot-concatenated fields, ex: fielda.fieldb.fieldc
     optional bool followUpMode = 6; // if on, the service would keep watch new coming docs
+    optional int32 limitCount = 7;
 }
 
 message QueryDocumentRequest {

@@ -42,12 +42,11 @@ func TestAPIDocTest(t *testing.T) {
 	}
 
 	swaggerPaths := m["paths"].(map[string]interface{})
-	for p := range swaggerPaths {
-		fmt.Printf("place:%s\n", p)
-	}
+	//for p := range swaggerPaths {
+	//	fmt.Printf("place:%s\n", p)
+	//}
 
 	for _, pathShouldExists := range pathsShouldExists {
-		fmt.Printf("checking:%s\n", pathShouldExists)
 		_, exist := swaggerPaths[pathShouldExists]
 		assert.True(t, exist)
 	}

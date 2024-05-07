@@ -85,6 +85,11 @@ type RestColServiceQueryDocumentsStreamParams struct {
 	*/
 	FollowUpMode *bool
 
+	// LimitCount.
+	//
+	// Format: int32
+	LimitCount *int32
+
 	// ProjectID.
 	ProjectID string
 
@@ -190,6 +195,17 @@ func (o *RestColServiceQueryDocumentsStreamParams) SetFollowUpMode(followUpMode 
 	o.FollowUpMode = followUpMode
 }
 
+// WithLimitCount adds the limitCount to the rest col service query documents stream params
+func (o *RestColServiceQueryDocumentsStreamParams) WithLimitCount(limitCount *int32) *RestColServiceQueryDocumentsStreamParams {
+	o.SetLimitCount(limitCount)
+	return o
+}
+
+// SetLimitCount adds the limitCount to the rest col service query documents stream params
+func (o *RestColServiceQueryDocumentsStreamParams) SetLimitCount(limitCount *int32) {
+	o.LimitCount = limitCount
+}
+
 // WithProjectID adds the projectID to the rest col service query documents stream params
 func (o *RestColServiceQueryDocumentsStreamParams) WithProjectID(projectID string) *RestColServiceQueryDocumentsStreamParams {
 	o.SetProjectID(projectID)
@@ -265,6 +281,23 @@ func (o *RestColServiceQueryDocumentsStreamParams) WriteToRequest(r runtime.Clie
 		if qFollowUpMode != "" {
 
 			if err := r.SetQueryParam("followUpMode", qFollowUpMode); err != nil {
+				return err
+			}
+		}
+	}
+
+	if o.LimitCount != nil {
+
+		// query param limitCount
+		var qrLimitCount int32
+
+		if o.LimitCount != nil {
+			qrLimitCount = *o.LimitCount
+		}
+		qLimitCount := swag.FormatInt32(qrLimitCount)
+		if qLimitCount != "" {
+
+			if err := r.SetQueryParam("limitCount", qLimitCount); err != nil {
 				return err
 			}
 		}

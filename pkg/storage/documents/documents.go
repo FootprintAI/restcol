@@ -63,7 +63,7 @@ type QueryConditioner interface {
 type conditions struct {
 	startedAt *time.Time
 	endedAt   *time.Time
-	limit     *int
+	limit     *int32
 }
 
 func newConditions(cnds ...QueryConditioner) *conditions {
@@ -111,14 +111,14 @@ var (
 )
 
 type withLimit struct {
-	count int
+	count int32
 }
 
 func (s withLimit) apply(c *conditions) {
 	c.limit = &s.count
 }
 
-func WithLimitCount(count int) withLimit {
+func WithLimitCount(count int32) withLimit {
 	return withLimit{count: count}
 }
 
@@ -142,7 +142,7 @@ func (c *DocumentCURD) Query(ctx context.Context,
 		projections.Where("created_at < ?", *conditions.endedAt)
 	}
 	if conditions.limit != nil {
-		projections.Limit(*conditions.limit)
+		projections.Limit(int(*conditions.limit))
 	} else {
 		projections.Limit(30) // default limit = 30
 	}

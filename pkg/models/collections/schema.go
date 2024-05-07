@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/cthulhu/jsonpath"
@@ -13,6 +12,11 @@ import (
 	"gorm.io/gorm"
 
 	apppb "github.com/footprintai/restcol/api/pb"
+	dotnotation "github.com/footprintai/restcol/pkg/notation/dot"
+)
+
+var (
+	NullSchemaID SchemaID = SchemaID(-1)
 )
 
 type SchemaID int
@@ -27,8 +31,8 @@ type ModelSchema struct {
 	UpdatedAt time.Time      `gorm:"column:updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at"`
 
-	Fields            []ModelFieldSchema `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	ModelCollectionID CollectionID       // foreigh key to ModelCollection -> ID
+	Fields            []*ModelFieldSchema `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	ModelCollectionID CollectionID        // foreigh key to ModelCollection -> ID
 }
 
 func (m ModelSchema) TableName() string {
@@ -113,19 +117,20 @@ func (s SwagValueValue) Interface() interface{} {
 	return s.Proto().AsInterface()
 }
 
-func Must(s SwagValueValue, e error) SwagValueValue {
+func Must(s *SwagValueValue, e error) *SwagValueValue {
 	if e != nil {
 		panic(e)
 	}
 	return s
 }
 
-func NewSwagValue(v any) (SwagValueValue, error) {
+func NewSwagValue(v any) (*SwagValueValue, error) {
 	pbValue, err := structpb.NewValue(v)
 	if err != nil {
-		return SwagValueValue{}, err
+		return &SwagValueValue{}, err
 	}
-	return SwagValueValue(*pbValue), nil
+	swagVal := SwagValueValue(*pbValue)
+	return &swagVal, nil
 }
 
 func (s SwagValueValue) Proto() *structpb.Value {
@@ -133,8 +138,8 @@ func (s SwagValueValue) Proto() *structpb.Value {
 	return &pbValue
 }
 
-func (s SwagValueValue) Type() SwagValueType {
-	pbValue := structpb.Value(s)
+func (s *SwagValueValue) Type() SwagValueType {
+	pbValue := structpb.Value(*s)
 	switch pbValue.Kind.(type) {
 	case *structpb.Value_NullValue:
 		return NullSwagValueType
@@ -177,9 +182,9 @@ type ModelFieldSchema struct {
 	UpdatedAt time.Time      `gorm:"column:updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at"`
 
-	FieldName      string         `gorm:"column:field_name"` // dot concated path, a.b.c represents a -> b -> c path
-	FieldValueType SwagValueType  `gorm:"column:value_type"`
-	FieldExample   SwagValueValue `gorm:"column:value_example;type:jsonb"`
+	FieldName      *dotnotation.DotNotation `gorm:"column:field_name";type:string` // dot concated path, a.b.c represents a -> b -> c path
+	FieldValueType SwagValueType            `gorm:"column:value_type"`
+	FieldExample   *SwagValueValue          `gorm:"column:value_example;type:jsonb"`
 
 	ModelSchemaID SchemaID // foreign key to ModelSchema -> ID
 }
@@ -188,16 +193,15 @@ func (m ModelFieldSchema) TableName() string {
 	return "restcol-collections-schematable"
 }
 
-type ModelFieldsSchema []ModelFieldSchema
+type ModelFieldsSchema []*ModelFieldSchema
 
 func (m ModelFieldsSchema) ToJSON(dotPrefixs ...string) ([]byte, error) {
 
-	withPrefix := func(fieldName string) string {
+	withPrefix := func(fieldName *dotnotation.DotNotation) string {
 		if len(dotPrefixs) == 0 {
-			return fieldName
+			return fieldName.String()
 		}
-		prefixAndFieldName := append(dotPrefixs, fieldName)
-		return strings.Join(prefixAndFieldName, ".")
+		return fieldName.AddPrefix(dotPrefixs...).String()
 	}
 
 	// convert fields into a map with a common dotPrefix

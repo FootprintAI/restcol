@@ -65,7 +65,7 @@ type RestColServiceDeleteCollectionParams struct {
 	CollectionID string
 
 	// ProjectID.
-	ProjectID *string
+	ProjectID string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -132,13 +132,13 @@ func (o *RestColServiceDeleteCollectionParams) SetCollectionID(collectionID stri
 }
 
 // WithProjectID adds the projectID to the rest col service delete collection params
-func (o *RestColServiceDeleteCollectionParams) WithProjectID(projectID *string) *RestColServiceDeleteCollectionParams {
+func (o *RestColServiceDeleteCollectionParams) WithProjectID(projectID string) *RestColServiceDeleteCollectionParams {
 	o.SetProjectID(projectID)
 	return o
 }
 
 // SetProjectID adds the projectId to the rest col service delete collection params
-func (o *RestColServiceDeleteCollectionParams) SetProjectID(projectID *string) {
+func (o *RestColServiceDeleteCollectionParams) SetProjectID(projectID string) {
 	o.ProjectID = projectID
 }
 
@@ -155,21 +155,9 @@ func (o *RestColServiceDeleteCollectionParams) WriteToRequest(r runtime.ClientRe
 		return err
 	}
 
-	if o.ProjectID != nil {
-
-		// query param projectId
-		var qrProjectID string
-
-		if o.ProjectID != nil {
-			qrProjectID = *o.ProjectID
-		}
-		qProjectID := qrProjectID
-		if qProjectID != "" {
-
-			if err := r.SetQueryParam("projectId", qProjectID); err != nil {
-				return err
-			}
-		}
+	// path param projectId
+	if err := r.SetPathParam("projectId", o.ProjectID); err != nil {
+		return err
 	}
 
 	if len(res) > 0 {

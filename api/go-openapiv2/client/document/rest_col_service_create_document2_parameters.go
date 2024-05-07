@@ -69,6 +69,9 @@ type RestColServiceCreateDocument2Params struct {
 	// CollectionID.
 	CollectionID string
 
+	// ProjectID.
+	ProjectID string
+
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
@@ -144,6 +147,17 @@ func (o *RestColServiceCreateDocument2Params) SetCollectionID(collectionID strin
 	o.CollectionID = collectionID
 }
 
+// WithProjectID adds the projectID to the rest col service create document2 params
+func (o *RestColServiceCreateDocument2Params) WithProjectID(projectID string) *RestColServiceCreateDocument2Params {
+	o.SetProjectID(projectID)
+	return o
+}
+
+// SetProjectID adds the projectId to the rest col service create document2 params
+func (o *RestColServiceCreateDocument2Params) SetProjectID(projectID string) {
+	o.ProjectID = projectID
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *RestColServiceCreateDocument2Params) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -159,6 +173,11 @@ func (o *RestColServiceCreateDocument2Params) WriteToRequest(r runtime.ClientReq
 
 	// path param collectionId
 	if err := r.SetPathParam("collectionId", o.CollectionID); err != nil {
+		return err
+	}
+
+	// path param projectId
+	if err := r.SetPathParam("projectId", o.ProjectID); err != nil {
 		return err
 	}
 

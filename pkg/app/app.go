@@ -3,16 +3,15 @@ package app
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
 
 	sderrors "github.com/sdinsure/agent/pkg/errors"
 	"github.com/sdinsure/agent/pkg/logger"
 	sdinsureruntime "github.com/sdinsure/agent/pkg/runtime"
 	"google.golang.org/genproto/googleapis/api/httpbody"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"gorm.io/datatypes"
 
 	apppb "github.com/footprintai/restcol/api/pb"
 	collectionsmodel "github.com/footprintai/restcol/pkg/models/collections"
@@ -28,11 +27,13 @@ func NewRestColServiceServerService(
 	log logger.Logger,
 	collectionCURD *collectionsstorage.CollectionCURD,
 	documentCURD *documentsstorage.DocumentCURD,
+	schemaBuilder *schemafinder.SchemaBuilder,
 ) *RestColServiceServerService {
 	return &RestColServiceServerService{
 		log:            log,
 		collectionCURD: collectionCURD,
 		documentCURD:   documentCURD,
+		schemaBuilder:  schemaBuilder,
 	}
 }
 
@@ -43,6 +44,8 @@ type RestColServiceServerService struct {
 	collectionCURD *collectionsstorage.CollectionCURD
 	documentCURD   *documentsstorage.DocumentCURD
 
+	schemaBuilder *schemafinder.SchemaBuilder
+
 	//optional
 	defaultProjectResolver sdinsureruntime.ProjectResolver
 }
@@ -52,13 +55,27 @@ func (r *RestColServiceServerService) SetDefaultProjectResolver(projectResolver 
 }
 
 func (r *RestColServiceServerService) GetSwaggerDoc(ctx context.Context, req *apppb.GetSwaggerDocRequest) (*httpbody.HttpBody, error) {
+	var err error
 	projectId, err := r.getProjectIdFromCtx(ctx)
 	if err != nil {
 		return nil, err
 	}
-	collectionList, err := r.collectionCURD.ListByProjectID(ctx, "", projectId)
-	if err != nil {
-		return nil, err
+
+	var collectionList []*collectionsmodel.ModelCollection
+	if len(req.CollectionId) > 0 {
+		var selectedCollection *collectionsmodel.ModelCollection
+		cid := collectionsmodel.NewCollectionIDFromStr(req.CollectionId)
+		selectedCollection, err = r.collectionCURD.GetLatestSchema(ctx, "", cid)
+		if err != nil {
+			return nil, err
+		}
+		collectionList = append(collectionList, selectedCollection)
+	} else {
+		// query collections from the project
+		collectionList, err = r.collectionCURD.ListByProjectID(ctx, "", projectId)
+		if err != nil {
+			return nil, err
+		}
 	}
 	colSwaggerDoc := collectionsswagger.NewCollectionSwaggerDoc(collectionList...)
 	colSwaggerDocInStr, err := colSwaggerDoc.RenderDoc()
@@ -186,15 +203,14 @@ func (r *RestColServiceServerService) CreateDocument(ctx context.Context, req *a
 		}
 	}
 	// auto detect schema
-	schemaBuilder := schemafinder.NewSchemaBuilder(r.log)
-	_, modelSchema, err := schemaBuilder.Parse(req.Data)
+	_, modelSchema, valueHolder, err := r.schemaBuilder.Parse(req.Data)
 	if err != nil {
 		r.log.Error("failed to convert into modelschema, err:%+v\n", err)
 		return nil, err
 	}
 	docModel := &documentsmodel.ModelDocument{
 		ID:                documentsmodel.NewDocumentID(),
-		Data:              datatypes.JSON(req.Data),
+		Data:              documentsmodel.NewModelDocumentData(valueHolder),
 		ModelCollectionID: cid,
 		ModelCollection: collectionsmodel.NewModelCollection(
 			projectId,
@@ -226,13 +242,56 @@ func (r *RestColServiceServerService) GetDocument(ctx context.Context, req *appp
 	if err != nil {
 		return nil, err
 	}
+	filteredDoc, err := r.filterDocWithSelectedFields(docModel, req.FieldSelectors)
+	if err != nil {
+		return nil, err
+	}
 
 	return &apppb.GetDocumentResponse{
 		XMetadata: documentsmodel.NewPbDocumentMetadata(docModel),
-		Data:      []byte(docModel.Data),
+		Data:      filteredDoc,
 	}, nil
 
 }
+
+func (r *RestColServiceServerService) filterDocWithSelectedFields(doc *documentsmodel.ModelDocument, selectedFields []string) (*structpb.Value, error) {
+	r.log.Info("query doc with fields:%+v\n", selectedFields)
+	if len(selectedFields) == 0 {
+		// no selectedFields, return all
+
+		return structpb.NewValue(doc.Data.MapValue)
+	}
+
+	// get associated schema
+	modelSchema, err := r.schemaBuilder.Flatten(doc.Data.MapValue)
+	if err != nil {
+		return nil, err
+	}
+
+	// make selectedFields into a lookup map
+	lookupMap := make(map[string]struct{})
+	for _, selectedField := range selectedFields {
+		r.log.Info("query doc, add field:%s\n", strings.ToLower(selectedField))
+		lookupMap[strings.ToLower(selectedField)] = struct{}{}
+	}
+
+	var fieldsInSelected []*collectionsmodel.ModelFieldSchema
+	for _, dataField := range modelSchema.Fields {
+		r.log.Info("query doc, select field:%s\n", dataField.FieldName.String())
+		_, exist := lookupMap[dataField.FieldName.String()]
+		if exist {
+			r.log.Info("query doc, added field:%s\n", dataField.FieldName.String())
+			fieldsInSelected = append(fieldsInSelected, dataField)
+		}
+	}
+	// construct the whole struct with fieldsInSelected
+	structWithSelectedFields, err := schemafinder.Build(fieldsInSelected)
+	if err != nil {
+		return nil, err
+	}
+	return structpb.NewValue(structWithSelectedFields)
+}
+
 func (r *RestColServiceServerService) DeleteDocument(ctx context.Context, req *apppb.DeleteDocumentRequest) (*apppb.DeleteDocumentResponse, error) {
 	return nil, sderrors.NewNotImplError(errors.New("not implemented"))
 }
@@ -265,9 +324,14 @@ func (r *RestColServiceServerService) QueryDocumentsStream(req *apppb.QueryDocum
 		}
 		// TODO: apply field selector
 		for _, doc := range queryDocs {
+			filteredDoc, err := r.filterDocWithSelectedFields(doc, req.FieldSelectors)
+			if err != nil {
+				return err
+			}
+
 			if err := stream.Send(&apppb.GetDocumentResponse{
 				XMetadata: documentsmodel.NewPbDocumentMetadata(doc),
-				Data:      []byte(doc.Data),
+				Data:      filteredDoc,
 			}); err != nil {
 				return err
 			}
@@ -290,10 +354,15 @@ func (r *RestColServiceServerService) QueryDocumentsStream(req *apppb.QueryDocum
 		}
 		// TODO: apply field selector
 		for _, doc := range queryDocs {
+			filteredDoc, err := r.filterDocWithSelectedFields(doc, req.FieldSelectors)
+			if err != nil {
+				return err
+			}
+
 			sendingCount = sendingCount + 1
 			if err := stream.Send(&apppb.GetDocumentResponse{
 				XMetadata: documentsmodel.NewPbDocumentMetadata(doc),
-				Data:      []byte(doc.Data),
+				Data:      filteredDoc,
 			}); err != nil {
 				return err
 			}
@@ -326,5 +395,32 @@ func makeQueryConditioner(startedAt *timestamppb.Timestamp, endedAt *timestamppb
 }
 
 func (r *RestColServiceServerService) QueryDocument(ctx context.Context, req *apppb.QueryDocumentRequest) (*apppb.QueryDocumentResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method QueryDocument not implemented")
+	projectId, err := r.getProjectIdFromCtx(ctx)
+	if err != nil {
+		return nil, err
+	}
+	cid := collectionsmodel.NewCollectionIDFromStr(req.CollectionId)
+	queryDocs, err := r.documentCURD.Query(
+		ctx,
+		"",
+		projectId,
+		cid,
+		makeQueryConditioner(req.SinceTs, req.EndedAt)...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	resp := &apppb.QueryDocumentResponse{}
+	for _, doc := range queryDocs {
+		filteredDocBytes, err := r.filterDocWithSelectedFields(doc, req.FieldSelectors)
+		if err != nil {
+			return nil, err
+		}
+		resp.Docs = append(resp.Docs, &apppb.GetDocumentResponse{
+			XMetadata: documentsmodel.NewPbDocumentMetadata(doc),
+			Data:      filteredDocBytes,
+		})
+	}
+	return resp, nil
+
 }

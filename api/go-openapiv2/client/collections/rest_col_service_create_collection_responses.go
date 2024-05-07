@@ -86,11 +86,11 @@ func (o *RestColServiceCreateCollectionOK) Code() int {
 }
 
 func (o *RestColServiceCreateCollectionOK) Error() string {
-	return fmt.Sprintf("[POST /v1/collections][%d] restColServiceCreateCollectionOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /v1/projects/{projectId}/collections][%d] restColServiceCreateCollectionOK  %+v", 200, o.Payload)
 }
 
 func (o *RestColServiceCreateCollectionOK) String() string {
-	return fmt.Sprintf("[POST /v1/collections][%d] restColServiceCreateCollectionOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /v1/projects/{projectId}/collections][%d] restColServiceCreateCollectionOK  %+v", 200, o.Payload)
 }
 
 func (o *RestColServiceCreateCollectionOK) GetPayload() *models.APICreateCollectionResponse {
@@ -158,11 +158,11 @@ func (o *RestColServiceCreateCollectionDefault) Code() int {
 }
 
 func (o *RestColServiceCreateCollectionDefault) Error() string {
-	return fmt.Sprintf("[POST /v1/collections][%d] RestColService_CreateCollection default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[POST /v1/projects/{projectId}/collections][%d] RestColService_CreateCollection default  %+v", o._statusCode, o.Payload)
 }
 
 func (o *RestColServiceCreateCollectionDefault) String() string {
-	return fmt.Sprintf("[POST /v1/collections][%d] RestColService_CreateCollection default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[POST /v1/projects/{projectId}/collections][%d] RestColService_CreateCollection default  %+v", o._statusCode, o.Payload)
 }
 
 func (o *RestColServiceCreateCollectionDefault) GetPayload() *models.RPCStatus {

@@ -49,14 +49,11 @@ func (c *CollectionSwaggerDoc) RenderDoc() (string, error) {
 
 	var pathSpec []*spec.Swagger
 	for _, col := range c.Collections {
-		if len(col.Schemas) == 0 {
-			continue
-		}
 		swagSpec, _ := newSwagDoc()
 		specClone, _ := copyPathsWithFilter(
 			swagSpec,
 			cidPathFilter,
-			documentTagFilter,
+			tagFilter,
 		)
 		if err := replacePathsWithCollection(col, specClone); err != nil {
 			return "", err
@@ -80,7 +77,7 @@ type PathFilterFunc func(path string) bool
 
 // cidPathFilter filters a path with {cid}
 func cidPathFilter(path string) bool {
-	if strings.Contains(path, "{cid}") {
+	if strings.Contains(path, "{collectionId}") {
 		return true
 	}
 	return false
@@ -88,9 +85,12 @@ func cidPathFilter(path string) bool {
 
 type TagFilterFunc func(tags []string) bool
 
-func documentTagFilter(tags []string) bool {
+func tagFilter(tags []string) bool {
 	for _, tag := range tags {
 		if tag == "document" {
+			return true
+		}
+		if tag == "swagger" {
 			return true
 		}
 	}
@@ -141,15 +141,21 @@ func copyPathsWithFilter(origSpec *spec.Swagger, pathFilter PathFilterFunc, tagF
 // replacePathsWithCollection expands $cid, $pid with values defined in col
 func replacePathsWithCollection(col *modelcollections.ModelCollection, specClone *spec.Swagger) error {
 	// all response of a single collection now is under `apiRequestResponse`
-	responseDefs, err := swagdef.ModelFieldsSchemaToSwagDef(col.Schemas[0].Fields, "apiRequestResponse")
+	var fields []*modelcollections.ModelFieldSchema
+	if len(col.Schemas) > 1 {
+		// pick the latest
+		fields = col.Schemas[0].Fields
+	}
+
+	responseDefs, err := swagdef.ModelFieldsSchemaToSwagDef(fields, "apiRequestResponse")
 	if err != nil {
 		return err
 	}
 	apiRequestBodySchema := (*responseDefs)["apiRequestResponse"]
 	apiResponseSchema := (*responseDefs)["apiRequestResponse"]
 
-	var cidReplacer = regexp.MustCompile(`\{cid\}`)
-	var pidReplacer = regexp.MustCompile(`\{pid\}`)
+	var cidReplacer = regexp.MustCompile(`\{collectionId\}`)
+	var pidReplacer = regexp.MustCompile(`\{projectId\}`)
 	pathClone := &spec.Paths{
 		Paths: map[string]spec.PathItem{},
 	}
@@ -165,12 +171,12 @@ func replacePathsWithCollection(col *modelcollections.ModelCollection, specClone
 			)
 		cidParam := spec.Parameter{
 			ParamProps: spec.ParamProps{
-				Name: "cid",
+				Name: "collectionId",
 			},
 		}
 		pidParam := spec.Parameter{
 			ParamProps: spec.ParamProps{
-				Name: "pid",
+				Name: "projectId",
 			},
 		}
 		delParams := []spec.Parameter{cidParam, pidParam}

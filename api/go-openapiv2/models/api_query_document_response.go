@@ -7,6 +7,7 @@ package models
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -19,7 +20,7 @@ import (
 type APIQueryDocumentResponse struct {
 
 	// docs
-	Docs *APIGetDocumentResponse `json:"docs,omitempty"`
+	Docs []*APIGetDocumentResponse `json:"docs"`
 }
 
 // Validate validates this api query document response
@@ -41,15 +42,22 @@ func (m *APIQueryDocumentResponse) validateDocs(formats strfmt.Registry) error {
 		return nil
 	}
 
-	if m.Docs != nil {
-		if err := m.Docs.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("docs")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("docs")
-			}
-			return err
+	for i := 0; i < len(m.Docs); i++ {
+		if swag.IsZero(m.Docs[i]) { // not required
+			continue
 		}
+
+		if m.Docs[i] != nil {
+			if err := m.Docs[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("docs" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("docs" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
@@ -71,20 +79,24 @@ func (m *APIQueryDocumentResponse) ContextValidate(ctx context.Context, formats 
 
 func (m *APIQueryDocumentResponse) contextValidateDocs(ctx context.Context, formats strfmt.Registry) error {
 
-	if m.Docs != nil {
+	for i := 0; i < len(m.Docs); i++ {
 
-		if swag.IsZero(m.Docs) { // not required
-			return nil
-		}
+		if m.Docs[i] != nil {
 
-		if err := m.Docs.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("docs")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("docs")
+			if swag.IsZero(m.Docs[i]) { // not required
+				return nil
 			}
-			return err
+
+			if err := m.Docs[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("docs" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("docs" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
 		}
+
 	}
 
 	return nil

@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	dummyProject = projectsmodel.ModelProject{
+	DummyModelProject = projectsmodel.ModelProject{
 		ID:   projectsmodel.NewProjectID(1001),
 		Type: projectsmodel.ProxyProjectType,
 	}
@@ -25,7 +25,7 @@ func NewDummyProject(projectcurd *projectsstorage.ProjectCURD) *DummyProject {
 }
 
 func (d *DummyProject) Init(ctx context.Context) error {
-	return d.projectcurd.Write(ctx, "", &dummyProject)
+	return d.projectcurd.Write(ctx, "", &DummyModelProject)
 }
 
 func (d *DummyProject) GetProject(ctx context.Context, pid projectsmodel.ProjectID) (*projectsmodel.ModelProject, error) {

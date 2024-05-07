@@ -27,7 +27,7 @@
     "application/json"
   ],
   "paths": {
-    "/v1/apidoc": {
+    "/v1/projects/{projectId}/apidoc": {
       "get": {
         "summary": "Return API Doc in Swagger",
         "operationId": "RestColService_GetSwaggerDoc",
@@ -48,6 +48,12 @@
         "parameters": [
           {
             "name": "projectId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collectionId",
             "in": "query",
             "required": false,
             "type": "string"
@@ -58,7 +64,7 @@
         ]
       }
     },
-    "/v1/collections": {
+    "/v1/projects/{projectId}/collections": {
       "get": {
         "summary": "list collections endpoint",
         "operationId": "RestColService_ListCollections",
@@ -79,8 +85,8 @@
         "parameters": [
           {
             "name": "projectId",
-            "in": "query",
-            "required": false,
+            "in": "path",
+            "required": true,
             "type": "string"
           }
         ],
@@ -91,589 +97,6 @@
       "post": {
         "summary": "Add collection endpoint, a collection is a set of documents with scheme-free.",
         "operationId": "RestColService_CreateCollection",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/apiCreateCollectionResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/apiCreateCollectionRequest"
-            }
-          }
-        ],
-        "tags": [
-          "collections"
-        ]
-      }
-    },
-    "/v1/collections/{collectionId}": {
-      "get": {
-        "description": "retrieve an individual collection information and document keys assocaited with it",
-        "operationId": "RestColService_GetCollection",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/apiGetCollectionResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "collectionId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "projectId",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "collections"
-        ]
-      },
-      "delete": {
-        "description": "remove an individual collection and its associated doc",
-        "operationId": "RestColService_DeleteCollection",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/apiDeleteCollectionResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "collectionId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "projectId",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "collections"
-        ]
-      }
-    },
-    "/v1/collections/{collectionId}/{documentId}": {
-      "get": {
-        "summary": "GetDocument endpoint is a generic endpoint for retrieving data across multiple collections",
-        "description": "retrieve a document information from the collection.",
-        "operationId": "RestColService_GetDocument2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/apiGetDocumentResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "collectionId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "documentId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "projectId",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "document"
-        ]
-      },
-      "delete": {
-        "summary": "DeleteDocument endpoint is a generic endpoint for deleting a specific data",
-        "description": "Remove the specific document from the collection",
-        "operationId": "RestColService_DeleteDocument",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/apiDeleteDocumentResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "collectionId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "documentId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "projectId",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "document"
-        ]
-      }
-    },
-    "/v1/collections/{collectionId}:docstream": {
-      "get": {
-        "description": "run query against a collection, return documents in streaming which matched the query",
-        "operationId": "RestColService_QueryDocumentsStream2",
-        "responses": {
-          "200": {
-            "description": "A successful response.(streaming responses)",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "result": {
-                  "$ref": "#/definitions/apiGetDocumentResponse"
-                },
-                "error": {
-                  "$ref": "#/definitions/rpcStatus"
-                }
-              },
-              "title": "Stream result of apiGetDocumentResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "collectionId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "projectId",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "sinceTs",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "date-time"
-          },
-          {
-            "name": "endedAt",
-            "description": "endedAt specifies when is the ended timeframe of the query",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "date-time"
-          },
-          {
-            "name": "queryfields",
-            "description": "dot-concatenated fields, ex: fielda.fieldb.fieldc",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "followUpMode",
-            "description": "if on, the service would keep watch new coming docs",
-            "in": "query",
-            "required": false,
-            "type": "boolean"
-          }
-        ],
-        "tags": [
-          "document"
-        ]
-      }
-    },
-    "/v1/collections/{collectionId}:newdoc": {
-      "post": {
-        "description": "create a document to the collection",
-        "operationId": "RestColService_CreateDocument2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/apiCreateDocumentResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "collectionId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/RestColServiceCreateDocumentBody"
-            }
-          }
-        ],
-        "tags": [
-          "document"
-        ]
-      }
-    },
-    "/v1/collections/{collectionId}:query": {
-      "get": {
-        "description": "run query against a collection, return documents matched the query",
-        "operationId": "RestColService_QueryDocument2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/apiQueryDocumentResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "collectionId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "projectId",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "sinceTs",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "date-time"
-          },
-          {
-            "name": "endedAt",
-            "description": "endedAt specifies when is the ended timeframe of the query",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "date-time"
-          },
-          {
-            "name": "queryfields",
-            "description": "dot-concatenated fields, ex: fielda.fieldb.fieldc",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "limitCount",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          }
-        ],
-        "tags": [
-          "document"
-        ]
-      }
-    },
-    "/v1/doc/{documentId}": {
-      "get": {
-        "summary": "GetDocument endpoint is a generic endpoint for retrieving data across multiple collections",
-        "description": "retrieve a document information from the collection.",
-        "operationId": "RestColService_GetDocument",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/apiGetDocumentResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "documentId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "projectId",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "collectionId",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "document"
-        ]
-      }
-    },
-    "/v1/docstream": {
-      "get": {
-        "description": "run query against a collection, return documents in streaming which matched the query",
-        "operationId": "RestColService_QueryDocumentsStream",
-        "responses": {
-          "200": {
-            "description": "A successful response.(streaming responses)",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "result": {
-                  "$ref": "#/definitions/apiGetDocumentResponse"
-                },
-                "error": {
-                  "$ref": "#/definitions/rpcStatus"
-                }
-              },
-              "title": "Stream result of apiGetDocumentResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "projectId",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "collectionId",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "sinceTs",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "date-time"
-          },
-          {
-            "name": "endedAt",
-            "description": "endedAt specifies when is the ended timeframe of the query",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "date-time"
-          },
-          {
-            "name": "queryfields",
-            "description": "dot-concatenated fields, ex: fielda.fieldb.fieldc",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "followUpMode",
-            "description": "if on, the service would keep watch new coming docs",
-            "in": "query",
-            "required": false,
-            "type": "boolean"
-          }
-        ],
-        "tags": [
-          "document"
-        ]
-      }
-    },
-    "/v1/newdoc": {
-      "post": {
-        "description": "create a document to the collection",
-        "operationId": "RestColService_CreateDocument",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/apiCreateDocumentResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/apiCreateDocumentRequest"
-            }
-          }
-        ],
-        "tags": [
-          "document"
-        ]
-      }
-    },
-    "/v1/projects/{projectId}/apidoc": {
-      "get": {
-        "summary": "Return API Doc in Swagger",
-        "operationId": "RestColService_GetSwaggerDoc2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/apiHttpBody"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "projectId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "swagger"
-        ]
-      }
-    },
-    "/v1/projects/{projectId}/collections": {
-      "get": {
-        "summary": "list collections endpoint",
-        "operationId": "RestColService_ListCollections2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/apiListCollectionsResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "projectId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "collections"
-        ]
-      },
-      "post": {
-        "summary": "Add collection endpoint, a collection is a set of documents with scheme-free.",
-        "operationId": "RestColService_CreateCollection2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -712,7 +135,7 @@
     "/v1/projects/{projectId}/collections/{collectionId}": {
       "get": {
         "description": "retrieve an individual collection information and document keys assocaited with it",
-        "operationId": "RestColService_GetCollection2",
+        "operationId": "RestColService_GetCollection",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -747,7 +170,7 @@
       },
       "delete": {
         "description": "remove an individual collection and its associated doc",
-        "operationId": "RestColService_DeleteCollection2",
+        "operationId": "RestColService_DeleteCollection",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -781,11 +204,118 @@
         ]
       }
     },
-    "/v1/projects/{projectId}/collections/{collectionId}/{documentId}": {
+    "/v1/projects/{projectId}/collections/{collectionId}/apidoc": {
+      "get": {
+        "summary": "Return API Doc in Swagger",
+        "operationId": "RestColService_GetSwaggerDoc2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiHttpBody"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collectionId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "swagger"
+        ]
+      }
+    },
+    "/v1/projects/{projectId}/collections/{collectionId}/docs": {
+      "get": {
+        "description": "run query against a collection, return documents matched the query",
+        "operationId": "RestColService_QueryDocument",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiQueryDocumentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collectionId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "sinceTs",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "endedAt",
+            "description": "endedAt specifies when is the ended timeframe of the query",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "fieldSelectors",
+            "description": "dot-concatenated fields, ex: fielda.fieldb.fieldc",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "limitCount",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "document"
+        ]
+      }
+    },
+    "/v1/projects/{projectId}/collections/{collectionId}/docs/{documentId}": {
       "get": {
         "summary": "GetDocument endpoint is a generic endpoint for retrieving data across multiple collections",
         "description": "retrieve a document information from the collection.",
-        "operationId": "RestColService_GetDocument3",
+        "operationId": "RestColService_GetDocument",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -818,6 +348,17 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "fieldSelectors",
+            "description": "dot-concatenated fields, ex: fielda.fieldb.fieldc",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -827,7 +368,7 @@
       "delete": {
         "summary": "DeleteDocument endpoint is a generic endpoint for deleting a specific data",
         "description": "Remove the specific document from the collection",
-        "operationId": "RestColService_DeleteDocument2",
+        "operationId": "RestColService_DeleteDocument",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -867,10 +408,10 @@
         ]
       }
     },
-    "/v1/projects/{projectId}/collections/{collectionId}:docstream": {
+    "/v1/projects/{projectId}/collections/{collectionId}/docs:stream": {
       "get": {
         "description": "run query against a collection, return documents in streaming which matched the query",
-        "operationId": "RestColService_QueryDocumentsStream3",
+        "operationId": "RestColService_QueryDocumentsStream",
         "responses": {
           "200": {
             "description": "A successful response.(streaming responses)",
@@ -923,11 +464,15 @@
             "format": "date-time"
           },
           {
-            "name": "queryfields",
+            "name": "fieldSelectors",
             "description": "dot-concatenated fields, ex: fielda.fieldb.fieldc",
             "in": "query",
             "required": false,
-            "type": "string"
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           },
           {
             "name": "followUpMode",
@@ -945,7 +490,7 @@
     "/v1/projects/{projectId}/collections/{collectionId}:newdoc": {
       "post": {
         "description": "create a document to the collection",
-        "operationId": "RestColService_CreateDocument3",
+        "operationId": "RestColService_CreateDocument2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -987,15 +532,15 @@
         ]
       }
     },
-    "/v1/projects/{projectId}/collections/{collectionId}:query": {
-      "get": {
-        "description": "run query against a collection, return documents matched the query",
-        "operationId": "RestColService_QueryDocument3",
+    "/v1/projects/{projectId}/newdoc": {
+      "post": {
+        "description": "create a document to the collection",
+        "operationId": "RestColService_CreateDocument",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/apiQueryDocumentResponse"
+              "$ref": "#/definitions/apiCreateDocumentResponse"
             }
           },
           "default": {
@@ -1013,105 +558,12 @@
             "type": "string"
           },
           {
-            "name": "collectionId",
-            "in": "path",
+            "name": "body",
+            "in": "body",
             "required": true,
-            "type": "string"
-          },
-          {
-            "name": "sinceTs",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "date-time"
-          },
-          {
-            "name": "endedAt",
-            "description": "endedAt specifies when is the ended timeframe of the query",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "date-time"
-          },
-          {
-            "name": "queryfields",
-            "description": "dot-concatenated fields, ex: fielda.fieldb.fieldc",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "limitCount",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          }
-        ],
-        "tags": [
-          "document"
-        ]
-      }
-    },
-    "/v1/query": {
-      "get": {
-        "description": "run query against a collection, return documents matched the query",
-        "operationId": "RestColService_QueryDocument",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/apiQueryDocumentResponse"
+              "$ref": "#/definitions/RestColServiceCreateDocumentBody"
             }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "projectId",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "collectionId",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "sinceTs",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "date-time"
-          },
-          {
-            "name": "endedAt",
-            "description": "endedAt specifies when is the ended timeframe of the query",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "date-time"
-          },
-          {
-            "name": "queryfields",
-            "description": "dot-concatenated fields, ex: fielda.fieldb.fieldc",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "limitCount",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
           }
         ],
         "tags": [
@@ -1193,30 +645,6 @@
       ],
       "default": "COLLECTION_TYPE_NONE"
     },
-    "apiCreateCollectionRequest": {
-      "type": "object",
-      "properties": {
-        "projectId": {
-          "type": "string"
-        },
-        "collectionId": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "collectionType": {
-          "$ref": "#/definitions/apiCollectionType"
-        },
-        "schemas": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/apiSchemaField"
-          }
-        }
-      }
-    },
     "apiCreateCollectionResponse": {
       "type": "object",
       "properties": {
@@ -1235,28 +663,6 @@
             "type": "object",
             "$ref": "#/definitions/apiSchemaField"
           }
-        }
-      }
-    },
-    "apiCreateDocumentRequest": {
-      "type": "object",
-      "properties": {
-        "projectId": {
-          "type": "string"
-        },
-        "collectionId": {
-          "type": "string"
-        },
-        "documentId": {
-          "type": "string"
-        },
-        "data": {
-          "type": "string",
-          "format": "byte",
-          "title": "data represents rawdata for any kind of formating"
-        },
-        "dataformat": {
-          "$ref": "#/definitions/apiDataFormat"
         }
       }
     },
@@ -1344,10 +750,7 @@
         "Metadata": {
           "$ref": "#/definitions/apiDataMetadata"
         },
-        "data": {
-          "type": "string",
-          "format": "byte"
-        }
+        "data": {}
       }
     },
     "apiHttpBody": {
@@ -1380,7 +783,11 @@
       "type": "object",
       "properties": {
         "docs": {
-          "$ref": "#/definitions/apiGetDocumentResponse"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/apiGetDocumentResponse"
+          }
         }
       }
     },

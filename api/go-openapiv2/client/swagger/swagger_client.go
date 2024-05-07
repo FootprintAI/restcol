@@ -46,7 +46,7 @@ func (a *Client) RestColServiceGetSwaggerDoc(params *RestColServiceGetSwaggerDoc
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_GetSwaggerDoc",
 		Method:             "GET",
-		PathPattern:        "/v1/apidoc",
+		PathPattern:        "/v1/projects/{projectId}/apidoc",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},
@@ -84,7 +84,7 @@ func (a *Client) RestColServiceGetSwaggerDoc2(params *RestColServiceGetSwaggerDo
 	op := &runtime.ClientOperation{
 		ID:                 "RestColService_GetSwaggerDoc2",
 		Method:             "GET",
-		PathPattern:        "/v1/projects/{projectId}/apidoc",
+		PathPattern:        "/v1/projects/{projectId}/collections/{collectionId}/apidoc",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},

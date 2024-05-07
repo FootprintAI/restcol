@@ -61,6 +61,9 @@ RestColServiceGetSwaggerDoc2Params contains all the parameters to send to the AP
 */
 type RestColServiceGetSwaggerDoc2Params struct {
 
+	// CollectionID.
+	CollectionID string
+
 	// ProjectID.
 	ProjectID string
 
@@ -117,6 +120,17 @@ func (o *RestColServiceGetSwaggerDoc2Params) SetHTTPClient(client *http.Client) 
 	o.HTTPClient = client
 }
 
+// WithCollectionID adds the collectionID to the rest col service get swagger doc2 params
+func (o *RestColServiceGetSwaggerDoc2Params) WithCollectionID(collectionID string) *RestColServiceGetSwaggerDoc2Params {
+	o.SetCollectionID(collectionID)
+	return o
+}
+
+// SetCollectionID adds the collectionId to the rest col service get swagger doc2 params
+func (o *RestColServiceGetSwaggerDoc2Params) SetCollectionID(collectionID string) {
+	o.CollectionID = collectionID
+}
+
 // WithProjectID adds the projectID to the rest col service get swagger doc2 params
 func (o *RestColServiceGetSwaggerDoc2Params) WithProjectID(projectID string) *RestColServiceGetSwaggerDoc2Params {
 	o.SetProjectID(projectID)
@@ -135,6 +149,11 @@ func (o *RestColServiceGetSwaggerDoc2Params) WriteToRequest(r runtime.ClientRequ
 		return err
 	}
 	var res []error
+
+	// path param collectionId
+	if err := r.SetPathParam("collectionId", o.CollectionID); err != nil {
+		return err
+	}
 
 	// path param projectId
 	if err := r.SetPathParam("projectId", o.ProjectID); err != nil {

@@ -89,11 +89,11 @@ func (o *RestColServiceQueryDocumentsStreamOK) Code() int {
 }
 
 func (o *RestColServiceQueryDocumentsStreamOK) Error() string {
-	return fmt.Sprintf("[GET /v1/docstream][%d] restColServiceQueryDocumentsStreamOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs:stream][%d] restColServiceQueryDocumentsStreamOK  %+v", 200, o.Payload)
 }
 
 func (o *RestColServiceQueryDocumentsStreamOK) String() string {
-	return fmt.Sprintf("[GET /v1/docstream][%d] restColServiceQueryDocumentsStreamOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs:stream][%d] restColServiceQueryDocumentsStreamOK  %+v", 200, o.Payload)
 }
 
 func (o *RestColServiceQueryDocumentsStreamOK) GetPayload() *RestColServiceQueryDocumentsStreamOKBody {
@@ -161,11 +161,11 @@ func (o *RestColServiceQueryDocumentsStreamDefault) Code() int {
 }
 
 func (o *RestColServiceQueryDocumentsStreamDefault) Error() string {
-	return fmt.Sprintf("[GET /v1/docstream][%d] RestColService_QueryDocumentsStream default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs:stream][%d] RestColService_QueryDocumentsStream default  %+v", o._statusCode, o.Payload)
 }
 
 func (o *RestColServiceQueryDocumentsStreamDefault) String() string {
-	return fmt.Sprintf("[GET /v1/docstream][%d] RestColService_QueryDocumentsStream default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs:stream][%d] RestColService_QueryDocumentsStream default  %+v", o._statusCode, o.Payload)
 }
 
 func (o *RestColServiceQueryDocumentsStreamDefault) GetPayload() *models.RPCStatus {

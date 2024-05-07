@@ -2,12 +2,10 @@ package storagedocuments
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"gorm.io/datatypes"
 
 	appmodelcollections "github.com/footprintai/restcol/pkg/models/collections"
 	appmodeldocuments "github.com/footprintai/restcol/pkg/models/documents"
@@ -48,8 +46,9 @@ func TestDocument(t *testing.T) {
 
 	record := &appmodeldocuments.ModelDocument{
 		ID:                appmodeldocuments.NewDocumentID(),
-		Data:              datatypes.JSON("{\"foo\": \"bar\"}"),
+		Data:              appmodeldocuments.NewModelDocumentData(map[string]interface{}{"foo": "bar"}),
 		ModelCollectionID: modelCollection.ID,
+		ModelProjectID:    regularProject.ID,
 	}
 	assert.Nil(t, dcrud.Write(ctx, "", record))
 
@@ -115,7 +114,7 @@ func newDocs(pid appmodelprojects.ProjectID, cid appmodelcollections.CollectionI
 		did := appmodeldocuments.NewDocumentID()
 		record := &appmodeldocuments.ModelDocument{
 			ID:                did,
-			Data:              datatypes.JSON(fmt.Sprintf("{\"foo\": \"bar\", \"myid\": \"%s\"}", did.String())),
+			Data:              appmodeldocuments.NewModelDocumentData(map[string]interface{}{"foo": "bar", "myid": did.String()}),
 			ModelCollectionID: cid,
 			ModelProjectID:    pid,
 		}

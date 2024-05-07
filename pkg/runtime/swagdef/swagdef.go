@@ -44,12 +44,14 @@ func RawJsonMessageToSwagDef(rawJson []byte) (*spec.Definitions, error) {
 
 // ModelFieldsSchemaToSwagDef converts from dot-notation json structure
 // into swag.Definitions
-func ModelFieldsSchemaToSwagDef(fields []modelcollections.ModelFieldSchema, withPrefixs ...string) (*spec.Definitions, error) {
-
-	fieldsWithJson, err := modelcollections.ModelFieldsSchema(fields).ToJSON(withPrefixs...)
-	if err != nil {
-		return nil, err
+func ModelFieldsSchemaToSwagDef(fields []*modelcollections.ModelFieldSchema, withPrefixs ...string) (*spec.Definitions, error) {
+	if len(fields) > 0 {
+		fieldsWithJson, err := modelcollections.ModelFieldsSchema(fields).ToJSON(withPrefixs...)
+		if err != nil {
+			return nil, err
+		}
+		return RawJsonMessageToSwagDef(fieldsWithJson)
 	}
-	return RawJsonMessageToSwagDef(fieldsWithJson)
+	return &spec.Definitions{}, nil
 
 }

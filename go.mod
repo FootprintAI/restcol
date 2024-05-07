@@ -18,7 +18,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1
 	github.com/hashicorp/go-version v1.6.0
-	github.com/sdinsure/agent v0.0.0-20240501222330-05d7cceb3a37
+	github.com/sdinsure/agent v0.0.0-20240507063151-21680815cf8f
 	github.com/stretchr/testify v1.9.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240227224415-6ceb2ff114de
 	google.golang.org/grpc v1.63.2

@@ -2,7 +2,6 @@ package integrationtest
 
 import (
 	"encoding/json"
-	"fmt"
 	"testing"
 
 	"github.com/go-openapi/runtime"
@@ -11,9 +10,7 @@ import (
 
 	restcolopenapicollections "github.com/footprintai/restcol/api/go-openapiv2/client/collections"
 	restcolopenapidocument "github.com/footprintai/restcol/api/go-openapiv2/client/document"
-	restcolopenapiswagger "github.com/footprintai/restcol/api/go-openapiv2/client/swagger"
 	restcolopenapimodel "github.com/footprintai/restcol/api/go-openapiv2/models"
-	integrationtestclient "github.com/footprintai/restcol/integrationtest/client"
 )
 
 func TestIntegrationTest(t *testing.T) {
@@ -25,25 +22,24 @@ func TestIntegrationTest(t *testing.T) {
 	suite := SetupTest(t)
 	defer suite.Close()
 
-	client := suite.NewClient()
+	SetupCollection(t, suite)
 
+	client := suite.NewClient()
 	// post /api/newdoc
-	createDocumentParam := &restcolopenapidocument.RestColServiceCreateDocumentParams{
-		Body: &restcolopenapimodel.APICreateDocumentRequest{
-			CollectionID: "", // empty cid, would create a new collection
-			DocumentID:   "",
-			ProjectID:    "",  // empty pid, would use default pid
-			Dataformat:   nil, // use auto infer
-			Data:         []byte(jsonData),
+	createDocumentParam := &restcolopenapidocument.RestColServiceCreateDocument2Params{
+		Body: &restcolopenapimodel.RestColServiceCreateDocumentBody{
+			Data: []byte(jsonData),
 		},
+		CollectionID: cid,
+		ProjectID:    projectId,
 	}
-	restcolCreateDocumentOk, err := client.Document.RestColServiceCreateDocument(createDocumentParam, noAuthInfo())
+	restcolCreateDocumentOk, err := client.Document.RestColServiceCreateDocument2(createDocumentParam, noAuthInfo())
 	assert.NoError(t, err)
-	createdCid := restcolCreateDocumentOk.Payload.Metadata.CollectionID
 
 	// get /api/collections/{cid}
 	getCollectionParams := &restcolopenapicollections.RestColServiceGetCollectionParams{
-		CollectionID: createdCid,
+		CollectionID: cid,
+		ProjectID:    projectId,
 	}
 	restcolGetCollectionOk, err := client.Collections.RestColServiceGetCollection(getCollectionParams, noAuthInfo())
 	assert.NoError(t, err)
@@ -64,15 +60,40 @@ func TestIntegrationTest(t *testing.T) {
 			Name:     "foo3.foo3foo",
 		},
 	}
-	fmt.Printf("%+v\n", restcolGetCollectionOk.Payload.Schemas[2].Example)
 	assert.EqualValues(t, expectedSchema, restcolGetCollectionOk.Payload.Schemas)
 
-	// get /apidoc
-	getSwaggerDocParams := &restcolopenapiswagger.RestColServiceGetSwaggerDocParams{}
-	restcolGetSwaggerDocOk, err := client.Swagger.RestColServiceGetSwaggerDoc(getSwaggerDocParams, noAuthInfo(), integrationtestclient.WithRawSwaggerDocReader())
+	// get doc with field selector
+	getDocumentParam := &restcolopenapidocument.RestColServiceGetDocumentParams{
+		DocumentID:     restcolCreateDocumentOk.Payload.Metadata.DocumentID,
+		CollectionID:   cid,
+		ProjectID:      projectId,
+		FieldSelectors: []string{"foo2.foo2foo"},
+	}
+	restcolGetDocumentOk, err := client.Document.RestColServiceGetDocument(getDocumentParam, noAuthInfo())
 	assert.NoError(t, err)
-	assert.EqualValues(t, restcolGetSwaggerDocOk.Payload.ContentType, "application/json")
+	assert.EqualValues(t, map[string]interface{}{
+		"foo2": map[string]interface{}{
+			"foo2foo": "foo2bar",
+		},
+	}, restcolGetDocumentOk.Payload.Data)
 
+	// get doc with empty field selector
+	getDocumentParam = &restcolopenapidocument.RestColServiceGetDocumentParams{
+		DocumentID:   restcolCreateDocumentOk.Payload.Metadata.DocumentID,
+		CollectionID: cid,
+		ProjectID:    projectId,
+	}
+	restcolGetDocumentOk, err = client.Document.RestColServiceGetDocument(getDocumentParam, noAuthInfo())
+	assert.NoError(t, err)
+	assert.EqualValues(t, map[string]interface{}{
+		"foo": "bar",
+		"foo2": map[string]interface{}{
+			"foo2foo": "foo2bar",
+		},
+		"foo3": map[string]interface{}{
+			"foo3foo": json.Number("123"),
+		},
+	}, restcolGetDocumentOk.Payload.Data)
 }
 
 func mustJSON(v any) string {

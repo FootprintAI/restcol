@@ -62,7 +62,7 @@ RestColServiceListCollectionsParams contains all the parameters to send to the A
 type RestColServiceListCollectionsParams struct {
 
 	// ProjectID.
-	ProjectID *string
+	ProjectID string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -118,13 +118,13 @@ func (o *RestColServiceListCollectionsParams) SetHTTPClient(client *http.Client)
 }
 
 // WithProjectID adds the projectID to the rest col service list collections params
-func (o *RestColServiceListCollectionsParams) WithProjectID(projectID *string) *RestColServiceListCollectionsParams {
+func (o *RestColServiceListCollectionsParams) WithProjectID(projectID string) *RestColServiceListCollectionsParams {
 	o.SetProjectID(projectID)
 	return o
 }
 
 // SetProjectID adds the projectId to the rest col service list collections params
-func (o *RestColServiceListCollectionsParams) SetProjectID(projectID *string) {
+func (o *RestColServiceListCollectionsParams) SetProjectID(projectID string) {
 	o.ProjectID = projectID
 }
 
@@ -136,21 +136,9 @@ func (o *RestColServiceListCollectionsParams) WriteToRequest(r runtime.ClientReq
 	}
 	var res []error
 
-	if o.ProjectID != nil {
-
-		// query param projectId
-		var qrProjectID string
-
-		if o.ProjectID != nil {
-			qrProjectID = *o.ProjectID
-		}
-		qProjectID := qrProjectID
-		if qProjectID != "" {
-
-			if err := r.SetQueryParam("projectId", qProjectID); err != nil {
-				return err
-			}
-		}
+	// path param projectId
+	if err := r.SetPathParam("projectId", o.ProjectID); err != nil {
+		return err
 	}
 
 	if len(res) > 0 {

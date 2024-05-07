@@ -65,7 +65,7 @@ type RestColServiceGetCollectionParams struct {
 	CollectionID string
 
 	// ProjectID.
-	ProjectID *string
+	ProjectID string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -132,13 +132,13 @@ func (o *RestColServiceGetCollectionParams) SetCollectionID(collectionID string)
 }
 
 // WithProjectID adds the projectID to the rest col service get collection params
-func (o *RestColServiceGetCollectionParams) WithProjectID(projectID *string) *RestColServiceGetCollectionParams {
+func (o *RestColServiceGetCollectionParams) WithProjectID(projectID string) *RestColServiceGetCollectionParams {
 	o.SetProjectID(projectID)
 	return o
 }
 
 // SetProjectID adds the projectId to the rest col service get collection params
-func (o *RestColServiceGetCollectionParams) SetProjectID(projectID *string) {
+func (o *RestColServiceGetCollectionParams) SetProjectID(projectID string) {
 	o.ProjectID = projectID
 }
 
@@ -155,21 +155,9 @@ func (o *RestColServiceGetCollectionParams) WriteToRequest(r runtime.ClientReque
 		return err
 	}
 
-	if o.ProjectID != nil {
-
-		// query param projectId
-		var qrProjectID string
-
-		if o.ProjectID != nil {
-			qrProjectID = *o.ProjectID
-		}
-		qProjectID := qrProjectID
-		if qProjectID != "" {
-
-			if err := r.SetQueryParam("projectId", qProjectID); err != nil {
-				return err
-			}
-		}
+	// path param projectId
+	if err := r.SetPathParam("projectId", o.ProjectID); err != nil {
+		return err
 	}
 
 	if len(res) > 0 {

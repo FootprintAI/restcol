@@ -3,6 +3,7 @@ package storagecollections
 import (
 	"context"
 
+	sdinsureerrors "github.com/sdinsure/agent/pkg/errors"
 	storagepostgres "github.com/sdinsure/agent/pkg/storage/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -45,7 +46,12 @@ func (c *CollectionCURD) GetLatestSchema(ctx context.Context, tableName string, 
 	s := &appmodelcollections.ModelSchema{}
 	err := c.With(ctx, tableName).Where("model_collection_id = ?", cid.String()).Order("id desc").First(s).Error
 	if err != nil {
-		return nil, storage.WrapStorageError(err)
+		wrappedErr := storage.WrapStorageError(err)
+		ismyerr, myerr := sdinsureerrors.As(wrappedErr)
+		if ismyerr && myerr.Code() == sdinsureerrors.CodeNotFound {
+			return c.Get(ctx, tableName, cid, appmodelcollections.NullSchemaID)
+		}
+		return nil, wrappedErr
 	}
 	return c.Get(ctx, tableName, cid, s.ID)
 }
@@ -63,14 +69,15 @@ func (c *CollectionCURD) ListByProjectID(ctx context.Context, tableName string, 
 
 func (c *CollectionCURD) Get(ctx context.Context, tableName string, cid appmodelcollections.CollectionID, sid appmodelcollections.SchemaID) (*appmodelcollections.ModelCollection, error) {
 	record := &appmodelcollections.ModelCollection{}
-	err := c.With(ctx, tableName).
-		Preload("Schemas", func(db *gorm.DB) *gorm.DB {
+	db := c.With(ctx, tableName)
+	if sid != appmodelcollections.NullSchemaID {
+		db = db.Preload("Schemas", func(db *gorm.DB) *gorm.DB {
 			return db.Where(&appmodelcollections.ModelSchema{ID: sid})
-		}).
-		Preload("Schemas.Fields").
+		}).Preload("Schemas.Fields")
+	}
+	if err := db.
 		Where("id = ?", cid.String()).
-		Find(record).Error
-	if err != nil {
+		Find(record).Error; err != nil {
 		return nil, storage.WrapStorageError(err)
 	}
 	return record, nil

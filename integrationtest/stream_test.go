@@ -30,13 +30,14 @@ func TestIntegrationStreamTest(t *testing.T) {
 
 	// post /api/newdoc
 	createDocumentParam := &restcolopenapidocument.RestColServiceCreateDocumentParams{
-		Body: &restcolopenapimodel.APICreateDocumentRequest{
+		Body: &restcolopenapimodel.RestColServiceCreateDocumentBody{
 			Data: []byte(jsonData),
 		},
+		ProjectID: projectId,
 	}
 	restcolCreateDocumentOk, err := client.Document.RestColServiceCreateDocument(createDocumentParam, noAuthInfo())
 	assert.NoError(t, err)
-	createdPid := restcolCreateDocumentOk.Payload.Metadata.ProjectID
+	assert.EqualValues(t, projectId, restcolCreateDocumentOk.Payload.Metadata.ProjectID)
 	createdCid := restcolCreateDocumentOk.Payload.Metadata.CollectionID
 
 	startedTs := strfmt.DateTime(time.Now())
@@ -44,14 +45,14 @@ func TestIntegrationStreamTest(t *testing.T) {
 	// create a goroutine to continueous write docs
 	go func(count int32) {
 		for i := int32(0); i < count; i++ {
-			createDocumentParam := &restcolopenapidocument.RestColServiceCreateDocumentParams{
-				Body: &restcolopenapimodel.APICreateDocumentRequest{
-					Data:         []byte(jsonData),
-					CollectionID: createdCid,
-					ProjectID:    createdPid,
+			createDocumentParam := &restcolopenapidocument.RestColServiceCreateDocument2Params{
+				Body: &restcolopenapimodel.RestColServiceCreateDocumentBody{
+					Data: []byte(jsonData),
 				},
+				CollectionID: createdCid,
+				ProjectID:    projectId,
 			}
-			_, err := client.Document.RestColServiceCreateDocument(createDocumentParam, noAuthInfo())
+			_, err := client.Document.RestColServiceCreateDocument2(createDocumentParam, noAuthInfo())
 			assert.NoError(t, err)
 
 			time.Sleep(10 * time.Millisecond)
@@ -61,8 +62,8 @@ func TestIntegrationStreamTest(t *testing.T) {
 
 	// create a stream to read the data,
 	queryDocumentsStreamParam := &restcolopenapidocument.RestColServiceQueryDocumentsStreamParams{
-		ProjectID:    nullable.StringP(createdPid),
-		CollectionID: nullable.StringP(createdCid),
+		ProjectID:    projectId,
+		CollectionID: createdCid,
 		SinceTs:      &startedTs,
 		FollowUpMode: nullable.BoolP(true),
 	}

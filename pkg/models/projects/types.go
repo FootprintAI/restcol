@@ -36,3 +36,7 @@ type ModelProject struct {
 	ID   ProjectID   `gorm:"column:id;primarykey;type:string;"`
 	Type ProjectType `gorm:"column:type;type:string;"`
 }
+
+func (m ModelProject) TableName() string {
+	return "restcol-projects"
+}

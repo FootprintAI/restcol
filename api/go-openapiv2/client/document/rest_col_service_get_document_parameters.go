@@ -14,6 +14,7 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
 // NewRestColServiceGetDocumentParams creates a new RestColServiceGetDocumentParams object,
@@ -62,13 +63,19 @@ RestColServiceGetDocumentParams contains all the parameters to send to the API e
 type RestColServiceGetDocumentParams struct {
 
 	// CollectionID.
-	CollectionID *string
+	CollectionID string
 
 	// DocumentID.
 	DocumentID string
 
+	/* FieldSelectors.
+
+	   dot-concatenated fields, ex: fielda.fieldb.fieldc
+	*/
+	FieldSelectors []string
+
 	// ProjectID.
-	ProjectID *string
+	ProjectID string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -124,13 +131,13 @@ func (o *RestColServiceGetDocumentParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithCollectionID adds the collectionID to the rest col service get document params
-func (o *RestColServiceGetDocumentParams) WithCollectionID(collectionID *string) *RestColServiceGetDocumentParams {
+func (o *RestColServiceGetDocumentParams) WithCollectionID(collectionID string) *RestColServiceGetDocumentParams {
 	o.SetCollectionID(collectionID)
 	return o
 }
 
 // SetCollectionID adds the collectionId to the rest col service get document params
-func (o *RestColServiceGetDocumentParams) SetCollectionID(collectionID *string) {
+func (o *RestColServiceGetDocumentParams) SetCollectionID(collectionID string) {
 	o.CollectionID = collectionID
 }
 
@@ -145,14 +152,25 @@ func (o *RestColServiceGetDocumentParams) SetDocumentID(documentID string) {
 	o.DocumentID = documentID
 }
 
+// WithFieldSelectors adds the fieldSelectors to the rest col service get document params
+func (o *RestColServiceGetDocumentParams) WithFieldSelectors(fieldSelectors []string) *RestColServiceGetDocumentParams {
+	o.SetFieldSelectors(fieldSelectors)
+	return o
+}
+
+// SetFieldSelectors adds the fieldSelectors to the rest col service get document params
+func (o *RestColServiceGetDocumentParams) SetFieldSelectors(fieldSelectors []string) {
+	o.FieldSelectors = fieldSelectors
+}
+
 // WithProjectID adds the projectID to the rest col service get document params
-func (o *RestColServiceGetDocumentParams) WithProjectID(projectID *string) *RestColServiceGetDocumentParams {
+func (o *RestColServiceGetDocumentParams) WithProjectID(projectID string) *RestColServiceGetDocumentParams {
 	o.SetProjectID(projectID)
 	return o
 }
 
 // SetProjectID adds the projectId to the rest col service get document params
-func (o *RestColServiceGetDocumentParams) SetProjectID(projectID *string) {
+func (o *RestColServiceGetDocumentParams) SetProjectID(projectID string) {
 	o.ProjectID = projectID
 }
 
@@ -164,21 +182,9 @@ func (o *RestColServiceGetDocumentParams) WriteToRequest(r runtime.ClientRequest
 	}
 	var res []error
 
-	if o.CollectionID != nil {
-
-		// query param collectionId
-		var qrCollectionID string
-
-		if o.CollectionID != nil {
-			qrCollectionID = *o.CollectionID
-		}
-		qCollectionID := qrCollectionID
-		if qCollectionID != "" {
-
-			if err := r.SetQueryParam("collectionId", qCollectionID); err != nil {
-				return err
-			}
-		}
+	// path param collectionId
+	if err := r.SetPathParam("collectionId", o.CollectionID); err != nil {
+		return err
 	}
 
 	// path param documentId
@@ -186,25 +192,41 @@ func (o *RestColServiceGetDocumentParams) WriteToRequest(r runtime.ClientRequest
 		return err
 	}
 
-	if o.ProjectID != nil {
+	if o.FieldSelectors != nil {
 
-		// query param projectId
-		var qrProjectID string
+		// binding items for fieldSelectors
+		joinedFieldSelectors := o.bindParamFieldSelectors(reg)
 
-		if o.ProjectID != nil {
-			qrProjectID = *o.ProjectID
+		// query array param fieldSelectors
+		if err := r.SetQueryParam("fieldSelectors", joinedFieldSelectors...); err != nil {
+			return err
 		}
-		qProjectID := qrProjectID
-		if qProjectID != "" {
+	}
 
-			if err := r.SetQueryParam("projectId", qProjectID); err != nil {
-				return err
-			}
-		}
+	// path param projectId
+	if err := r.SetPathParam("projectId", o.ProjectID); err != nil {
+		return err
 	}
 
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
 	return nil
+}
+
+// bindParamRestColServiceGetDocument binds the parameter fieldSelectors
+func (o *RestColServiceGetDocumentParams) bindParamFieldSelectors(formats strfmt.Registry) []string {
+	fieldSelectorsIR := o.FieldSelectors
+
+	var fieldSelectorsIC []string
+	for _, fieldSelectorsIIR := range fieldSelectorsIR { // explode []string
+
+		fieldSelectorsIIV := fieldSelectorsIIR // string as string
+		fieldSelectorsIC = append(fieldSelectorsIC, fieldSelectorsIIV)
+	}
+
+	// items.CollectionFormat: "multi"
+	fieldSelectorsIS := swag.JoinByFormat(fieldSelectorsIC, "multi")
+
+	return fieldSelectorsIS
 }

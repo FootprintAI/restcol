@@ -91,7 +91,7 @@
           }
         ],
         "tags": [
-          "collections"
+          "collection"
         ]
       },
       "post": {
@@ -128,7 +128,7 @@
           }
         ],
         "tags": [
-          "collections"
+          "collection"
         ]
       }
     },
@@ -165,7 +165,7 @@
           }
         ],
         "tags": [
-          "collections"
+          "collection"
         ]
       },
       "delete": {
@@ -200,7 +200,7 @@
           }
         ],
         "tags": [
-          "collections"
+          "collection"
         ]
       }
     },

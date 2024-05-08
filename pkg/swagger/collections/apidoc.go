@@ -100,6 +100,10 @@ func tagFilter(tags []string) bool {
 		if tag == "swagger" {
 			return true
 		}
+		if tag == "collection" {
+			return true
+		}
+
 	}
 	return false
 }

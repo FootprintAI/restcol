@@ -36,6 +36,22 @@ func TestIntegrationTest(t *testing.T) {
 	restcolCreateDocumentOk, err := client.Document.RestColServiceCreateDocument2(createDocumentParam, noAuthInfo())
 	assert.NoError(t, err)
 
+	createDocumentParam2 := &restcolopenapidocument.RestColServiceCreateDocument2Params{
+		Body: &restcolopenapimodel.RestColServiceCreateDocumentBody{
+			Data: []byte(jsonData),
+		},
+		CollectionID: cid,
+		ProjectID:    projectId,
+	}
+	restcolCreateDocumentOk2, err := client.Document.RestColServiceCreateDocument2(createDocumentParam2, noAuthInfo())
+	assert.NoError(t, err)
+
+	// make sure the docs are not the same
+	assert.True(t, restcolCreateDocumentOk2.Payload.Metadata.DocumentID != restcolCreateDocumentOk.Payload.Metadata.DocumentID)
+	// make sure the schema id is the same as it can be reused
+	assert.True(t, restcolCreateDocumentOk2.Payload.Metadata.SchemaID == restcolCreateDocumentOk.Payload.Metadata.SchemaID)
+	assert.True(t, restcolCreateDocumentOk2.Payload.Metadata.SchemaID != "")
+
 	// get /api/collections/{cid}
 	getCollectionParams := &restcolopenapicollections.RestColServiceGetCollectionParams{
 		CollectionID: cid,

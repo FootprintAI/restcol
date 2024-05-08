@@ -11,10 +11,7 @@ func Build(fields []*appmodelcollections.ModelFieldSchema) (map[string]interface
 	constructedData := make(map[string]interface{})
 
 	for _, field := range fields {
-
-		fmt.Printf("build field:%s\n", field.FieldName.String())
-
-		parts := field.FieldName.Parts()
+		parts := field.FieldName.Parts
 		var branchParts []string
 		var leavePart string
 		if len(parts) == 0 {
@@ -42,6 +39,5 @@ func Build(fields []*appmodelcollections.ModelFieldSchema) (map[string]interface
 		}
 		constructedDataPtr[leavePart] = field.FieldExample.Proto().AsInterface()
 	}
-	fmt.Printf("result struct:%+v\n", constructedData)
 	return constructedData, nil
 }

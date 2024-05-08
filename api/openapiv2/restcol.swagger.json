@@ -699,11 +699,15 @@
       "properties": {
         "projectId": {
           "type": "string",
-          "title": "pid is project id"
+          "title": "projectId is project id"
         },
         "collectionId": {
           "type": "string",
-          "title": "cid is collection id from collection data"
+          "title": "collectionId is collection id from collection data"
+        },
+        "schemaId": {
+          "type": "string",
+          "title": "schemaId is the schema index stored in collection"
         },
         "documentId": {
           "type": "string",

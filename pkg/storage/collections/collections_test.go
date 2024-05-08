@@ -47,8 +47,8 @@ func TestStorage(t *testing.T) {
 		cid,
 		apppb.CollectionType_COLLECTION_TYPE_REGULAR_FILES,
 		"test description",
-		[]appmodelcollections.ModelSchema{
-			appmodelcollections.ModelSchema{
+		[]*appmodelcollections.ModelSchema{
+			&appmodelcollections.ModelSchema{
 				Fields: []*appmodelcollections.ModelFieldSchema{
 					&appmodelcollections.ModelFieldSchema{
 						FieldName:      dotnotation.New("foo"),
@@ -86,8 +86,8 @@ func TestStorage(t *testing.T) {
 		cid,
 		apppb.CollectionType_COLLECTION_TYPE_REGULAR_FILES,
 		"test description - part 2",
-		[]appmodelcollections.ModelSchema{
-			appmodelcollections.ModelSchema{
+		[]*appmodelcollections.ModelSchema{
+			&appmodelcollections.ModelSchema{
 				Fields: []*appmodelcollections.ModelFieldSchema{
 					&appmodelcollections.ModelFieldSchema{
 						FieldName:      dotnotation.New("foo"),

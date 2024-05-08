@@ -165,7 +165,7 @@ func makeUniqueOperatorId(pathItem spec.PathItem) spec.PathItem {
 func replacePathsWithCollection(col *modelcollections.ModelCollection, specClone *spec.Swagger) error {
 	// all response of a single collection now is under `apiRequestResponse`
 	var fields []*modelcollections.ModelFieldSchema
-	if len(col.Schemas) > 1 {
+	if len(col.Schemas) > 0 {
 		// pick the latest
 		fields = col.Schemas[0].Fields
 	}

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"fmt"
+	"reflect"
 	"time"
 
 	"github.com/cthulhu/jsonpath"
@@ -125,12 +126,26 @@ func Must(s *SwagValueValue, e error) *SwagValueValue {
 }
 
 func NewSwagValue(v any) (*SwagValueValue, error) {
-	pbValue, err := structpb.NewValue(v)
+	pbValue, err := structpb.NewValue(wrapSlice(v))
 	if err != nil {
 		return &SwagValueValue{}, err
 	}
 	swagVal := SwagValueValue(*pbValue)
 	return &swagVal, nil
+}
+
+func wrapSlice(v any) any {
+	s := reflect.ValueOf(v)
+	t := reflect.TypeOf(v)
+	switch t.Kind() {
+	case reflect.Array, reflect.Slice:
+		ret := make([]interface{}, s.Len())
+		for i := 0; i < s.Len(); i++ {
+			ret[i] = s.Index(i).Interface()
+		}
+		return ret
+	}
+	return v
 }
 
 func (s SwagValueValue) Proto() *structpb.Value {

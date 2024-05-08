@@ -27,8 +27,8 @@ func TestCollectionSuite(
 		cid,
 		apppb.CollectionType_COLLECTION_TYPE_REGULAR_FILES,
 		"from testsuite",
-		[]appmodelcollections.ModelSchema{
-			appmodelcollections.ModelSchema{
+		[]*appmodelcollections.ModelSchema{
+			&appmodelcollections.ModelSchema{
 				Fields: []*appmodelcollections.ModelFieldSchema{
 					&appmodelcollections.ModelFieldSchema{
 						FieldName:      dotnotation.New("foo"),

@@ -263,14 +263,17 @@ enum DataFormat {
 }
 
 message DataMetadata {
-    // pid is project id
+    // projectId is project id
     string projectId = 1;
 
-    // cid is collection id from collection data
+    // collectionId is collection id from collection data
     string collectionId = 2;
 
+    // schemaId is the schema index stored in collection
+    string schemaId = 3;
+
     // did (aka dataid) would be used to naming ${documentId} field, that field should be url safe
-    string documentId = 3;
+    string documentId = 4;
 
     google.protobuf.Timestamp _createdAt = 10; // ts when the record was created
     optional google.protobuf.Timestamp _deletedAt = 11; // ts when the record was deleted

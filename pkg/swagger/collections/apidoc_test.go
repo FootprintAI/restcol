@@ -24,8 +24,8 @@ func TestCollectionDoc(t *testing.T) {
 		ID:             cid1,
 		ModelProjectID: modelprojects.NewProjectID(1),
 		Summary:        "test swagger doc generation",
-		Schemas: []modelcollections.ModelSchema{
-			modelcollections.ModelSchema{
+		Schemas: []*modelcollections.ModelSchema{
+			&modelcollections.ModelSchema{
 				Fields: []*modelcollections.ModelFieldSchema{
 					&modelcollections.ModelFieldSchema{
 						FieldName:      dotnotation.New("foo"),

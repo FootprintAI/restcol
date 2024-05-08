@@ -105,7 +105,7 @@ func (r *RestColServiceServerService) CreateCollection(ctx context.Context, req 
 	if req.Description != nil {
 		summary = *req.Description
 	}
-	var modelSchemaSlice []collectionsmodel.ModelSchema
+	var modelSchemaSlice []*collectionsmodel.ModelSchema
 	if len(req.Schemas) > 0 {
 		// request is with a specific schema, use it
 		modelSchema, _ := collectionsmodel.NewModelSchema(req.Schemas)
@@ -188,6 +188,7 @@ func (r *RestColServiceServerService) GetCollection(ctx context.Context, req *ap
 func (r *RestColServiceServerService) DeleteCollection(ctx context.Context, req *apppb.DeleteCollectionRequest) (*apppb.DeleteCollectionResponse, error) {
 	return nil, sderrors.NewNotImplError(errors.New("not implemented"))
 }
+
 func (r *RestColServiceServerService) CreateDocument(ctx context.Context, req *apppb.CreateDocumentRequest) (*apppb.CreateDocumentResponse, error) {
 	projectId, err := r.getProjectIdFromCtx(ctx)
 	if err != nil {
@@ -202,12 +203,34 @@ func (r *RestColServiceServerService) CreateDocument(ctx context.Context, req *a
 			return nil, err
 		}
 	}
+
+	modelCollection, err := r.collectionCURD.GetLatestSchema(ctx, "", cid)
+	if err != nil {
+		return nil, err
+	}
+
+	var docSchema *collectionsmodel.ModelSchema
+
 	// auto detect schema
-	_, modelSchema, valueHolder, err := r.schemaBuilder.Parse(req.Data)
+	_, inputDataSchema, valueHolder, err := r.schemaBuilder.Parse(req.Data)
 	if err != nil {
 		r.log.Error("failed to convert into modelschema, err:%+v\n", err)
 		return nil, err
 	}
+	// check whether we need to create a new schema mapping
+	// or use existing schema
+	if len(modelCollection.Schemas) == 0 {
+		// no previous schema, use the latest data
+		docSchema = inputDataSchema
+	} else {
+		// has schema under the collection
+		if r.schemaBuilder.Equals(modelCollection.Schemas[0], inputDataSchema) {
+			docSchema = modelCollection.Schemas[0]
+		} else {
+			docSchema = inputDataSchema
+		}
+	}
+
 	docModel := &documentsmodel.ModelDocument{
 		ID:                documentsmodel.NewDocumentID(),
 		Data:              documentsmodel.NewModelDocumentData(valueHolder),
@@ -217,8 +240,8 @@ func (r *RestColServiceServerService) CreateDocument(ctx context.Context, req *a
 			cid,
 			apppb.CollectionType_COLLECTION_TYPE_REGULAR_FILES,
 			"auto created collection",
-			[]collectionsmodel.ModelSchema{
-				*modelSchema,
+			[]*collectionsmodel.ModelSchema{
+				docSchema,
 			},
 		),
 		ModelProjectID: projectId,

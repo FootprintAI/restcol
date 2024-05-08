@@ -208,22 +208,54 @@ func replacePathsWithCollection(col *modelcollections.ModelCollection, specClone
 		}
 		delParams := []spec.Parameter{cidParam, pidParam}
 		// replace pathItem properties
-		if pathItem.PathItemProps.Get != nil {
-			updateToSwagOperation(pathItem.PathItemProps.Get, col.Summary, delParams, nil, &apiResponseSchema)
+		if op := pathItem.PathItemProps.Get; op != nil {
+			if isCollectionOperation(op) {
+				updateToSwagOperation(op, col.Summary, delParams, nil, nil)
+			} else {
+				updateToSwagOperation(op, col.Summary, delParams, nil, &apiResponseSchema)
+			}
 		}
-		if pathItem.PathItemProps.Put != nil {
-			updateToSwagOperation(pathItem.PathItemProps.Put, col.Summary, delParams, &apiRequestBodySchema, &apiResponseSchema)
+		if op := pathItem.PathItemProps.Put; op != nil {
+			if isCollectionOperation(op) {
+				updateToSwagOperation(op, col.Summary, delParams, nil, nil)
+			} else {
+				updateToSwagOperation(op, col.Summary, delParams, &apiRequestBodySchema, &apiResponseSchema)
+			}
 		}
-		if pathItem.PathItemProps.Post != nil {
-			updateToSwagOperation(pathItem.PathItemProps.Post, col.Summary, delParams, &apiRequestBodySchema, &apiResponseSchema)
+		if op := pathItem.PathItemProps.Post; op != nil {
+			if isCollectionOperation(op) {
+				updateToSwagOperation(op, col.Summary, delParams, nil, nil)
+			} else {
+				updateToSwagOperation(op, col.Summary, delParams, &apiRequestBodySchema, &apiResponseSchema)
+			}
 		}
-		if pathItem.PathItemProps.Delete != nil {
-			updateToSwagOperation(pathItem.PathItemProps.Delete, col.Summary, delParams, nil, nil)
+		if op := pathItem.PathItemProps.Delete; op != nil {
+			if isCollectionOperation(op) {
+				updateToSwagOperation(op, col.Summary, delParams, nil, nil)
+			} else {
+				updateToSwagOperation(op, col.Summary, delParams, nil, nil)
+			}
 		}
 		pathClone.Paths[replacedPath] = pathItem
 	}
 	specClone.SwaggerProps.Paths = pathClone
 	return nil
+}
+
+func isCollectionOperation(op *spec.Operation) bool {
+	if op == nil {
+		return false
+	}
+	return contains(op.OperationProps.Tags, "collection")
+}
+
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }
 
 func updateToSwagOperation(op *spec.Operation, newSummary string, delParams []spec.Parameter, apiRequestBodySchema *spec.Schema, apiResponseSchema *spec.Schema) error {

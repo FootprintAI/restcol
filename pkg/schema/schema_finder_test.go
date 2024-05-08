@@ -5,8 +5,10 @@ import (
 	"testing"
 
 	"github.com/sdinsure/agent/pkg/logger"
-
 	"github.com/stretchr/testify/assert"
+
+	appmodelcollections "github.com/footprintai/restcol/pkg/models/collections"
+	dotnotation "github.com/footprintai/restcol/pkg/notation/dot"
 )
 
 func TestTraverseMap(t *testing.T) {
@@ -51,3 +53,41 @@ var (
 		},
 	}
 )
+
+func TestSchemaFlatten(t *testing.T) {
+	schemaBuilder := NewSchemaBuilder(logger.NewLogger())
+
+	m1Schema, err := schemaBuilder.Flatten(m1)
+	assert.NoError(t, err)
+
+	m1Schema2 := &appmodelcollections.ModelSchema{
+		Fields: []*appmodelcollections.ModelFieldSchema{
+			&appmodelcollections.ModelFieldSchema{
+				FieldName:      dotnotation.New("foo"),
+				FieldValueType: appmodelcollections.StringSwagValueType,
+			},
+			&appmodelcollections.ModelFieldSchema{
+				FieldName:      dotnotation.New("fooInt"),
+				FieldValueType: appmodelcollections.NumberSwagValueType,
+			},
+			&appmodelcollections.ModelFieldSchema{
+				FieldName:      dotnotation.New("foostruct", "foostructslice"),
+				FieldValueType: appmodelcollections.ArraySwagValueType,
+			},
+			&appmodelcollections.ModelFieldSchema{
+				FieldName:      dotnotation.New("foostruct", "foostructslicefloat"),
+				FieldValueType: appmodelcollections.ArraySwagValueType,
+			},
+			&appmodelcollections.ModelFieldSchema{
+				FieldName:      dotnotation.New("foostruct", "foostructstring"),
+				FieldValueType: appmodelcollections.StringSwagValueType,
+			},
+			&appmodelcollections.ModelFieldSchema{
+				FieldName:      dotnotation.New("foostruct", "foostructstruct", "foostructstructstring"),
+				FieldValueType: appmodelcollections.StringSwagValueType,
+			},
+		},
+	}
+	equal := schemaBuilder.Equals(m1Schema, m1Schema2)
+	assert.True(t, equal)
+}

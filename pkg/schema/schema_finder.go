@@ -101,3 +101,28 @@ func TraverseMap(log sdinsurelogger.Logger, m map[string]interface{}, prefixes [
 	}
 	return nil
 }
+
+func (s *SchemaBuilder) Equals(s1, s2 *appmodelcollections.ModelSchema) bool {
+
+	if len(s1.Fields) != len(s2.Fields) {
+		return false
+	}
+
+	// lookup is keyed by fieldname and each value is with FieldValueType
+	lookup := make(map[string]appmodelcollections.SwagValueType)
+
+	for _, field := range s1.Fields {
+		lookup[field.FieldName.String()] = field.FieldValueType
+	}
+
+	for _, field := range s2.Fields {
+		lookupValue, lookupExists := lookup[field.FieldName.String()]
+		if !lookupExists {
+			return false
+		}
+		if lookupValue != field.FieldValueType {
+			return false
+		}
+	}
+	return true
+}

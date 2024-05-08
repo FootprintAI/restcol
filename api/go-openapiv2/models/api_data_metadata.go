@@ -27,7 +27,7 @@ type APIDataMetadata struct {
 	// Format: date-time
 	DeletedAt strfmt.DateTime `json:"DeletedAt,omitempty"`
 
-	// cid is collection id from collection data
+	// collectionId is collection id from collection data
 	CollectionID string `json:"collectionId,omitempty"`
 
 	// dataformat
@@ -36,8 +36,11 @@ type APIDataMetadata struct {
 	// did (aka dataid) would be used to naming ${documentId} field, that field should be url safe
 	DocumentID string `json:"documentId,omitempty"`
 
-	// pid is project id
+	// projectId is project id
 	ProjectID string `json:"projectId,omitempty"`
+
+	// schemaId is the schema index stored in collection
+	SchemaID string `json:"schemaId,omitempty"`
 }
 
 // Validate validates this api data metadata

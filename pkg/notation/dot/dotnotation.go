@@ -8,7 +8,7 @@ import (
 )
 
 type DotNotation struct {
-	parts []string
+	Parts []string `json:"parts"`
 }
 
 var (
@@ -31,42 +31,38 @@ func (d DotNotation) Value() (driver.Value, error) {
 
 func New(parts ...string) *DotNotation {
 	return &DotNotation{
-		parts: parts,
+		Parts: parts,
 	}
 }
 
-func (d *DotNotation) Parts() []string {
-	return d.parts
-}
-
 func (d *DotNotation) String() string {
-	return strings.ToLower(strings.Join(d.parts, "."))
+	return strings.Join(d.Parts, ".")
 }
 
 func (d *DotNotation) AddSuffix(suffixs ...string) *DotNotation {
 	return &DotNotation{
-		parts: append(d.parts, suffixs...),
+		Parts: append(d.Parts, suffixs...),
 	}
 }
 
 func (d *DotNotation) AddPrefix(prefixs ...string) *DotNotation {
 	return &DotNotation{
-		parts: append(prefixs, d.parts...),
+		Parts: append(prefixs, d.Parts...),
 	}
 }
 
 func (d *DotNotation) Less(d2 *DotNotation) bool {
-	if len(d.parts) > len(d2.parts) {
+	if len(d.Parts) > len(d2.Parts) {
 		return false
 	}
-	if len(d.parts) < len(d2.parts) {
+	if len(d.Parts) < len(d2.Parts) {
 		return true
 	}
-	for partIndex := 0; partIndex < len(d.parts); partIndex++ {
-		if d.parts[partIndex] > d2.parts[partIndex] {
+	for partIndex := 0; partIndex < len(d.Parts); partIndex++ {
+		if d.Parts[partIndex] > d2.Parts[partIndex] {
 			return false
 		}
-		if d.parts[partIndex] < d2.parts[partIndex] {
+		if d.Parts[partIndex] < d2.Parts[partIndex] {
 			return true
 		}
 	}

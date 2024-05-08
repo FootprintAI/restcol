@@ -21,7 +21,7 @@ type ModelCollection struct {
 	UpdatedAt time.Time      `gorm:"column:updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at"`
 
-	Schemas        []ModelSchema           `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"` // associated to many schemes
+	Schemas        []*ModelSchema          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"` // associated to many schemes
 	ModelProjectID modelprojects.ProjectID // foreign key to model project
 	ModelProject   modelprojects.ModelProject
 }
@@ -31,7 +31,7 @@ func NewModelCollection(
 	id CollectionID,
 	t apppb.CollectionType,
 	summary string,
-	schemas []ModelSchema,
+	schemas []*ModelSchema,
 ) ModelCollection {
 	return ModelCollection{
 		ID:             id,

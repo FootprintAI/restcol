@@ -20,14 +20,14 @@ func NewPbCollectionMetadata(mc *ModelCollection) *apppb.CollectionMetadata {
 	return metadata
 }
 
-func NewModelSchema(reqSchemas []*apppb.SchemaField) (ModelSchema, error) {
+func NewModelSchema(reqSchemas []*apppb.SchemaField) (*ModelSchema, error) {
 	var fields []*ModelFieldSchema
 
 	for _, reqSchema := range reqSchemas {
 		valType := NewSwaggerValueType(reqSchema.Datatype)
 		valueValue, err := NewSwagValue(reqSchema.Example)
 		if err != nil {
-			return ModelSchema{}, err
+			return nil, err
 		}
 		fields = append(fields, &ModelFieldSchema{
 			FieldName:      dotnotation.Parse(reqSchema.Name),
@@ -36,14 +36,17 @@ func NewModelSchema(reqSchemas []*apppb.SchemaField) (ModelSchema, error) {
 		})
 	}
 
-	return ModelSchema{
+	return &ModelSchema{
 		Fields: fields,
 	}, nil
 }
 
-func NewPbSchemaFields(m ModelSchema) []*apppb.SchemaField {
-	var pbfields []*apppb.SchemaField
+func NewPbSchemaFields(m *ModelSchema) []*apppb.SchemaField {
+	if m == nil {
+		return nil
+	}
 
+	var pbfields []*apppb.SchemaField
 	for _, field := range m.Fields {
 		pbfields = append(pbfields, &apppb.SchemaField{
 			Name:     field.FieldName.String(),

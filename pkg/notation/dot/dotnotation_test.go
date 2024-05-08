@@ -25,7 +25,7 @@ func TestDotNotation(t *testing.T) {
 		assert.EqualValues(t, testcase.repr, dot.String())
 
 		gotDot := Parse(testcase.repr)
-		assert.EqualValues(t, testcase.parts, gotDot.parts)
+		assert.EqualValues(t, testcase.parts, gotDot.Parts)
 	}
 }
 

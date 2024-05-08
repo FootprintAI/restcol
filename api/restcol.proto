@@ -71,7 +71,7 @@ service RestColService {
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Add collection endpoint, a collection is a set of documents with scheme-free."
-            tags: "collections"
+            tags: "collection"
         };
     }
 
@@ -81,7 +81,7 @@ service RestColService {
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "list collections endpoint"
-            tags: "collections"
+            tags: "collection"
         };
 
     }
@@ -92,7 +92,7 @@ service RestColService {
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "retrieve an individual collection information and document keys assocaited with it"
-            tags: "collections"
+            tags: "collection"
         };
 
     }
@@ -103,7 +103,7 @@ service RestColService {
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "remove an individual collection and its associated doc"
-            tags: "collections"
+            tags: "collection"
         };
     }
 

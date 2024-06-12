@@ -22,7 +22,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240513163218-0867130af1f8
 	google.golang.org/grpc v1.64.0
-	google.golang.org/protobuf v1.34.1
+	google.golang.org/protobuf v1.34.2
 	gorm.io/gorm v1.25.10
 )
 

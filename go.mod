@@ -21,7 +21,7 @@ require (
 	github.com/sdinsure/agent v0.0.0-20240507074650-281b67936555
 	github.com/stretchr/testify v1.9.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240814211410-ddb44dafa142
-	google.golang.org/grpc v1.65.0
+	google.golang.org/grpc v1.66.0
 	google.golang.org/protobuf v1.34.2
 	gorm.io/gorm v1.25.11
 )

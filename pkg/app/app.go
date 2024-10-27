@@ -174,13 +174,22 @@ func (r *RestColServiceServerService) GetCollection(ctx context.Context, req *ap
 	cid = collectionsmodel.NewCollectionIDFromStr(req.CollectionId)
 	mc, err := r.collectionCURD.GetLatestSchema(ctx, "", cid)
 	if err != nil {
+		ismyerr, myerr := sderrors.As(err)
+		if ismyerr && myerr.Code() == sderrors.CodeNotFound {
+			return &apppb.GetCollectionResponse{}, nil
+		}
 		return nil, err
 	}
 	resp := &apppb.GetCollectionResponse{
-		XMetadata:      collectionsmodel.NewPbCollectionMetadata(mc),
-		Description:    mc.Summary,
-		CollectionType: mc.Type.Proto(),
-		Schemas:        collectionsmodel.NewPbSchemaFields(mc.Schemas[0]),
+		XMetadata: collectionsmodel.NewPbCollectionMetadata(mc),
+	}
+	if mc == nil {
+		return resp, nil
+	}
+	resp.Description = mc.Summary
+	resp.CollectionType = mc.Type.Proto()
+	if mc.Schemas != nil {
+		resp.Schemas = collectionsmodel.NewPbSchemaFields(mc.Schemas[0])
 	}
 	return resp, nil
 }
@@ -230,9 +239,18 @@ func (r *RestColServiceServerService) CreateDocument(ctx context.Context, req *a
 			docSchema = inputDataSchema
 		}
 	}
+	var docId documentsmodel.DocumentID
+	if req.DocumentId == nil {
+		docId = documentsmodel.NewDocumentID()
+	} else {
+		docId, err = documentsmodel.Parse(*req.DocumentId)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	docModel := &documentsmodel.ModelDocument{
-		ID:                documentsmodel.NewDocumentID(),
+		ID:                docId,
 		Data:              documentsmodel.NewModelDocumentData(valueHolder),
 		ModelCollectionID: cid,
 		ModelCollection: collectionsmodel.NewModelCollection(
@@ -279,6 +297,11 @@ func (r *RestColServiceServerService) GetDocument(ctx context.Context, req *appp
 
 func (r *RestColServiceServerService) filterDocWithSelectedFields(doc *documentsmodel.ModelDocument, selectedFields []string) (*structpb.Value, error) {
 	r.log.Info("query doc with fields:%+v\n", selectedFields)
+
+	if doc.Data == nil {
+		return nil, nil
+	}
+
 	if len(selectedFields) == 0 {
 		// no selectedFields, return all
 

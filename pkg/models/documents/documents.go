@@ -23,10 +23,10 @@ type ModelDocument struct {
 
 	Data *ModelDocumentData `gorm:"column:data;type:jsonb"`
 
-	ModelCollectionID modelcollections.CollectionID // foreign key to model collection
+	ModelCollectionID modelcollections.CollectionID `gorm:"primarykey;"` // foreign key to model collection
 	ModelCollection   modelcollections.ModelCollection
 
-	ModelProjectID modelprojects.ProjectID // foreigh key to model project
+	ModelProjectID modelprojects.ProjectID `gorm:"primarykey;"` // foreigh key to model project
 	ModelProject   modelprojects.ModelProject
 }
 

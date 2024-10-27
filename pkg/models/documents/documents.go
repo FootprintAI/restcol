@@ -34,10 +34,12 @@ func (m ModelDocument) TableName() string {
 	return "restcol-documents"
 }
 
-type DocumentID uuid.UUID
+type DocumentID struct {
+	S string
+}
 
 func (d DocumentID) String() string {
-	return uuid.UUID(d).String()
+	return d.S
 }
 
 var (
@@ -63,18 +65,18 @@ func (d *DocumentID) Scan(value interface{}) error {
 }
 
 func Parse(s string) (DocumentID, error) {
-	innerUuid, err := uuid.Parse(s)
-	if err != nil {
-		fmt.Printf("parse doc uuid failed, err:+%v, s:%s\n", err, s)
-		return DocumentID{}, err
-	}
-	return DocumentID(innerUuid), nil
+	//innerUuid, err := uuid.Parse(s)
+	//if err != nil {
+	//	fmt.Printf("parse doc uuid failed, err:+%v, s:%s\n", err, s)
+	//	return DocumentID{}, err
+	//}
+	return DocumentID{S: s}, nil
 
 }
 
 func NewDocumentID() DocumentID {
 	uid, _ := uuid.NewV7()
-	return DocumentID(uid)
+	return DocumentID{S: uid.String()}
 }
 
 type ModelDocumentData struct {

@@ -77,7 +77,7 @@ func (c *CollectionCURD) Get(ctx context.Context, tableName string, cid appmodel
 	}
 	if err := db.
 		Where("id = ?", cid.String()).
-		Find(record).Error; err != nil {
+		First(record).Error; err != nil {
 		return nil, storage.WrapStorageError(err)
 	}
 	return record, nil

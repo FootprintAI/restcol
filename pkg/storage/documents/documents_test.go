@@ -2,6 +2,7 @@ package storagedocuments
 
 import (
 	"context"
+	"reflect"
 	"testing"
 	"time"
 
@@ -55,6 +56,7 @@ func TestDocument(t *testing.T) {
 	found, err := dcrud.Get(ctx, "", regularProject.ID, modelCollection.ID, record.ID)
 	assert.Nil(t, err)
 	assert.EqualValues(t, found, record)
+
 }
 
 func TestDocumentQuery(t *testing.T) {
@@ -121,4 +123,53 @@ func newDocs(pid appmodelprojects.ProjectID, cid appmodelcollections.CollectionI
 		docs = append(docs, record)
 	}
 	return docs
+}
+
+func TestDocumentSameID(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skip this for now")
+		return
+	}
+	ctx := context.Background()
+	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger())
+	assert.NoError(t, err)
+
+	regularProject, _, err := storageprojects.TestProjectSuite(postgrescli)
+	assert.Nil(t, err)
+
+	modelCollection1, err := storagecollectionstestutils.TestCollectionSuite(postgrescli, regularProject)
+	assert.NoError(t, err)
+
+	modelCollection2, err := storagecollectionstestutils.TestCollectionSuite(postgrescli, regularProject)
+	assert.NoError(t, err)
+
+	dcrud := &DocumentCURD{postgrescli}
+	assert.Nil(t, dcrud.AutoMigrate())
+
+	record := &appmodeldocuments.ModelDocument{
+		ID:                appmodeldocuments.NewDocumentID(),
+		Data:              appmodeldocuments.NewModelDocumentData(map[string]interface{}{"foo": "bar"}),
+		ModelCollectionID: modelCollection1.ID,
+		ModelProjectID:    regularProject.ID,
+	}
+	assert.Nil(t, dcrud.Write(ctx, "", record))
+
+	// write again with same did but different cid
+	record2 := &appmodeldocuments.ModelDocument{
+		ID:                record.ID,
+		Data:              appmodeldocuments.NewModelDocumentData(map[string]interface{}{"foo": "bar"}),
+		ModelCollectionID: modelCollection2.ID,
+		ModelProjectID:    regularProject.ID,
+	}
+	assert.Nil(t, dcrud.Write(ctx, "", record2))
+
+	found1, err := dcrud.Get(ctx, "", regularProject.ID, modelCollection1.ID, record.ID)
+	assert.Nil(t, err)
+	found2, err := dcrud.Get(ctx, "", regularProject.ID, modelCollection2.ID, record.ID)
+	assert.Nil(t, err)
+	assert.True(t, found1.ID == found2.ID)
+	assert.True(t, found1.ModelProjectID == found2.ModelProjectID)
+	assert.True(t, found1.ModelCollectionID != found2.ModelCollectionID)
+	assert.False(t, reflect.DeepEqual(found1, found2))
+
 }

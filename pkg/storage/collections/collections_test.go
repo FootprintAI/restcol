@@ -65,7 +65,7 @@ func TestStorage(t *testing.T) {
 
 	assert.Nil(t, tcrud.Write(ctx, "", &mc))
 
-	m, err := tcrud.GetLatestSchema(ctx, "", cid)
+	m, err := tcrud.GetLatestSchema(ctx, "", regularProject.ID, cid)
 	assert.Nil(t, err)
 	assert.NotNil(t, m)
 
@@ -108,7 +108,7 @@ func TestStorage(t *testing.T) {
 
 	assert.Nil(t, tcrud.Update(ctx, "", &mc2))
 
-	m, err = tcrud.GetLatestSchema(ctx, "", cid)
+	m, err = tcrud.GetLatestSchema(ctx, "", regularProject.ID, cid)
 	assert.Nil(t, err)
 
 	assert.EqualValues(t, m.Summary, mc2.Summary)

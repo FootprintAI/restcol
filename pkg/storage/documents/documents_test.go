@@ -52,7 +52,7 @@ func TestDocument(t *testing.T) {
 	}
 	assert.Nil(t, dcrud.Write(ctx, "", record))
 
-	found, err := dcrud.Get(ctx, "", record.ID)
+	found, err := dcrud.Get(ctx, "", regularProject.ID, modelCollection.ID, record.ID)
 	assert.Nil(t, err)
 	assert.EqualValues(t, found, record)
 }

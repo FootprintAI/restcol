@@ -47,9 +47,9 @@ func (c *DocumentCURD) Update(ctx context.Context, tableName string, record *app
 	return storage.WrapStorageError(err)
 }
 
-func (c *DocumentCURD) Get(ctx context.Context, tableName string, did appmodeldocuments.DocumentID) (*appmodeldocuments.ModelDocument, error) {
+func (c *DocumentCURD) Get(ctx context.Context, tableName string, pid appmodelprojects.ProjectID, cid appmodelcollections.CollectionID, did appmodeldocuments.DocumentID) (*appmodeldocuments.ModelDocument, error) {
 	record := &appmodeldocuments.ModelDocument{}
-	err := c.With(ctx, tableName).Where("id = ?", did.String()).Find(record).Error
+	err := c.With(ctx, tableName).Where("id = ? and model_collection_id = ? and model_project_id = ?", did.String(), cid.String(), pid.String()).Find(record).Error
 	if err != nil {
 		return nil, storage.WrapStorageError(err)
 	}

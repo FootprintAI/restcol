@@ -42,18 +42,18 @@ func (c *CollectionCURD) Update(ctx context.Context, tableName string, record *a
 	return storage.WrapStorageError(err)
 }
 
-func (c *CollectionCURD) GetLatestSchema(ctx context.Context, tableName string, cid appmodelcollections.CollectionID) (*appmodelcollections.ModelCollection, error) {
+func (c *CollectionCURD) GetLatestSchema(ctx context.Context, tableName string, pid appmodelprojects.ProjectID, cid appmodelcollections.CollectionID) (*appmodelcollections.ModelCollection, error) {
 	s := &appmodelcollections.ModelSchema{}
 	err := c.With(ctx, tableName).Where("model_collection_id = ?", cid.String()).Order("id desc").First(s).Error
 	if err != nil {
 		wrappedErr := storage.WrapStorageError(err)
 		ismyerr, myerr := sdinsureerrors.As(wrappedErr)
 		if ismyerr && myerr.Code() == sdinsureerrors.CodeNotFound {
-			return c.Get(ctx, tableName, cid, appmodelcollections.NullSchemaID)
+			return c.Get(ctx, tableName, pid, cid, appmodelcollections.NullSchemaID)
 		}
 		return nil, wrappedErr
 	}
-	return c.Get(ctx, tableName, cid, s.ID)
+	return c.Get(ctx, tableName, pid, cid, s.ID)
 }
 
 func (c *CollectionCURD) ListByProjectID(ctx context.Context, tableName string, pid appmodelprojects.ProjectID) ([]*appmodelcollections.ModelCollection, error) {
@@ -67,7 +67,7 @@ func (c *CollectionCURD) ListByProjectID(ctx context.Context, tableName string, 
 	return cs, storage.WrapStorageError(err)
 }
 
-func (c *CollectionCURD) Get(ctx context.Context, tableName string, cid appmodelcollections.CollectionID, sid appmodelcollections.SchemaID) (*appmodelcollections.ModelCollection, error) {
+func (c *CollectionCURD) Get(ctx context.Context, tableName string, pid appmodelprojects.ProjectID, cid appmodelcollections.CollectionID, sid appmodelcollections.SchemaID) (*appmodelcollections.ModelCollection, error) {
 	record := &appmodelcollections.ModelCollection{}
 	db := c.With(ctx, tableName)
 	if sid != appmodelcollections.NullSchemaID {
@@ -77,6 +77,7 @@ func (c *CollectionCURD) Get(ctx context.Context, tableName string, cid appmodel
 	}
 	if err := db.
 		Where("id = ?", cid.String()).
+		Where("model_project_id = ?", pid.String()).
 		First(record).Error; err != nil {
 		return nil, storage.WrapStorageError(err)
 	}

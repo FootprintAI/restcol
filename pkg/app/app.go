@@ -65,7 +65,7 @@ func (r *RestColServiceServerService) GetSwaggerDoc(ctx context.Context, req *ap
 	if len(req.CollectionId) > 0 {
 		var selectedCollection *collectionsmodel.ModelCollection
 		cid := collectionsmodel.NewCollectionIDFromStr(req.CollectionId)
-		selectedCollection, err = r.collectionCURD.GetLatestSchema(ctx, "", cid)
+		selectedCollection, err = r.collectionCURD.GetLatestSchema(ctx, "", projectId, cid)
 		if err != nil {
 			return nil, err
 		}
@@ -171,8 +171,12 @@ func (r *RestColServiceServerService) GetCollection(ctx context.Context, req *ap
 	if len(req.CollectionId) == 0 {
 		return nil, sderrors.NewBadParamsError(errors.New("missing required field"))
 	}
+	projectId, err := r.getProjectIdFromCtx(ctx)
+	if err != nil {
+		return nil, err
+	}
 	cid = collectionsmodel.NewCollectionIDFromStr(req.CollectionId)
-	mc, err := r.collectionCURD.GetLatestSchema(ctx, "", cid)
+	mc, err := r.collectionCURD.GetLatestSchema(ctx, "", projectId, cid)
 	if err != nil {
 		ismyerr, myerr := sderrors.As(err)
 		if ismyerr && myerr.Code() == sderrors.CodeNotFound {
@@ -213,7 +217,7 @@ func (r *RestColServiceServerService) CreateDocument(ctx context.Context, req *a
 		}
 	}
 
-	modelCollection, err := r.collectionCURD.GetLatestSchema(ctx, "", cid)
+	modelCollection, err := r.collectionCURD.GetLatestSchema(ctx, "", projectId, cid)
 	if err != nil {
 		return nil, err
 	}
@@ -275,11 +279,17 @@ func (r *RestColServiceServerService) CreateDocument(ctx context.Context, req *a
 func (r *RestColServiceServerService) GetDocument(ctx context.Context, req *apppb.GetDocumentRequest) (*apppb.GetDocumentResponse, error) {
 	// TODO: use pid and cid for permission checking
 	// as for retrieving data, did is only required field
+	projectId, err := r.getProjectIdFromCtx(ctx)
+	if err != nil {
+		return nil, err
+	}
+	cid := collectionsmodel.NewCollectionIDFromStr(req.CollectionId)
+
 	did, err := documentsmodel.Parse(req.DocumentId)
 	if err != nil {
 		return nil, err
 	}
-	docModel, err := r.documentCURD.Get(ctx, "", did)
+	docModel, err := r.documentCURD.Get(ctx, "", projectId, cid, did)
 	if err != nil {
 		return nil, err
 	}

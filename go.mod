@@ -7,7 +7,7 @@ require (
 	github.com/clbanning/mxj/v2 v2.7.0
 	github.com/cthulhu/jsonpath v0.0.4
 	github.com/dop251/goja v0.0.0-20240220182346-e401ed450204
-	github.com/go-openapi/errors v0.22.0
+	github.com/go-openapi/errors v0.22.1
 	github.com/go-openapi/loads v0.22.0
 	github.com/go-openapi/runtime v0.28.0
 	github.com/go-openapi/spec v0.21.0

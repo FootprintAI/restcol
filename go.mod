@@ -1,6 +1,7 @@
 module github.com/footprintai/restcol
 
-go 1.21.5
+go 1.23.0
+
 toolchain go1.24.1
 
 require (
@@ -24,7 +25,7 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20250303144028-a0af3efb3deb
 	google.golang.org/grpc v1.72.0
 	google.golang.org/protobuf v1.36.6
-	gorm.io/gorm v1.26.1
+	gorm.io/gorm v1.30.1
 )
 
 require (

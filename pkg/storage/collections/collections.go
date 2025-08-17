@@ -33,7 +33,10 @@ func (c *CollectionCURD) AutoMigrate() error {
 }
 
 func (c *CollectionCURD) Write(ctx context.Context, tableName string, record *appmodelcollections.ModelCollection) error {
-	err := c.With(ctx, tableName).Clauses(clause.OnConflict{UpdateAll: true}).Create(record).Error
+	err := c.With(ctx, tableName).Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "id"}},
+		DoUpdates: clause.AssignmentColumns([]string{"type", "summary", "updated_at", "deleted_at"}),
+	}).Create(record).Error
 	return storage.WrapStorageError(err)
 }
 

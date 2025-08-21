@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -157,9 +158,25 @@ func (r *RestColServiceServerService) getProjectIdFromCtx(ctx context.Context) (
 
 // TODO getCollectionIDFromSchemas would lookup collection id with schema list given
 // This should scan all collections and match by its schema and return the right collection id
-// For now, we do nothing but return a new one
-func (r *RestColServiceServerService) getCollectionIDFromSchemas() (collectionsmodel.CollectionID, error) {
-	return collectionsmodel.NewCollectionID(), nil
+// For now, we create a new collection with auto-generated summary
+func (r *RestColServiceServerService) getCollectionIDFromSchemas(ctx context.Context, projectId projectsmodel.ProjectID) (collectionsmodel.CollectionID, error) {
+	cid := collectionsmodel.NewCollectionID()
+	
+	// Auto-create a collection with default settings
+	mc := collectionsmodel.NewModelCollection(
+		projectId,
+		cid,
+		apppb.CollectionType_COLLECTION_TYPE_REGULAR_FILES, // Default type
+		"auto created collection", // Auto-generated summary
+		[]*collectionsmodel.ModelSchema{}, // Empty schemas initially
+	)
+	
+	err := r.collectionCURD.Write(ctx, "", &mc)
+	if err != nil {
+		return collectionsmodel.CollectionID(""), err
+	}
+	
+	return cid, nil
 }
 
 func (r *RestColServiceServerService) ListCollections(ctx context.Context, req *apppb.ListCollectionsRequest) (*apppb.ListCollectionsResponse, error) {
@@ -211,7 +228,7 @@ func (r *RestColServiceServerService) CreateDocument(ctx context.Context, req *a
 	if req.CollectionId != "" {
 		cid = collectionsmodel.NewCollectionIDFromStr(req.CollectionId)
 	} else {
-		cid, err = r.getCollectionIDFromSchemas()
+		cid, err = r.getCollectionIDFromSchemas(ctx, projectId)
 		if err != nil {
 			return nil, err
 		}
@@ -349,7 +366,41 @@ func (r *RestColServiceServerService) filterDocWithSelectedFields(doc *documents
 }
 
 func (r *RestColServiceServerService) DeleteDocument(ctx context.Context, req *apppb.DeleteDocumentRequest) (*apppb.DeleteDocumentResponse, error) {
-	return nil, sderrors.NewNotImplError(errors.New("not implemented"))
+	// 1. Extract project ID from context (auth/authz)
+	projectId, err := r.getProjectIdFromCtx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// 2. Validate required parameters
+	if req.CollectionId == "" {
+		return nil, sderrors.NewBadParamsError(errors.New("collection_id is required"))
+	}
+	if req.DocumentId == "" {
+		return nil, sderrors.NewBadParamsError(errors.New("document_id is required"))
+	}
+
+	// 3. Parse and validate IDs
+	cid := collectionsmodel.NewCollectionIDFromStr(req.CollectionId)
+	did, err := documentsmodel.Parse(req.DocumentId)
+	if err != nil {
+		return nil, sderrors.NewBadParamsError(fmt.Errorf("invalid document_id: %w", err))
+	}
+
+	// 4. Check if document exists before deletion
+	_, err = r.documentCURD.Get(ctx, "", projectId, cid, did)
+	if err != nil {
+		return nil, err // Will return appropriate error (not found, etc.)
+	}
+
+	// 5. Perform deletion
+	err = r.documentCURD.Delete(ctx, "", projectId, cid, did)
+	if err != nil {
+		return nil, err
+	}
+
+	// 6. Return empty response (as defined in proto)
+	return &apppb.DeleteDocumentResponse{}, nil
 }
 
 func (r *RestColServiceServerService) QueryDocumentsStream(req *apppb.QueryDocumentStreamRequest, stream apppb.RestColService_QueryDocumentsStreamServer) error {

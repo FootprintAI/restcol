@@ -15,7 +15,7 @@ import (
 )
 
 type ModelDocument struct {
-	ID DocumentID `gorm:"column:id;primarykey;type:string;"`
+	ID DocumentID `gorm:"column:id;primaryKey;type:string;"`
 
 	CreatedAt time.Time      `gorm:"column:created_at"`
 	UpdatedAt time.Time      `gorm:"column:updated_at"`
@@ -23,10 +23,10 @@ type ModelDocument struct {
 
 	Data *ModelDocumentData `gorm:"column:data;type:jsonb"`
 
-	ModelCollectionID modelcollections.CollectionID `gorm:"primarykey;"` // foreign key to model collection
+	ModelCollectionID modelcollections.CollectionID `gorm:"column:model_collection_id;primaryKey;"` // foreign key to model collection
 	ModelCollection   modelcollections.ModelCollection
 
-	ModelProjectID modelprojects.ProjectID `gorm:"primarykey;"` // foreigh key to model project
+	ModelProjectID modelprojects.ProjectID `gorm:"column:model_project_id;primaryKey;"` // foreigh key to model project
 	ModelProject   modelprojects.ModelProject
 }
 

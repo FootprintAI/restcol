@@ -158,3 +158,9 @@ func (c *DocumentCURD) Query(ctx context.Context,
 	}
 	return records, nil
 }
+
+func (c *DocumentCURD) Delete(ctx context.Context, tableName string, pid appmodelprojects.ProjectID, cid appmodelcollections.CollectionID, did appmodeldocuments.DocumentID) error {
+	err := c.With(ctx, tableName).Where("id = ? AND model_collection_id = ? AND model_project_id = ?", 
+		did.String(), cid.String(), pid.String()).Delete(&appmodeldocuments.ModelDocument{}).Error
+	return storage.WrapStorageError(err)
+}

@@ -7,7 +7,7 @@ import (
 	storageflags "github.com/sdinsure/agent/pkg/storage/flags"
 	postgresstorage "github.com/sdinsure/agent/pkg/storage/postgres"
 
-	integrationtestserver "github.com/footprintai/restcol/integrationtest/server"
+	serverapp "github.com/footprintai/restcol/pkg/server/app"
 	"github.com/footprintai/restcol/pkg/version"
 )
 
@@ -29,7 +29,7 @@ func main() {
 		log.Fatal("failed to init dsn, err:%+v\n", err)
 	}
 
-	svr, err := integrationtestserver.NewServer(*grpcPort, *httpPort, postgresDb, log)
+	svr, err := serverapp.NewServer(*grpcPort, *httpPort, postgresDb, log)
 	if err != nil {
 		log.Fatal("failed to init dsn, err:%+v\n", err)
 	}

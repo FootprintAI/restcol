@@ -160,7 +160,29 @@ func (c *DocumentCURD) Query(ctx context.Context,
 }
 
 func (c *DocumentCURD) Delete(ctx context.Context, tableName string, pid appmodelprojects.ProjectID, cid appmodelcollections.CollectionID, did appmodeldocuments.DocumentID) error {
-	err := c.With(ctx, tableName).Where("id = ? AND model_collection_id = ? AND model_project_id = ?", 
+	err := c.With(ctx, tableName).Where("id = ? AND model_collection_id = ? AND model_project_id = ?",
 		did.String(), cid.String(), pid.String()).Delete(&appmodeldocuments.ModelDocument{}).Error
+	return storage.WrapStorageError(err)
+}
+
+// CountByCollection returns the number of active (non-soft-deleted) documents
+// in the given collection.
+func (c *DocumentCURD) CountByCollection(ctx context.Context, tableName string, pid appmodelprojects.ProjectID, cid appmodelcollections.CollectionID) (int64, error) {
+	var count int64
+	err := c.With(ctx, tableName).
+		Model(&appmodeldocuments.ModelDocument{}).
+		Where("model_project_id = ? AND model_collection_id = ?", pid.String(), cid.String()).
+		Count(&count).Error
+	if err != nil {
+		return 0, storage.WrapStorageError(err)
+	}
+	return count, nil
+}
+
+// DeleteByCollection soft-deletes every document in the given collection.
+func (c *DocumentCURD) DeleteByCollection(ctx context.Context, tableName string, pid appmodelprojects.ProjectID, cid appmodelcollections.CollectionID) error {
+	err := c.With(ctx, tableName).
+		Where("model_project_id = ? AND model_collection_id = ?", pid.String(), cid.String()).
+		Delete(&appmodeldocuments.ModelDocument{}).Error
 	return storage.WrapStorageError(err)
 }

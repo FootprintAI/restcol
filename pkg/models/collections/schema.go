@@ -33,7 +33,7 @@ type ModelSchema struct {
 	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at"`
 
 	Fields            []*ModelFieldSchema `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	ModelCollectionID CollectionID        // foreigh key to ModelCollection -> ID
+	ModelCollectionID CollectionID        `gorm:"index"` // foreign key to ModelCollection -> ID; indexed for GetLatestSchema
 }
 
 func (m ModelSchema) TableName() string {
@@ -114,7 +114,7 @@ func NewSwaggerValueType(pbDataType apppb.SchemaFieldDataType) SwagValueType {
 
 type SwagValueValue structpb.Value
 
-func (s SwagValueValue) Interface() interface{} {
+func (s *SwagValueValue) Interface() interface{} {
 	return s.Proto().AsInterface()
 }
 
@@ -128,10 +128,9 @@ func Must(s *SwagValueValue, e error) *SwagValueValue {
 func NewSwagValue(v any) (*SwagValueValue, error) {
 	pbValue, err := structpb.NewValue(wrapSlice(v))
 	if err != nil {
-		return &SwagValueValue{}, err
+		return nil, err
 	}
-	swagVal := SwagValueValue(*pbValue)
-	return &swagVal, nil
+	return (*SwagValueValue)(pbValue), nil
 }
 
 func wrapSlice(v any) any {
@@ -148,14 +147,12 @@ func wrapSlice(v any) any {
 	return v
 }
 
-func (s SwagValueValue) Proto() *structpb.Value {
-	pbValue := structpb.Value(s)
-	return &pbValue
+func (s *SwagValueValue) Proto() *structpb.Value {
+	return (*structpb.Value)(s)
 }
 
 func (s *SwagValueValue) Type() SwagValueType {
-	pbValue := structpb.Value(*s)
-	switch pbValue.Kind.(type) {
+	switch s.Proto().Kind.(type) {
 	case *structpb.Value_NullValue:
 		return NullSwagValueType
 	case *structpb.Value_BoolValue:
@@ -175,19 +172,14 @@ func (s *SwagValueValue) Type() SwagValueType {
 
 var (
 	_ sql.Scanner   = &SwagValueValue{}
-	_ driver.Valuer = SwagValueValue{}
+	_ driver.Valuer = &SwagValueValue{}
 )
 
 func (s *SwagValueValue) Scan(in any) error {
-	pbValue := &structpb.Value{}
-	if err := pbValue.UnmarshalJSON(in.([]byte)); err != nil {
-		return err
-	}
-	(*s) = SwagValueValue(*pbValue)
-	return nil
+	return s.Proto().UnmarshalJSON(in.([]byte))
 }
 
-func (s SwagValueValue) Value() (driver.Value, error) {
+func (s *SwagValueValue) Value() (driver.Value, error) {
 	return s.Proto().MarshalJSON()
 }
 
@@ -197,7 +189,7 @@ type ModelFieldSchema struct {
 	UpdatedAt time.Time      `gorm:"column:updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at"`
 
-	FieldName      *dotnotation.DotNotation `gorm:"column:field_name";type:string` // dot concated path, a.b.c represents a -> b -> c path
+	FieldName      *dotnotation.DotNotation `gorm:"column:field_name;type:string"` // dot concated path, a.b.c represents a -> b -> c path
 	FieldValueType SwagValueType            `gorm:"column:value_type"`
 	FieldExample   *SwagValueValue          `gorm:"column:value_example;type:jsonb"`
 

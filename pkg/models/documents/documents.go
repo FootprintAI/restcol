@@ -17,16 +17,19 @@ import (
 type ModelDocument struct {
 	ID DocumentID `gorm:"column:id;primaryKey;type:string;"`
 
-	CreatedAt time.Time      `gorm:"column:created_at"`
+	// The docScope composite index backs ModelDocument.Query,
+	// CountByCollection, and DeleteByCollection — all of which filter by
+	// (project, collection) and sort by created_at.
+	CreatedAt time.Time      `gorm:"column:created_at;index:docScope,priority:3"`
 	UpdatedAt time.Time      `gorm:"column:updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at"`
 
 	Data *ModelDocumentData `gorm:"column:data;type:jsonb"`
 
-	ModelCollectionID modelcollections.CollectionID `gorm:"column:model_collection_id;primaryKey;"` // foreign key to model collection
+	ModelCollectionID modelcollections.CollectionID `gorm:"column:model_collection_id;primaryKey;index:docScope,priority:2"` // foreign key to model collection
 	ModelCollection   modelcollections.ModelCollection
 
-	ModelProjectID modelprojects.ProjectID `gorm:"column:model_project_id;primaryKey;"` // foreigh key to model project
+	ModelProjectID modelprojects.ProjectID `gorm:"column:model_project_id;primaryKey;index:docScope,priority:1"` // foreign key to model project
 	ModelProject   modelprojects.ModelProject
 }
 

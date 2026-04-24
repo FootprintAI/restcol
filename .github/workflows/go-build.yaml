@@ -20,10 +20,10 @@ jobs:
     name: Build
     runs-on: ubuntu-22.04
     steps:
-      - name: Set up Go 1.x
+      - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.21.7"
+          go-version: "1.24.1"
         id: go
 
       - name: Check out code into the Go module directory
@@ -34,9 +34,15 @@ jobs:
           go mod tidy
           go mod vendor
 
+      - name: Vet
+        run: go vet ./...
+
+      - name: Build
+        run: go build ./...
+
       - name: Test
         id: test
         run: |
           export GOPATH=/home/runner/go
           export PATH=$PATH:/home/runner/go/bin
-          go test -test.v ./... --short -coverprofile coverage.out
+          go test -race -v ./... -short -coverprofile=coverage.out

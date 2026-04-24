@@ -175,6 +175,9 @@ func TestDocumentSameID(t *testing.T) {
 }
 
 func TestDocumentCURD_Delete(t *testing.T) {
+	if testing.Short() {
+		t.Skip("requires a local postgres; skipping under -short")
+	}
 	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger())
 	assert.NoError(t, err)
 
@@ -190,7 +193,7 @@ func TestDocumentCURD_Delete(t *testing.T) {
 	// Create a test collection
 	collection, err := storagecollectionstestutils.TestCollectionSuite(postgrescli, regularProject)
 	assert.NoError(t, err)
-	err = collectionsCURD.Write(context.TODO(), "", collection)
+	err = collectionsCURD.Write(context.Background(), "", collection)
 	assert.Nil(t, err)
 
 	// Create a test document
@@ -201,30 +204,33 @@ func TestDocumentCURD_Delete(t *testing.T) {
 		ModelProjectID:    regularProject.ID,
 	}
 
-	err = docCURD.Write(context.TODO(), "", testDoc)
+	err = docCURD.Write(context.Background(), "", testDoc)
 	assert.NoError(t, err)
 
 	// Verify document exists
-	foundDoc, err := docCURD.Get(context.TODO(), "", regularProject.ID, collection.ID, testDoc.ID)
+	foundDoc, err := docCURD.Get(context.Background(), "", regularProject.ID, collection.ID, testDoc.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, testDoc.ID, foundDoc.ID)
 
 	// Test successful deletion
-	err = docCURD.Delete(context.TODO(), "", regularProject.ID, collection.ID, testDoc.ID)
+	err = docCURD.Delete(context.Background(), "", regularProject.ID, collection.ID, testDoc.ID)
 	assert.NoError(t, err)
 
 	// Verify document is soft deleted (should return empty record)
-	deletedDoc, err := docCURD.Get(context.TODO(), "", regularProject.ID, collection.ID, testDoc.ID)
+	deletedDoc, err := docCURD.Get(context.Background(), "", regularProject.ID, collection.ID, testDoc.ID)
 	assert.NoError(t, err) // Get doesn't error, just returns empty record
 	assert.Empty(t, deletedDoc.ID.String()) // ID should be empty for soft-deleted record
 
 	// Test delete non-existent document (should not error in GORM)
 	nonExistentID := appmodeldocuments.NewDocumentID()
-	err = docCURD.Delete(context.TODO(), "", regularProject.ID, collection.ID, nonExistentID)
+	err = docCURD.Delete(context.Background(), "", regularProject.ID, collection.ID, nonExistentID)
 	assert.NoError(t, err) // GORM delete doesn't error for non-existent records
 }
 
 func TestDocumentCURD_Delete_WithWrongScope(t *testing.T) {
+	if testing.Short() {
+		t.Skip("requires a local postgres; skipping under -short")
+	}
 	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger())
 	assert.NoError(t, err)
 
@@ -243,9 +249,9 @@ func TestDocumentCURD_Delete_WithWrongScope(t *testing.T) {
 	proxyCollection, err := storagecollectionstestutils.TestCollectionSuite(postgrescli, proxyProject)
 	assert.NoError(t, err)
 	
-	err = collectionsCURD.Write(context.TODO(), "", regularCollection)
+	err = collectionsCURD.Write(context.Background(), "", regularCollection)
 	assert.Nil(t, err)
-	err = collectionsCURD.Write(context.TODO(), "", proxyCollection)
+	err = collectionsCURD.Write(context.Background(), "", proxyCollection)
 	assert.Nil(t, err)
 
 	// Create document in regular project
@@ -256,24 +262,24 @@ func TestDocumentCURD_Delete_WithWrongScope(t *testing.T) {
 		ModelProjectID:    regularProject.ID,
 	}
 
-	err = docCURD.Write(context.TODO(), "", testDoc)
+	err = docCURD.Write(context.Background(), "", testDoc)
 	assert.NoError(t, err)
 
 	// Try to delete with wrong project scope (should not delete anything)
-	err = docCURD.Delete(context.TODO(), "", proxyProject.ID, regularCollection.ID, testDoc.ID)
+	err = docCURD.Delete(context.Background(), "", proxyProject.ID, regularCollection.ID, testDoc.ID)
 	assert.NoError(t, err) // No error, but nothing deleted
 
 	// Verify document still exists in correct scope
-	foundDoc, err := docCURD.Get(context.TODO(), "", regularProject.ID, regularCollection.ID, testDoc.ID)
+	foundDoc, err := docCURD.Get(context.Background(), "", regularProject.ID, regularCollection.ID, testDoc.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, testDoc.ID, foundDoc.ID)
 
 	// Try to delete with wrong collection scope (should not delete anything)
-	err = docCURD.Delete(context.TODO(), "", regularProject.ID, proxyCollection.ID, testDoc.ID)
+	err = docCURD.Delete(context.Background(), "", regularProject.ID, proxyCollection.ID, testDoc.ID)
 	assert.NoError(t, err) // No error, but nothing deleted
 
 	// Verify document still exists in correct scope
-	foundDoc, err = docCURD.Get(context.TODO(), "", regularProject.ID, regularCollection.ID, testDoc.ID)
+	foundDoc, err = docCURD.Get(context.Background(), "", regularProject.ID, regularCollection.ID, testDoc.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, testDoc.ID, foundDoc.ID)
 }

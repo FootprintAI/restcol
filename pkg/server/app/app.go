@@ -1,4 +1,6 @@
-package integrationtestserver
+// Package serverapp wires together authentication, authorization, storage,
+// and the gRPC/HTTP gateway to produce a runnable restcol server.
+package serverapp
 
 import (
 	"context"
@@ -10,7 +12,7 @@ import (
 	appapp "github.com/footprintai/restcol/pkg/app"
 	appauthn "github.com/footprintai/restcol/pkg/authn"
 	appauthz "github.com/footprintai/restcol/pkg/authz"
-	dummy "github.com/footprintai/restcol/pkg/dummy"
+	bootstrap "github.com/footprintai/restcol/pkg/bootstrap"
 	appmiddleware "github.com/footprintai/restcol/pkg/middleware"
 	runtimeprojectgetter "github.com/footprintai/restcol/pkg/runtime/getter"
 	schemafinder "github.com/footprintai/restcol/pkg/schema"
@@ -72,8 +74,8 @@ func makeServerService(
 	if err := documentCURD.AutoMigrate(); err != nil {
 		return nil, err
 	}
-	dummyProject := dummy.NewDummyProject(projectCURD)
-	if err := dummyProject.Init(context.Background()); err != nil {
+	defaultProject := bootstrap.NewDefaultProject(projectCURD)
+	if err := defaultProject.Init(context.Background()); err != nil {
 		return nil, err
 	}
 
@@ -84,20 +86,9 @@ func makeServerService(
 		&appauthn.AnnonymousClaimParser{},
 		authnmiddleware.EnableAnnonymous(true),
 	)
-	//authnMiddleware := grpc_auth.UnaryServerInterceptor(.AuthFunc)
 	authZMiddleware := authzmiddleware.NewAuthZMiddleware(
 		log,
 		appmiddleware.NewAuthzMiddlwareAdaptor(&appauthz.AllowEveryOne{}),
-		//middleware.WithSkippedAuthZPaths([]middleware.HttpPath{
-		//	middleware.HttpPath{
-		//		RawPath:   "/v1/login",
-		//		RawMethod: http.MethodPost,
-		//	},
-		//	middleware.HttpPath{
-		//		RawPath:   "/v1/user",
-		//		RawMethod: http.MethodPost,
-		//	},
-		//}),
 	)
 	projectIdentityMiddleware := identitymiddleware.NewProjectIdentityMiddleware(projectResolver)
 
@@ -144,12 +135,12 @@ type Server struct {
 	httpPort int
 }
 
-// Start starts Server and blocks forever
+// Start starts the server and blocks until Stop is called.
 func (s *Server) Start() error {
 	return s.server.Start()
 }
 
-// Stop stops server
+// Stop terminates the server.
 func (s *Server) Stop() error {
 	return s.server.Stop()
 }

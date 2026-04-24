@@ -6,12 +6,12 @@ import (
 
 	restcolopenapicollections "github.com/footprintai/restcol/api/go-openapiv2/client/collections"
 	restcolopenapimodels "github.com/footprintai/restcol/api/go-openapiv2/models"
-	restcoldummy "github.com/footprintai/restcol/pkg/dummy"
+	bootstrap "github.com/footprintai/restcol/pkg/bootstrap"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
-	projectId = restcoldummy.DummyModelProject.ID.String()
+	projectId = bootstrap.DefaultModelProject.ID.String()
 	cid       string
 )
 

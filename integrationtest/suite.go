@@ -11,7 +11,7 @@ import (
 
 	restcolgohttpclient "github.com/footprintai/restcol/api/go-http-client"
 	restcolopenapi "github.com/footprintai/restcol/api/go-openapiv2/client"
-	integrationtestserver "github.com/footprintai/restcol/integrationtest/server"
+	serverapp "github.com/footprintai/restcol/pkg/server/app"
 )
 
 type SuiteCloser interface {
@@ -19,7 +19,7 @@ type SuiteCloser interface {
 }
 
 type suite struct {
-	svr *integrationtestserver.Server
+	svr *serverapp.Server
 }
 
 func (s *suite) Close() error {
@@ -36,7 +36,7 @@ func SetupTest(t *testing.T) *suite {
 	if err != nil {
 		assert.NoError(t, err)
 	}
-	svr, err := integrationtestserver.NewServer(50050, 50051, postgresDb, log)
+	svr, err := serverapp.NewServer(50050, 50051, postgresDb, log)
 	if err != nil {
 		log.Fatal("%+v", err)
 	}

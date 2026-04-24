@@ -357,6 +357,10 @@ func local_request_RestColService_GetCollection_0(ctx context.Context, marshaler
 
 }
 
+var (
+	filter_RestColService_DeleteCollection_0 = &utilities.DoubleArray{Encoding: map[string]int{"projectId": 0, "collectionId": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+)
+
 func request_RestColService_DeleteCollection_0(ctx context.Context, marshaler runtime.Marshaler, client RestColServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq DeleteCollectionRequest
 	var metadata runtime.ServerMetadata
@@ -386,6 +390,13 @@ func request_RestColService_DeleteCollection_0(ctx context.Context, marshaler ru
 	protoReq.CollectionId, err = runtime.String(val)
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_RestColService_DeleteCollection_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.DeleteCollection(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -422,6 +433,13 @@ func local_request_RestColService_DeleteCollection_0(ctx context.Context, marsha
 	protoReq.CollectionId, err = runtime.String(val)
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "collectionId", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_RestColService_DeleteCollection_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := server.DeleteCollection(ctx, &protoReq)

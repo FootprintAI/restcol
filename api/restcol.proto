@@ -248,6 +248,10 @@ message GetCollectionResponse{
 message DeleteCollectionRequest {
     string projectId = 1;
     string collectionId = 2;
+    // When false (default), DeleteCollection fails if the collection contains
+    // any documents. When true, all documents in the collection are
+    // soft-deleted before the collection itself is removed.
+    bool force = 3;
 }
 
 message DeleteCollectionResponse {}

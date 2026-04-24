@@ -67,6 +67,15 @@ func (c *CollectionCURD) ListByProjectID(ctx context.Context, tableName string, 
 	return cs, storage.WrapStorageError(err)
 }
 
+// Delete soft-deletes the named collection. Associated schemas remain because
+// the Schemas relationship is declared with OnDelete:SET NULL.
+func (c *CollectionCURD) Delete(ctx context.Context, tableName string, pid appmodelprojects.ProjectID, cid appmodelcollections.CollectionID) error {
+	err := c.With(ctx, tableName).
+		Where("id = ? AND model_project_id = ?", cid.String(), pid.String()).
+		Delete(&appmodelcollections.ModelCollection{}).Error
+	return storage.WrapStorageError(err)
+}
+
 func (c *CollectionCURD) Get(ctx context.Context, tableName string, pid appmodelprojects.ProjectID, cid appmodelcollections.CollectionID, sid appmodelcollections.SchemaID) (*appmodelcollections.ModelCollection, error) {
 	record := &appmodelcollections.ModelCollection{}
 	db := c.With(ctx, tableName)

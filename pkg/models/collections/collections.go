@@ -22,7 +22,7 @@ type ModelCollection struct {
 	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at"`
 
 	Schemas        []*ModelSchema          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"` // associated to many schemes
-	ModelProjectID modelprojects.ProjectID // foreign key to model project
+	ModelProjectID modelprojects.ProjectID `gorm:"index"` // foreign key to model project; indexed for ListByProjectID
 	ModelProject   modelprojects.ModelProject
 }
 
@@ -65,5 +65,5 @@ func (m *ModelCollectionType) Scan(in any) error {
 		(*m) = ModelCollectionType(apppb.CollectionType(int64Val))
 		return nil
 	}
-	return errors.New("shema: require int64")
+	return errors.New("schema: require int64")
 }

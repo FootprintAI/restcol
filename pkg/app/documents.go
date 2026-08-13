@@ -148,8 +148,22 @@ func (r *RestColServiceServerService) DeleteDocument(ctx context.Context, req *a
 		return nil, sderrors.NewBadParamsError(fmt.Errorf("invalid document_id: %w", err))
 	}
 
-	if _, err := r.documentCURD.Get(ctx, "", projectId, cid, did); err != nil {
+	existing, err := r.documentCURD.Get(ctx, "", projectId, cid, did)
+	if err != nil {
 		return nil, err
+	}
+	// Storage .Get uses gorm's .Find, which returns an empty record and a nil
+	// error for a row that is absent, soft-deleted, or in another
+	// project/collection. Checking only the error therefore cannot detect a
+	// missing document, and this delete reported 200 while removing nothing -
+	// including for a cross-project or cross-collection target, which is the
+	// worse half: a caller could not tell that apart from a real delete.
+	//
+	// Same guard GetDocument uses forty lines above. AIP-135: delete returns
+	// NOT_FOUND unless the request carries allow_missing, which
+	// DeleteDocumentRequest does not.
+	if existing.ID.String() == "" {
+		return nil, sderrors.NewNotFoundError(fmt.Errorf("document %s not found in collection %s", did.String(), cid.String()))
 	}
 	if err := r.documentCURD.Delete(ctx, "", projectId, cid, did); err != nil {
 		return nil, err

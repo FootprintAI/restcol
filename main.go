@@ -22,7 +22,7 @@ func main() {
 	flag.Parse()
 	version.Print()
 
-	log := logger.NewLogger()
+	log := logger.NewLogger(false)
 
 	postgresDb, err := postgresstorage.NewPostgresDbHelper(log, restcolPostgresFlags)
 	if err != nil {

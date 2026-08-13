@@ -25,7 +25,7 @@ func TestIntegrationStreamTest(t *testing.T) {
 	suite := SetupTest(t)
 	defer suite.Close()
 
-	log := logger.NewLogger()
+	log := logger.NewLogger(false)
 	client := suite.NewClient()
 
 	// post /api/newdoc

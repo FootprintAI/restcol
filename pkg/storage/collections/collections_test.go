@@ -29,7 +29,7 @@ func TestStorage(t *testing.T) {
 		return
 	}
 	ctx := context.Background()
-	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger())
+	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger(false))
 	assert.NoError(t, err)
 
 	regularProject, proxyProject, err := storageprojects.TestProjectSuite(postgrescli)

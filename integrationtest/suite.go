@@ -35,7 +35,7 @@ func (s *suite) NewClient() *restcolopenapi.RestColAPIDocumentations {
 }
 
 func SetupTest(t *testing.T) *suite {
-	log := logger.NewLogger()
+	log := logger.NewLogger(false)
 	postgresDb, err := storagetestutils.NewTestPostgresCli(log)
 	if err != nil {
 		assert.NoError(t, err)

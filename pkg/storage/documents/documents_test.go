@@ -216,10 +216,21 @@ func TestDocumentCURD_Delete(t *testing.T) {
 	err = docCURD.Delete(context.Background(), "", regularProject.ID, collection.ID, testDoc.ID)
 	assert.NoError(t, err)
 
-	// Verify document is soft deleted (should return empty record)
+	// Gone from the normal read path...
 	deletedDoc, err := docCURD.Get(context.Background(), "", regularProject.ID, collection.ID, testDoc.ID)
 	assert.NoError(t, err)                  // Get doesn't error, just returns empty record
-	assert.Empty(t, deletedDoc.ID.String()) // ID should be empty for soft-deleted record
+	assert.Empty(t, deletedDoc.ID.String()) // ID is empty when the row is not there
+
+	// ...and gone from the table, not merely hidden by gorm's deleted_at
+	// filter. This is the assertion that separates a hard delete from a soft
+	// one; without Unscoped here the query below would still find the row and
+	// the test would pass on a tombstone (#136).
+	var remaining int64
+	assert.NoError(t, postgrescli.GormDB().Unscoped().
+		Model(&appmodeldocuments.ModelDocument{}).
+		Where("id = ?", testDoc.ID.String()).
+		Count(&remaining).Error)
+	assert.Zero(t, remaining, "the row must be deleted, not tombstoned")
 
 	// Test delete non-existent document (should not error in GORM)
 	nonExistentID := appmodeldocuments.NewDocumentID()
@@ -282,4 +293,47 @@ func TestDocumentCURD_Delete_WithWrongScope(t *testing.T) {
 	foundDoc, err = docCURD.Get(context.Background(), "", regularProject.ID, regularCollection.ID, testDoc.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, testDoc.ID, foundDoc.ID)
+}
+
+// TestDocumentCURD_DeleteByCollection_IsPermanent covers the cascade path that
+// DeleteCollection(force=true) uses. It is the one most likely to be missed:
+// deleting a whole collection is exactly when a caller expects the payloads to
+// be gone, and a scoped delete there would retain every one of them.
+func TestDocumentCURD_DeleteByCollection_IsPermanent(t *testing.T) {
+	if testing.Short() {
+		t.Skip("requires a local postgres; skipping under -short")
+	}
+	ctx := context.Background()
+	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger(false))
+	assert.NoError(t, err)
+
+	regularProject, _, err := storageprojects.TestProjectSuite(postgrescli)
+	assert.Nil(t, err)
+
+	collection, err := storagecollectionstestutils.TestCollectionSuite(postgrescli, regularProject)
+	assert.NoError(t, err)
+
+	docCURD := NewDocumentCURD(postgrescli)
+	assert.Nil(t, docCURD.AutoMigrate())
+
+	for i := 0; i < 3; i++ {
+		assert.NoError(t, docCURD.Write(ctx, "", &appmodeldocuments.ModelDocument{
+			ID:                appmodeldocuments.NewDocumentID(),
+			Data:              appmodeldocuments.NewModelDocumentData(map[string]interface{}{"n": i}),
+			ModelCollectionID: collection.ID,
+			ModelProjectID:    regularProject.ID,
+		}))
+	}
+
+	assert.NoError(t, docCURD.DeleteByCollection(ctx, "", regularProject.ID, collection.ID))
+
+	// Unscoped: counts tombstones as well as live rows, so this fails if the
+	// cascade only marked them deleted.
+	var remaining int64
+	assert.NoError(t, postgrescli.GormDB().Unscoped().
+		Model(&appmodeldocuments.ModelDocument{}).
+		Where("model_project_id = ? AND model_collection_id = ?",
+			regularProject.ID.String(), collection.ID.String()).
+		Count(&remaining).Error)
+	assert.Zero(t, remaining, "the cascade must remove the rows, not tombstone them")
 }

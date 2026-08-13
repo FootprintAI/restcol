@@ -182,12 +182,17 @@ func TestGetDocument_ValidationAndScope(t *testing.T) {
 			code: sderrors.CodeBadParameters,
 		},
 		{
-			name: "malformed document id",
+			// Document ids are opaque strings, not UUIDs: documentsmodel.Parse
+			// accepts anything and CreateDocument will happily store a
+			// caller-supplied "not-a-valid-doc-id". Rejecting the same string on
+			// read would make a document that can be created but never fetched,
+			// so an unrecognised id is NotFound rather than BadParameters.
+			name: "unrecognised document id",
 			req: &apppb.GetDocumentRequest{
 				CollectionId: collectionsmodel.NewCollectionID().String(),
 				DocumentId:   "not-a-valid-doc-id",
 			},
-			code: sderrors.CodeBadParameters,
+			code: sderrors.CodeNotFound,
 		},
 	}
 	for _, tc := range cases {
@@ -253,11 +258,122 @@ func TestDeleteDocument_Validation(t *testing.T) {
 	})
 	assertErrorCode(t, err, sderrors.CodeBadParameters)
 
+	// See the note in TestGetDocument_ValidationAndScope: an id that does not
+	// resolve is NotFound, not BadParameters, because ids are opaque.
 	_, err = svc.DeleteDocument(ctx, &apppb.DeleteDocumentRequest{
 		CollectionId: collectionsmodel.NewCollectionID().String(),
 		DocumentId:   "not-a-valid-doc-id",
 	})
-	assertErrorCode(t, err, sderrors.CodeBadParameters)
+	assertErrorCode(t, err, sderrors.CodeNotFound)
+}
+
+// TestDeleteDocument_RemovesDocument is the regression bar for grandturks#936:
+// the document must actually be gone, and saying so twice must not report
+// success the second time.
+func TestDeleteDocument_RemovesDocument(t *testing.T) {
+	if testing.Short() {
+		t.Skip("requires a local postgres; skipping under -short")
+	}
+	svc, _ := newTestService(t)
+	ctx := context.Background()
+
+	coll, err := svc.CreateCollection(ctx, &apppb.CreateCollectionRequest{Description: strPtr("delete-me")})
+	assert.NoError(t, err)
+	cid := coll.XMetadata.CollectionId
+
+	created, err := svc.CreateDocument(ctx, &apppb.CreateDocumentRequest{
+		CollectionId: cid,
+		Data:         []byte(`{"field":"value"}`),
+	})
+	assert.NoError(t, err)
+	did := created.XMetadata.DocumentId
+
+	_, err = svc.DeleteDocument(ctx, &apppb.DeleteDocumentRequest{CollectionId: cid, DocumentId: did})
+	assert.NoError(t, err)
+
+	// The delete is a gorm soft delete, so this also proves the read path's
+	// implicit "deleted_at IS NULL" filter is doing the work we rely on.
+	_, err = svc.GetDocument(ctx, &apppb.GetDocumentRequest{CollectionId: cid, DocumentId: did})
+	assertErrorCode(t, err, sderrors.CodeNotFound)
+
+	_, err = svc.DeleteDocument(ctx, &apppb.DeleteDocumentRequest{CollectionId: cid, DocumentId: did})
+	assertErrorCode(t, err, sderrors.CodeNotFound)
+}
+
+// TestDeleteDocument_DisappearsFromQuery pins the collection listing, which is
+// the surface most callers poll rather than fetching documents by id.
+func TestDeleteDocument_DisappearsFromQuery(t *testing.T) {
+	if testing.Short() {
+		t.Skip("requires a local postgres; skipping under -short")
+	}
+	svc, _ := newTestService(t)
+	ctx := context.Background()
+
+	coll, err := svc.CreateCollection(ctx, &apppb.CreateCollectionRequest{Description: strPtr("query-after-delete")})
+	assert.NoError(t, err)
+	cid := coll.XMetadata.CollectionId
+
+	keep, err := svc.CreateDocument(ctx, &apppb.CreateDocumentRequest{
+		CollectionId: cid,
+		Data:         []byte(`{"keep":true}`),
+	})
+	assert.NoError(t, err)
+	drop, err := svc.CreateDocument(ctx, &apppb.CreateDocumentRequest{
+		CollectionId: cid,
+		Data:         []byte(`{"keep":false}`),
+	})
+	assert.NoError(t, err)
+
+	_, err = svc.DeleteDocument(ctx, &apppb.DeleteDocumentRequest{
+		CollectionId: cid,
+		DocumentId:   drop.XMetadata.DocumentId,
+	})
+	assert.NoError(t, err)
+
+	resp, err := svc.QueryDocument(ctx, &apppb.QueryDocumentRequest{CollectionId: cid})
+	assert.NoError(t, err)
+
+	var got []string
+	for _, doc := range resp.Docs {
+		got = append(got, doc.XMetadata.DocumentId)
+	}
+	assert.Equal(t, []string{keep.XMetadata.DocumentId}, got)
+}
+
+// TestDeleteDocument_WrongCollectionReturnsNotFound proves the delete is scoped
+// rather than keyed on the document id alone. Before the scope check this
+// returned success while deleting nothing.
+func TestDeleteDocument_WrongCollectionReturnsNotFound(t *testing.T) {
+	if testing.Short() {
+		t.Skip("requires a local postgres; skipping under -short")
+	}
+	svc, _ := newTestService(t)
+	ctx := context.Background()
+
+	coll, err := svc.CreateCollection(ctx, &apppb.CreateCollectionRequest{Description: strPtr("owner")})
+	assert.NoError(t, err)
+	cid := coll.XMetadata.CollectionId
+
+	other, err := svc.CreateCollection(ctx, &apppb.CreateCollectionRequest{Description: strPtr("bystander")})
+	assert.NoError(t, err)
+
+	created, err := svc.CreateDocument(ctx, &apppb.CreateDocumentRequest{
+		CollectionId: cid,
+		Data:         []byte(`{"field":"value"}`),
+	})
+	assert.NoError(t, err)
+	did := created.XMetadata.DocumentId
+
+	_, err = svc.DeleteDocument(ctx, &apppb.DeleteDocumentRequest{
+		CollectionId: other.XMetadata.CollectionId,
+		DocumentId:   did,
+	})
+	assertErrorCode(t, err, sderrors.CodeNotFound)
+
+	// ... and the document is untouched in its own collection.
+	got, err := svc.GetDocument(ctx, &apppb.GetDocumentRequest{CollectionId: cid, DocumentId: did})
+	assert.NoError(t, err)
+	assert.Equal(t, did, got.XMetadata.DocumentId)
 }
 
 func TestGetCollection_MissingIDRejected(t *testing.T) {

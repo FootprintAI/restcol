@@ -14,9 +14,34 @@ import (
 	apppb "github.com/footprintai/restcol/api/pb"
 	collectionsmodel "github.com/footprintai/restcol/pkg/models/collections"
 	documentsmodel "github.com/footprintai/restcol/pkg/models/documents"
+	projectsmodel "github.com/footprintai/restcol/pkg/models/projects"
 	schemafinder "github.com/footprintai/restcol/pkg/schema"
 	documentsstorage "github.com/footprintai/restcol/pkg/storage/documents"
 )
+
+// loadDocumentInScope fetches a document and turns "no such row" into NotFound.
+//
+// It exists because DocumentCURD.Get is built on gorm's Find, which yields a
+// zero-valued record and a *nil* error when nothing matches. A caller that
+// checks only err therefore cannot tell a hit from a miss, and neither can it
+// tell a document in this (project, collection) from one in somebody else's.
+// Every read of a single document must go through here.
+func (r *RestColServiceServerService) loadDocumentInScope(
+	ctx context.Context,
+	pid projectsmodel.ProjectID,
+	cid collectionsmodel.CollectionID,
+	did documentsmodel.DocumentID,
+) (*documentsmodel.ModelDocument, error) {
+	docModel, err := r.documentCURD.Get(ctx, "", pid, cid, did)
+	if err != nil {
+		return nil, err
+	}
+	if docModel.ID.String() == "" {
+		return nil, sderrors.NewNotFoundError(
+			fmt.Errorf("document %s not found in collection %s", did.String(), cid.String()))
+	}
+	return docModel, nil
+}
 
 // CreateDocument writes a document, auto-detecting its schema against the
 // collection's latest known schema. When no collection is supplied, one is
@@ -109,15 +134,9 @@ func (r *RestColServiceServerService) GetDocument(ctx context.Context, req *appp
 	if err != nil {
 		return nil, sderrors.NewBadParamsError(fmt.Errorf("invalid document_id: %w", err))
 	}
-	docModel, err := r.documentCURD.Get(ctx, "", projectId, cid, did)
+	docModel, err := r.loadDocumentInScope(ctx, projectId, cid, did)
 	if err != nil {
 		return nil, err
-	}
-	// Storage .Get returns an empty record (no error) for soft-deleted or
-	// scope-mismatched rows. Convert that into NotFound so the handler cannot
-	// leak a blank response under the wrong project/collection.
-	if docModel.ID.String() == "" {
-		return nil, sderrors.NewNotFoundError(fmt.Errorf("document %s not found in collection %s", did.String(), cid.String()))
 	}
 	filteredDoc, err := r.filterDocWithSelectedFields(docModel, req.FieldSelectors)
 	if err != nil {
@@ -148,7 +167,10 @@ func (r *RestColServiceServerService) DeleteDocument(ctx context.Context, req *a
 		return nil, sderrors.NewBadParamsError(fmt.Errorf("invalid document_id: %w", err))
 	}
 
-	if _, err := r.documentCURD.Get(ctx, "", projectId, cid, did); err != nil {
+	// Not a redundant read: this is what makes the delete return NotFound
+	// instead of reporting success for a document that was never there, in
+	// another collection, or in another tenant's project.
+	if _, err := r.loadDocumentInScope(ctx, projectId, cid, did); err != nil {
 		return nil, err
 	}
 	if err := r.documentCURD.Delete(ctx, "", projectId, cid, did); err != nil {

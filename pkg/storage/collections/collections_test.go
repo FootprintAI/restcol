@@ -8,8 +8,8 @@ import (
 	appmodelcollections "github.com/footprintai/restcol/pkg/models/collections"
 	dotnotation "github.com/footprintai/restcol/pkg/notation/dot"
 	storageprojects "github.com/footprintai/restcol/pkg/storage/projects"
+	storagetestutils "github.com/footprintai/restcol/pkg/storage/testutil"
 	"github.com/sdinsure/agent/pkg/logger"
-	storagetestutils "github.com/sdinsure/agent/pkg/storage/testutils"
 	"github.com/stretchr/testify/assert"
 )
 

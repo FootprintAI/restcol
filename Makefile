@@ -1,4 +1,4 @@
-.PHONY: build test test-race test-short vet lint tidy run-local run-postgres gen-proto clean help
+.PHONY: build test test-race test-short vet lint tidy run-local run-postgres gen-proto gen-swagger gen gen-check clean help
 
 BINARY := restcol
 GO      ?= go
@@ -35,9 +35,25 @@ run-postgres:
 run-local:
 	./run_local.sh
 
-## gen-proto: Regenerate proto/OpenAPI clients (requires buf)
+## gen-proto: Regenerate protobuf/gateway/OpenAPI output from the .proto (requires buf)
 gen-proto:
 	cd api && ./gen-proto-go.sh
+
+## gen-swagger: Regenerate the go-swagger client from the OpenAPI spec (requires the pinned swagger)
+gen-swagger:
+	cd api && ./gen-swagger-go-client.sh
+
+## gen: Regenerate everything under api/
+gen: gen-proto gen-swagger
+
+## gen-check: Fail if the committed api/ output does not match the generators
+gen-check:
+	cd api && buf generate
+	cd api && ./gen-swagger-go-client.sh
+	@git diff --exit-code -- api/ \
+		|| (echo ""; \
+		    echo "api/ is stale: regenerate with 'make gen' and commit the result."; \
+		    exit 1)
 
 ## clean: Remove build artifacts
 clean:

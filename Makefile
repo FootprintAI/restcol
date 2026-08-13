@@ -46,13 +46,20 @@ gen-swagger:
 ## gen: Regenerate everything under api/
 gen: gen-proto gen-swagger
 
-## gen-check: Fail if the committed api/ output does not match the generators
+## gen-check: Fail if the committed generated output does not match the generators
+#
+# Scoped to the three generated directories, not to api/ as a whole: api/ also
+# holds the .proto, the buf config and the generator scripts, and diffing those
+# means editing a generator reports its own edit as "generated code is stale" -
+# true but useless. These three are the outputs the check exists to protect.
+GENERATED := api/pb api/openapiv2 api/go-openapiv2
+
 gen-check:
 	cd api && buf generate
 	cd api && ./gen-swagger-go-client.sh
-	@git diff --exit-code -- api/ \
+	@git diff --exit-code -- $(GENERATED) \
 		|| (echo ""; \
-		    echo "api/ is stale: regenerate with 'make gen' and commit the result."; \
+		    echo "Generated code is stale: run 'make gen' and commit the result."; \
 		    exit 1)
 
 ## clean: Remove build artifacts

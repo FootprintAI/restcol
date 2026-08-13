@@ -33,7 +33,7 @@ func TestDocument(t *testing.T) {
 		return
 	}
 	ctx := context.Background()
-	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger())
+	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger(false))
 	assert.NoError(t, err)
 
 	regularProject, _, err := storageprojects.TestProjectSuite(postgrescli)
@@ -65,7 +65,7 @@ func TestDocumentQuery(t *testing.T) {
 		return
 	}
 	ctx := context.Background()
-	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger())
+	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger(false))
 	assert.NoError(t, err)
 
 	regularProject, _, err := storageprojects.TestProjectSuite(postgrescli)
@@ -131,7 +131,7 @@ func TestDocumentSameID(t *testing.T) {
 		return
 	}
 	ctx := context.Background()
-	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger())
+	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger(false))
 	assert.NoError(t, err)
 
 	regularProject, _, err := storageprojects.TestProjectSuite(postgrescli)
@@ -178,7 +178,7 @@ func TestDocumentCURD_Delete(t *testing.T) {
 	if testing.Short() {
 		t.Skip("requires a local postgres; skipping under -short")
 	}
-	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger())
+	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger(false))
 	assert.NoError(t, err)
 
 	regularProject, _, err := storageprojects.TestProjectSuite(postgrescli)
@@ -231,7 +231,7 @@ func TestDocumentCURD_Delete_WithWrongScope(t *testing.T) {
 	if testing.Short() {
 		t.Skip("requires a local postgres; skipping under -short")
 	}
-	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger())
+	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger(false))
 	assert.NoError(t, err)
 
 	regularProject, proxyProject, err := storageprojects.TestProjectSuite(postgrescli)

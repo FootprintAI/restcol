@@ -17,12 +17,15 @@ SWAGGER_VERSION="v0.33.0"
 TARGET="go-openapiv2"
 SPEC="openapiv2/restcol.swagger.json"
 
+# Install from the module proxy, not from a GitHub release asset: not every
+# module version has a matching release (v0.33.0 has none), and `curl -o` on a
+# 404 writes the error page into the file and still exits 0 - producing a
+# "swagger" that fails with `Not: command not found` long after the install
+# step reported success.
 swagger_bin="$(command -v swagger || true)"
 if [[ -z "${swagger_bin}" ]]; then
     echo "swagger not found on PATH. Install the pinned version:" >&2
-    echo "  curl -sSL -o /usr/local/bin/swagger \\" >&2
-    echo "    https://github.com/go-swagger/go-swagger/releases/download/${SWAGGER_VERSION}/swagger_linux_amd64" >&2
-    echo "  chmod +x /usr/local/bin/swagger" >&2
+    echo "  go install github.com/go-swagger/go-swagger/cmd/swagger@${SWAGGER_VERSION}" >&2
     exit 1
 fi
 

@@ -7,6 +7,8 @@ package document
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -24,7 +26,7 @@ type RestColServiceQueryDocumentsStreamReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *RestColServiceQueryDocumentsStreamReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *RestColServiceQueryDocumentsStreamReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewRestColServiceQueryDocumentsStreamOK()
@@ -89,11 +91,13 @@ func (o *RestColServiceQueryDocumentsStreamOK) Code() int {
 }
 
 func (o *RestColServiceQueryDocumentsStreamOK) Error() string {
-	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs:stream][%d] restColServiceQueryDocumentsStreamOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs:stream][%d] restColServiceQueryDocumentsStreamOK %s", 200, payload)
 }
 
 func (o *RestColServiceQueryDocumentsStreamOK) String() string {
-	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs:stream][%d] restColServiceQueryDocumentsStreamOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs:stream][%d] restColServiceQueryDocumentsStreamOK %s", 200, payload)
 }
 
 func (o *RestColServiceQueryDocumentsStreamOK) GetPayload() *RestColServiceQueryDocumentsStreamOKBody {
@@ -105,7 +109,7 @@ func (o *RestColServiceQueryDocumentsStreamOK) readResponse(response runtime.Cli
 	o.Payload = new(RestColServiceQueryDocumentsStreamOKBody)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -161,11 +165,13 @@ func (o *RestColServiceQueryDocumentsStreamDefault) Code() int {
 }
 
 func (o *RestColServiceQueryDocumentsStreamDefault) Error() string {
-	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs:stream][%d] RestColService_QueryDocumentsStream default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs:stream][%d] RestColService_QueryDocumentsStream default %s", o._statusCode, payload)
 }
 
 func (o *RestColServiceQueryDocumentsStreamDefault) String() string {
-	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs:stream][%d] RestColService_QueryDocumentsStream default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs:stream][%d] RestColService_QueryDocumentsStream default %s", o._statusCode, payload)
 }
 
 func (o *RestColServiceQueryDocumentsStreamDefault) GetPayload() *models.RPCStatus {
@@ -177,7 +183,7 @@ func (o *RestColServiceQueryDocumentsStreamDefault) readResponse(response runtim
 	o.Payload = new(models.RPCStatus)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -222,11 +228,15 @@ func (o *RestColServiceQueryDocumentsStreamOKBody) validateError(formats strfmt.
 
 	if o.Error != nil {
 		if err := o.Error.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
 				return ve.ValidateName("restColServiceQueryDocumentsStreamOK" + "." + "error")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
 				return ce.ValidateName("restColServiceQueryDocumentsStreamOK" + "." + "error")
 			}
+
 			return err
 		}
 	}
@@ -241,11 +251,15 @@ func (o *RestColServiceQueryDocumentsStreamOKBody) validateResult(formats strfmt
 
 	if o.Result != nil {
 		if err := o.Result.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
 				return ve.ValidateName("restColServiceQueryDocumentsStreamOK" + "." + "result")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
 				return ce.ValidateName("restColServiceQueryDocumentsStreamOK" + "." + "result")
 			}
+
 			return err
 		}
 	}
@@ -280,11 +294,15 @@ func (o *RestColServiceQueryDocumentsStreamOKBody) contextValidateError(ctx cont
 		}
 
 		if err := o.Error.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
 				return ve.ValidateName("restColServiceQueryDocumentsStreamOK" + "." + "error")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
 				return ce.ValidateName("restColServiceQueryDocumentsStreamOK" + "." + "error")
 			}
+
 			return err
 		}
 	}
@@ -301,11 +319,15 @@ func (o *RestColServiceQueryDocumentsStreamOKBody) contextValidateResult(ctx con
 		}
 
 		if err := o.Result.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
 				return ve.ValidateName("restColServiceQueryDocumentsStreamOK" + "." + "result")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
 				return ce.ValidateName("restColServiceQueryDocumentsStreamOK" + "." + "result")
 			}
+
 			return err
 		}
 	}

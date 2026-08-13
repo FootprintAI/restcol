@@ -6,6 +6,8 @@ package swagger
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type RestColServiceGetSwaggerDoc2Reader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *RestColServiceGetSwaggerDoc2Reader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *RestColServiceGetSwaggerDoc2Reader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewRestColServiceGetSwaggerDoc2OK()
@@ -86,11 +88,13 @@ func (o *RestColServiceGetSwaggerDoc2OK) Code() int {
 }
 
 func (o *RestColServiceGetSwaggerDoc2OK) Error() string {
-	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/apidoc][%d] restColServiceGetSwaggerDoc2OK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/apidoc][%d] restColServiceGetSwaggerDoc2OK %s", 200, payload)
 }
 
 func (o *RestColServiceGetSwaggerDoc2OK) String() string {
-	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/apidoc][%d] restColServiceGetSwaggerDoc2OK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/apidoc][%d] restColServiceGetSwaggerDoc2OK %s", 200, payload)
 }
 
 func (o *RestColServiceGetSwaggerDoc2OK) GetPayload() *models.APIHTTPBody {
@@ -102,7 +106,7 @@ func (o *RestColServiceGetSwaggerDoc2OK) readResponse(response runtime.ClientRes
 	o.Payload = new(models.APIHTTPBody)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -158,11 +162,13 @@ func (o *RestColServiceGetSwaggerDoc2Default) Code() int {
 }
 
 func (o *RestColServiceGetSwaggerDoc2Default) Error() string {
-	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/apidoc][%d] RestColService_GetSwaggerDoc2 default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/apidoc][%d] RestColService_GetSwaggerDoc2 default %s", o._statusCode, payload)
 }
 
 func (o *RestColServiceGetSwaggerDoc2Default) String() string {
-	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/apidoc][%d] RestColService_GetSwaggerDoc2 default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/apidoc][%d] RestColService_GetSwaggerDoc2 default %s", o._statusCode, payload)
 }
 
 func (o *RestColServiceGetSwaggerDoc2Default) GetPayload() *models.RPCStatus {
@@ -174,7 +180,7 @@ func (o *RestColServiceGetSwaggerDoc2Default) readResponse(response runtime.Clie
 	o.Payload = new(models.RPCStatus)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 

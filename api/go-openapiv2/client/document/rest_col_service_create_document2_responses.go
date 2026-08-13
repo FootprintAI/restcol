@@ -6,6 +6,8 @@ package document
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type RestColServiceCreateDocument2Reader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *RestColServiceCreateDocument2Reader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *RestColServiceCreateDocument2Reader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewRestColServiceCreateDocument2OK()
@@ -86,11 +88,13 @@ func (o *RestColServiceCreateDocument2OK) Code() int {
 }
 
 func (o *RestColServiceCreateDocument2OK) Error() string {
-	return fmt.Sprintf("[POST /v1/projects/{projectId}/collections/{collectionId}:newdoc][%d] restColServiceCreateDocument2OK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /v1/projects/{projectId}/collections/{collectionId}:newdoc][%d] restColServiceCreateDocument2OK %s", 200, payload)
 }
 
 func (o *RestColServiceCreateDocument2OK) String() string {
-	return fmt.Sprintf("[POST /v1/projects/{projectId}/collections/{collectionId}:newdoc][%d] restColServiceCreateDocument2OK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /v1/projects/{projectId}/collections/{collectionId}:newdoc][%d] restColServiceCreateDocument2OK %s", 200, payload)
 }
 
 func (o *RestColServiceCreateDocument2OK) GetPayload() *models.APICreateDocumentResponse {
@@ -102,7 +106,7 @@ func (o *RestColServiceCreateDocument2OK) readResponse(response runtime.ClientRe
 	o.Payload = new(models.APICreateDocumentResponse)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -158,11 +162,13 @@ func (o *RestColServiceCreateDocument2Default) Code() int {
 }
 
 func (o *RestColServiceCreateDocument2Default) Error() string {
-	return fmt.Sprintf("[POST /v1/projects/{projectId}/collections/{collectionId}:newdoc][%d] RestColService_CreateDocument2 default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /v1/projects/{projectId}/collections/{collectionId}:newdoc][%d] RestColService_CreateDocument2 default %s", o._statusCode, payload)
 }
 
 func (o *RestColServiceCreateDocument2Default) String() string {
-	return fmt.Sprintf("[POST /v1/projects/{projectId}/collections/{collectionId}:newdoc][%d] RestColService_CreateDocument2 default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /v1/projects/{projectId}/collections/{collectionId}:newdoc][%d] RestColService_CreateDocument2 default %s", o._statusCode, payload)
 }
 
 func (o *RestColServiceCreateDocument2Default) GetPayload() *models.RPCStatus {
@@ -174,7 +180,7 @@ func (o *RestColServiceCreateDocument2Default) readResponse(response runtime.Cli
 	o.Payload = new(models.RPCStatus)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 

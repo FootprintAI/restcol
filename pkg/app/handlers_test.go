@@ -41,11 +41,15 @@ type fixedProjectInfor struct {
 func (f *fixedProjectInfor) GetProjectID() (string, error) { return f.pid.String(), nil }
 func (f *fixedProjectInfor) GetProject(any) error          { return nil }
 
+// Visibility matches the production getter, which reports "" because restcol
+// has no per-project visibility. See pkg/runtime/getter.projectInfor.
+func (f *fixedProjectInfor) Visibility() string { return "" }
+
 // newTestService spins up a full handler against a real postgres. Tests using
 // it must be guarded with testing.Short() — CI runs -short.
 func newTestService(t *testing.T) (*RestColServiceServerService, *projectsmodel.ModelProject) {
 	t.Helper()
-	log := logger.NewLogger()
+	log := logger.NewLogger(false)
 	db, err := storagetestutils.NewTestPostgresCli(log)
 	assert.NoError(t, err)
 

@@ -14,7 +14,7 @@ import (
 func TestTraverseMap(t *testing.T) {
 
 	traversedMap := make(map[string]interface{})
-	TraverseMap(logger.NewLogger(), m1, []string{}, func(prefixes []string, current string, val any) error {
+	TraverseMap(logger.NewLogger(false), m1, []string{}, func(prefixes []string, current string, val any) error {
 		path := strings.Join(append(prefixes, current), ".")
 		traversedMap[path] = val
 		return nil
@@ -55,7 +55,7 @@ var (
 )
 
 func TestSchemaFlatten(t *testing.T) {
-	schemaBuilder := NewSchemaBuilder(logger.NewLogger())
+	schemaBuilder := NewSchemaBuilder(logger.NewLogger(false))
 
 	m1Schema, err := schemaBuilder.Flatten(m1)
 	assert.NoError(t, err)

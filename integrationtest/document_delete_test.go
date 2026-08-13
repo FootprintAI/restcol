@@ -2,6 +2,7 @@ package integrationtest
 
 import (
 	"fmt"
+	"net/http"
 	"testing"
 
 	sderrors "github.com/sdinsure/agent/pkg/errors"
@@ -12,19 +13,16 @@ import (
 )
 
 // assertNotFound asserts that a call was refused because the document is not
-// there, in the given (project, collection) scope.
+// there, in the given (project, collection) scope — and that the refusal
+// reaches the caller as an HTTP 404.
 //
-// It checks the application error code carried in the message rather than the
-// HTTP status, and that is deliberate. Standalone restcol answers 500 for
-// *every* application error: this module pins a github.com/sdinsure/agent that
-// predates GRPCStatus() on *sderrors.Error, so NotFound degrades to Unknown on
-// the way out through the gateway. Consumers whose module graph selects a newer
-// sdinsure — grandturks does, via MVS — already get a correct 404 out of this
-// same handler.
-//
-// Asserting the application code therefore states the real contract, passes
-// today, and keeps passing once the dependency is bumped and the status becomes
-// 404. Asserting 500 would freeze the bug into the suite.
+// The status half is the regression guard for #59. Until the sdinsure/agent
+// bump, *every* application error left this service as a 500: the pinned
+// version had no GRPCStatus() on *sderrors.Error, so NotFound degraded to
+// Unknown on the way out through the gateway, and a client could not tell a
+// missing document from a broken server. An earlier version of this helper
+// deliberately asserted only the application code, so it would keep passing
+// once the status was fixed. It is fixed; assert both.
 func assertNotFound(t *testing.T, err error) {
 	t.Helper()
 	if !assert.Error(t, err) {
@@ -33,6 +31,14 @@ func assertNotFound(t *testing.T, err error) {
 	want := fmt.Sprintf("code(%d),", sderrors.CodeNotFound.Int())
 	assert.Contains(t, err.Error(), want,
 		"expected a NotFound application error, got: %v", err)
+
+	coder, ok := err.(interface{ Code() int })
+	if !assert.True(t, ok, "expected a generated error carrying a status, got %T", err) {
+		return
+	}
+	assert.Equal(t, http.StatusNotFound, coder.Code(),
+		"NotFound must reach the client as 404; a 500 here means the error code "+
+			"is not being mapped to a gRPC status (#59)")
 }
 
 func TestDeleteDocument(t *testing.T) {
@@ -182,6 +188,12 @@ func TestDeleteDocument_UnknownProjectIsRejected(t *testing.T) {
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), fmt.Sprintf("code(%d),", sderrors.CodeBadParameters.Int()),
 		"an unresolvable project must be rejected by the identity middleware, got: %v", err)
+	if coder, ok := err.(interface{ Code() int }); assert.True(t, ok) {
+		// The other half of the #59 mapping: BadParameters must arrive as 400,
+		// not as the blanket 500 every application error used to become.
+		assert.Equal(t, http.StatusBadRequest, coder.Code(),
+			"BadParameters must reach the client as 400, got: %v", err)
+	}
 
 	// ... and the document is untouched under its real project.
 	getResp, err := client.Document.RestColServiceGetDocument(

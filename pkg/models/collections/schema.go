@@ -176,10 +176,37 @@ var (
 )
 
 func (s *SwagValueValue) Scan(in any) error {
-	return s.Proto().UnmarshalJSON(in.([]byte))
+	// A NULL column leaves the zero value rather than panicking on the type
+	// assertion, which is what happened when nothing checked.
+	if in == nil {
+		return nil
+	}
+	b, ok := in.([]byte)
+	if !ok {
+		return fmt.Errorf("schema: cannot scan %T into SwagValueValue, want []byte", in)
+	}
+	return s.Proto().UnmarshalJSON(b)
 }
 
+// Value implements driver.Valuer.
+//
+// The nil check is load-bearing. The receiver is a pointer, so a nil
+// *SwagValueValue *does* satisfy driver.Valuer, and database/sql hands it to
+// the driver instead of substituting NULL - so this method gets called on nil.
+// ModelFieldSchema.FieldExample is routinely nil (a field with no example), and
+// without the guard the call reaches MarshalJSON on a nil structpb.Value and
+// fails the whole insert:
+//
+//	unable to encode (*SwagValueValue)(nil) into text format for jsonb (OID 3802):
+//	proto: google.protobuf.Value: none of the oneof fields is set
+//
+// pgx before v5.9 short-circuited nil pointers and never reached here, so this
+// stayed latent from the receiver change until the driver moved. A missing
+// example is SQL NULL.
 func (s *SwagValueValue) Value() (driver.Value, error) {
+	if s == nil {
+		return nil, nil
+	}
 	return s.Proto().MarshalJSON()
 }
 

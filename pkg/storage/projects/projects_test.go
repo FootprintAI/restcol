@@ -23,7 +23,7 @@ func TestProject(t *testing.T) {
 		t.Skip("skip this for now")
 		return
 	}
-	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger())
+	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger(false))
 	assert.NoError(t, err)
 
 	_, _, err = TestProjectSuite(postgrescli)

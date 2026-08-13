@@ -159,14 +159,25 @@ func (c *DocumentCURD) Query(ctx context.Context,
 	return records, nil
 }
 
+// Delete removes a document permanently. The row and its data are gone; there
+// is no recovery.
+//
+// Unscoped is deliberate (#136). ModelDocument carries gorm.DeletedAt, so
+// without it this writes a tombstone and keeps the row — including the `data`
+// jsonb, which for inference sinks holds base64 image bytes. That gave the
+// worst of both: the caller could not recover the document (there is no
+// Undelete RPC, and every read filters deleted_at IS NULL) while the bytes
+// stayed in the database indefinitely. A delete that reports success and
+// retains the data is not a delete.
 func (c *DocumentCURD) Delete(ctx context.Context, tableName string, pid appmodelprojects.ProjectID, cid appmodelcollections.CollectionID, did appmodeldocuments.DocumentID) error {
-	err := c.With(ctx, tableName).Where("id = ? AND model_collection_id = ? AND model_project_id = ?",
-		did.String(), cid.String(), pid.String()).Delete(&appmodeldocuments.ModelDocument{}).Error
+	err := c.With(ctx, tableName).Unscoped().
+		Where("id = ? AND model_collection_id = ? AND model_project_id = ?",
+			did.String(), cid.String(), pid.String()).
+		Delete(&appmodeldocuments.ModelDocument{}).Error
 	return storage.WrapStorageError(err)
 }
 
-// CountByCollection returns the number of active (non-soft-deleted) documents
-// in the given collection.
+// CountByCollection returns the number of documents in the given collection.
 func (c *DocumentCURD) CountByCollection(ctx context.Context, tableName string, pid appmodelprojects.ProjectID, cid appmodelcollections.CollectionID) (int64, error) {
 	var count int64
 	err := c.With(ctx, tableName).
@@ -179,9 +190,12 @@ func (c *DocumentCURD) CountByCollection(ctx context.Context, tableName string, 
 	return count, nil
 }
 
-// DeleteByCollection soft-deletes every document in the given collection.
+// DeleteByCollection permanently removes every document in the given
+// collection. Same reasoning as Delete: this is what DeleteCollection(force)
+// cascades through, so leaving it scoped would mean the cascade retained every
+// payload it claimed to remove.
 func (c *DocumentCURD) DeleteByCollection(ctx context.Context, tableName string, pid appmodelprojects.ProjectID, cid appmodelcollections.CollectionID) error {
-	err := c.With(ctx, tableName).
+	err := c.With(ctx, tableName).Unscoped().
 		Where("model_project_id = ? AND model_collection_id = ?", pid.String(), cid.String()).
 		Delete(&appmodeldocuments.ModelDocument{}).Error
 	return storage.WrapStorageError(err)

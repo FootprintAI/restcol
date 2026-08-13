@@ -8,4 +8,4 @@ package models
 // APIListCollectionsResponse api list collections response
 //
 // swagger:model apiListCollectionsResponse
-type APIListCollectionsResponse interface{}
+type APIListCollectionsResponse any

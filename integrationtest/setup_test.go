@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	restcolopenapicollections "github.com/footprintai/restcol/api/go-openapiv2/client/collections"
+	restcolopenapicollections "github.com/footprintai/restcol/api/go-openapiv2/client/collection"
 	restcolopenapimodels "github.com/footprintai/restcol/api/go-openapiv2/models"
 	bootstrap "github.com/footprintai/restcol/pkg/bootstrap"
 	"github.com/stretchr/testify/assert"
@@ -27,7 +27,7 @@ func SetupCollection(t *testing.T, s *suite) {
 			},
 			ProjectID: projectId,
 		}
-		restColServiceCreateCollectionOK, err := client.Collections.RestColServiceCreateCollection(createCollectionParam, noAuthInfo())
+		restColServiceCreateCollectionOK, err := client.Collection.RestColServiceCreateCollection(createCollectionParam, noAuthInfo())
 		assert.NoError(t, err)
 		cid = restColServiceCreateCollectionOK.Payload.Metadata.CollectionID
 	}

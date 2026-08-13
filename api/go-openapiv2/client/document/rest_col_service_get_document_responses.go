@@ -6,6 +6,8 @@ package document
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type RestColServiceGetDocumentReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *RestColServiceGetDocumentReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *RestColServiceGetDocumentReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewRestColServiceGetDocumentOK()
@@ -86,11 +88,13 @@ func (o *RestColServiceGetDocumentOK) Code() int {
 }
 
 func (o *RestColServiceGetDocumentOK) Error() string {
-	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs/{documentId}][%d] restColServiceGetDocumentOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs/{documentId}][%d] restColServiceGetDocumentOK %s", 200, payload)
 }
 
 func (o *RestColServiceGetDocumentOK) String() string {
-	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs/{documentId}][%d] restColServiceGetDocumentOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs/{documentId}][%d] restColServiceGetDocumentOK %s", 200, payload)
 }
 
 func (o *RestColServiceGetDocumentOK) GetPayload() *models.APIGetDocumentResponse {
@@ -102,7 +106,7 @@ func (o *RestColServiceGetDocumentOK) readResponse(response runtime.ClientRespon
 	o.Payload = new(models.APIGetDocumentResponse)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -158,11 +162,13 @@ func (o *RestColServiceGetDocumentDefault) Code() int {
 }
 
 func (o *RestColServiceGetDocumentDefault) Error() string {
-	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs/{documentId}][%d] RestColService_GetDocument default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs/{documentId}][%d] RestColService_GetDocument default %s", o._statusCode, payload)
 }
 
 func (o *RestColServiceGetDocumentDefault) String() string {
-	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs/{documentId}][%d] RestColService_GetDocument default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections/{collectionId}/docs/{documentId}][%d] RestColService_GetDocument default %s", o._statusCode, payload)
 }
 
 func (o *RestColServiceGetDocumentDefault) GetPayload() *models.RPCStatus {
@@ -174,7 +180,7 @@ func (o *RestColServiceGetDocumentDefault) readResponse(response runtime.ClientR
 	o.Payload = new(models.RPCStatus)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 

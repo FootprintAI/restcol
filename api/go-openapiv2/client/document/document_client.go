@@ -7,12 +7,38 @@ package document
 
 import (
 	"github.com/go-openapi/runtime"
+	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 )
 
 // New creates a new document API client.
 func New(transport runtime.ClientTransport, formats strfmt.Registry) ClientService {
 	return &Client{transport: transport, formats: formats}
+}
+
+// New creates a new document API client with basic auth credentials.
+// It takes the following parameters:
+// - host: http host (github.com).
+// - basePath: any base path for the API client ("/v1", "/v3").
+// - scheme: http scheme ("http", "https").
+// - user: user for basic authentication header.
+// - password: password for basic authentication header.
+func NewClientWithBasicAuth(host, basePath, scheme, user, password string) ClientService {
+	transport := httptransport.New(host, basePath, []string{scheme})
+	transport.DefaultAuthentication = httptransport.BasicAuth(user, password)
+	return &Client{transport: transport, formats: strfmt.Default}
+}
+
+// New creates a new document API client with a bearer token for authentication.
+// It takes the following parameters:
+// - host: http host (github.com).
+// - basePath: any base path for the API client ("/v1", "/v3").
+// - scheme: http scheme ("http", "https").
+// - bearerToken: bearer token for Bearer authentication header.
+func NewClientWithBearerToken(host, basePath, scheme, bearerToken string) ClientService {
+	transport := httptransport.New(host, basePath, []string{scheme})
+	transport.DefaultAuthentication = httptransport.BearerToken(bearerToken)
+	return &Client{transport: transport, formats: strfmt.Default}
 }
 
 /*
@@ -23,7 +49,7 @@ type Client struct {
 	formats   strfmt.Registry
 }
 
-// ClientOption is the option for Client methods
+// ClientOption may be used to customize the behavior of Client methods.
 type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
@@ -47,7 +73,7 @@ type ClientService interface {
 RestColServiceCreateDocument create a document to the collection
 */
 func (a *Client) RestColServiceCreateDocument(params *RestColServiceCreateDocumentParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceCreateDocumentOK, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewRestColServiceCreateDocumentParams()
 	}
@@ -67,17 +93,22 @@ func (a *Client) RestColServiceCreateDocument(params *RestColServiceCreateDocume
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*RestColServiceCreateDocumentOK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
+
+	// unexpected success response.
+	//
+	// a default response is provided: fill this and return an error
 	unexpectedSuccess := result.(*RestColServiceCreateDocumentDefault)
+
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
@@ -85,7 +116,7 @@ func (a *Client) RestColServiceCreateDocument(params *RestColServiceCreateDocume
 RestColServiceCreateDocument2 create a document to the collection
 */
 func (a *Client) RestColServiceCreateDocument2(params *RestColServiceCreateDocument2Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceCreateDocument2OK, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewRestColServiceCreateDocument2Params()
 	}
@@ -105,17 +136,22 @@ func (a *Client) RestColServiceCreateDocument2(params *RestColServiceCreateDocum
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*RestColServiceCreateDocument2OK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
+
+	// unexpected success response.
+	//
+	// a default response is provided: fill this and return an error
 	unexpectedSuccess := result.(*RestColServiceCreateDocument2Default)
+
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
@@ -125,7 +161,7 @@ RestColServiceDeleteDocument deletes document endpoint is a generic endpoint for
 Remove the specific document from the collection
 */
 func (a *Client) RestColServiceDeleteDocument(params *RestColServiceDeleteDocumentParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceDeleteDocumentOK, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewRestColServiceDeleteDocumentParams()
 	}
@@ -145,17 +181,22 @@ func (a *Client) RestColServiceDeleteDocument(params *RestColServiceDeleteDocume
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*RestColServiceDeleteDocumentOK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
+
+	// unexpected success response.
+	//
+	// a default response is provided: fill this and return an error
 	unexpectedSuccess := result.(*RestColServiceDeleteDocumentDefault)
+
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
@@ -165,7 +206,7 @@ RestColServiceGetDocument gets document endpoint is a generic endpoint for retri
 retrieve a document information from the collection.
 */
 func (a *Client) RestColServiceGetDocument(params *RestColServiceGetDocumentParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceGetDocumentOK, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewRestColServiceGetDocumentParams()
 	}
@@ -185,17 +226,22 @@ func (a *Client) RestColServiceGetDocument(params *RestColServiceGetDocumentPara
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*RestColServiceGetDocumentOK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
+
+	// unexpected success response.
+	//
+	// a default response is provided: fill this and return an error
 	unexpectedSuccess := result.(*RestColServiceGetDocumentDefault)
+
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
@@ -203,7 +249,7 @@ func (a *Client) RestColServiceGetDocument(params *RestColServiceGetDocumentPara
 RestColServiceQueryDocument run query against a collection, return documents matched the query
 */
 func (a *Client) RestColServiceQueryDocument(params *RestColServiceQueryDocumentParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceQueryDocumentOK, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewRestColServiceQueryDocumentParams()
 	}
@@ -223,17 +269,22 @@ func (a *Client) RestColServiceQueryDocument(params *RestColServiceQueryDocument
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*RestColServiceQueryDocumentOK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
+
+	// unexpected success response.
+	//
+	// a default response is provided: fill this and return an error
 	unexpectedSuccess := result.(*RestColServiceQueryDocumentDefault)
+
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
@@ -241,7 +292,7 @@ func (a *Client) RestColServiceQueryDocument(params *RestColServiceQueryDocument
 RestColServiceQueryDocumentsStream run query against a collection, return documents in streaming which matched the query
 */
 func (a *Client) RestColServiceQueryDocumentsStream(params *RestColServiceQueryDocumentsStreamParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceQueryDocumentsStreamOK, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewRestColServiceQueryDocumentsStreamParams()
 	}
@@ -261,17 +312,22 @@ func (a *Client) RestColServiceQueryDocumentsStream(params *RestColServiceQueryD
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*RestColServiceQueryDocumentsStreamOK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
+
+	// unexpected success response.
+	//
+	// a default response is provided: fill this and return an error
 	unexpectedSuccess := result.(*RestColServiceQueryDocumentsStreamDefault)
+
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 

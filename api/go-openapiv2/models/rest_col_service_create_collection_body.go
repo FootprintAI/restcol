@@ -7,6 +7,7 @@ package models
 
 import (
 	"context"
+	stderrors "errors"
 	"strconv"
 
 	"github.com/go-openapi/errors"
@@ -57,11 +58,15 @@ func (m *RestColServiceCreateCollectionBody) validateCollectionType(formats strf
 
 	if m.CollectionType != nil {
 		if err := m.CollectionType.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
 				return ve.ValidateName("collectionType")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
 				return ce.ValidateName("collectionType")
 			}
+
 			return err
 		}
 	}
@@ -81,11 +86,15 @@ func (m *RestColServiceCreateCollectionBody) validateSchemas(formats strfmt.Regi
 
 		if m.Schemas[i] != nil {
 			if err := m.Schemas[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("schemas" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("schemas" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}
@@ -122,11 +131,15 @@ func (m *RestColServiceCreateCollectionBody) contextValidateCollectionType(ctx c
 		}
 
 		if err := m.CollectionType.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
 				return ve.ValidateName("collectionType")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
 				return ce.ValidateName("collectionType")
 			}
+
 			return err
 		}
 	}
@@ -145,11 +158,15 @@ func (m *RestColServiceCreateCollectionBody) contextValidateSchemas(ctx context.
 			}
 
 			if err := m.Schemas[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("schemas" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("schemas" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}

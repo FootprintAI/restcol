@@ -7,6 +7,7 @@ package models
 
 import (
 	"context"
+	stderrors "errors"
 	"strconv"
 
 	"github.com/go-openapi/errors"
@@ -61,11 +62,15 @@ func (m *APICreateCollectionResponse) validateMetadata(formats strfmt.Registry) 
 
 	if m.Metadata != nil {
 		if err := m.Metadata.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
 				return ve.ValidateName("Metadata")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
 				return ce.ValidateName("Metadata")
 			}
+
 			return err
 		}
 	}
@@ -80,11 +85,15 @@ func (m *APICreateCollectionResponse) validateCollectionType(formats strfmt.Regi
 
 	if m.CollectionType != nil {
 		if err := m.CollectionType.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
 				return ve.ValidateName("collectionType")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
 				return ce.ValidateName("collectionType")
 			}
+
 			return err
 		}
 	}
@@ -104,11 +113,15 @@ func (m *APICreateCollectionResponse) validateSchemas(formats strfmt.Registry) e
 
 		if m.Schemas[i] != nil {
 			if err := m.Schemas[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("schemas" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("schemas" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}
@@ -149,11 +162,15 @@ func (m *APICreateCollectionResponse) contextValidateMetadata(ctx context.Contex
 		}
 
 		if err := m.Metadata.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
 				return ve.ValidateName("Metadata")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
 				return ce.ValidateName("Metadata")
 			}
+
 			return err
 		}
 	}
@@ -170,11 +187,15 @@ func (m *APICreateCollectionResponse) contextValidateCollectionType(ctx context.
 		}
 
 		if err := m.CollectionType.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
 				return ve.ValidateName("collectionType")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
 				return ce.ValidateName("collectionType")
 			}
+
 			return err
 		}
 	}
@@ -193,11 +214,15 @@ func (m *APICreateCollectionResponse) contextValidateSchemas(ctx context.Context
 			}
 
 			if err := m.Schemas[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("schemas" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("schemas" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}

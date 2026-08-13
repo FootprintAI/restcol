@@ -53,7 +53,7 @@ const (
 )
 
 // for schema
-var apiSchemaFieldDataTypeEnum []interface{}
+var apiSchemaFieldDataTypeEnum []any
 
 func init() {
 	var res []APISchemaFieldDataType

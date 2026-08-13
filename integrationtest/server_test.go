@@ -8,7 +8,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/stretchr/testify/assert"
 
-	restcolopenapicollections "github.com/footprintai/restcol/api/go-openapiv2/client/collections"
+	restcolopenapicollections "github.com/footprintai/restcol/api/go-openapiv2/client/collection"
 	restcolopenapidocument "github.com/footprintai/restcol/api/go-openapiv2/client/document"
 	restcolopenapimodel "github.com/footprintai/restcol/api/go-openapiv2/models"
 )
@@ -57,7 +57,7 @@ func TestIntegrationTest(t *testing.T) {
 		CollectionID: cid,
 		ProjectID:    projectId,
 	}
-	restcolGetCollectionOk, err := client.Collections.RestColServiceGetCollection(getCollectionParams, noAuthInfo())
+	restcolGetCollectionOk, err := client.Collection.RestColServiceGetCollection(getCollectionParams, noAuthInfo())
 	assert.NoError(t, err)
 	expectedSchema := []*restcolopenapimodel.APISchemaField{
 		&restcolopenapimodel.APISchemaField{

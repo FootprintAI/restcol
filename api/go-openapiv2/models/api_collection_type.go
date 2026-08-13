@@ -50,7 +50,7 @@ const (
 )
 
 // for schema
-var apiCollectionTypeEnum []interface{}
+var apiCollectionTypeEnum []any
 
 func init() {
 	var res []APICollectionType

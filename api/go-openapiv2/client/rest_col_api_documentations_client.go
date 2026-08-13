@@ -10,7 +10,7 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/footprintai/restcol/api/go-openapiv2/client/collections"
+	"github.com/footprintai/restcol/api/go-openapiv2/client/collection"
 	"github.com/footprintai/restcol/api/go-openapiv2/client/document"
 	"github.com/footprintai/restcol/api/go-openapiv2/client/swagger"
 )
@@ -57,7 +57,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *RestColAPI
 
 	cli := new(RestColAPIDocumentations)
 	cli.Transport = transport
-	cli.Collections = collections.New(transport, formats)
+	cli.Collection = collection.New(transport, formats)
 	cli.Document = document.New(transport, formats)
 	cli.Swagger = swagger.New(transport, formats)
 	return cli
@@ -104,7 +104,7 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 
 // RestColAPIDocumentations is a client for rest col API documentations
 type RestColAPIDocumentations struct {
-	Collections collections.ClientService
+	Collection collection.ClientService
 
 	Document document.ClientService
 
@@ -116,7 +116,7 @@ type RestColAPIDocumentations struct {
 // SetTransport changes the transport on the client and all its subresources
 func (c *RestColAPIDocumentations) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
-	c.Collections.SetTransport(transport)
+	c.Collection.SetTransport(transport)
 	c.Document.SetTransport(transport)
 	c.Swagger.SetTransport(transport)
 }

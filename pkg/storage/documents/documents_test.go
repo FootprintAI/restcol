@@ -13,8 +13,8 @@ import (
 	appmodelprojects "github.com/footprintai/restcol/pkg/models/projects"
 	storagecollectionstestutils "github.com/footprintai/restcol/pkg/storage/collections"
 	storageprojects "github.com/footprintai/restcol/pkg/storage/projects"
+	storagetestutils "github.com/footprintai/restcol/pkg/storage/testutil"
 	"github.com/sdinsure/agent/pkg/logger"
-	storagetestutils "github.com/sdinsure/agent/pkg/storage/testutils"
 )
 
 func TestDocument(t *testing.T) {
@@ -218,7 +218,7 @@ func TestDocumentCURD_Delete(t *testing.T) {
 
 	// Verify document is soft deleted (should return empty record)
 	deletedDoc, err := docCURD.Get(context.Background(), "", regularProject.ID, collection.ID, testDoc.ID)
-	assert.NoError(t, err) // Get doesn't error, just returns empty record
+	assert.NoError(t, err)                  // Get doesn't error, just returns empty record
 	assert.Empty(t, deletedDoc.ID.String()) // ID should be empty for soft-deleted record
 
 	// Test delete non-existent document (should not error in GORM)
@@ -248,7 +248,7 @@ func TestDocumentCURD_Delete_WithWrongScope(t *testing.T) {
 	assert.NoError(t, err)
 	proxyCollection, err := storagecollectionstestutils.TestCollectionSuite(postgrescli, proxyProject)
 	assert.NoError(t, err)
-	
+
 	err = collectionsCURD.Write(context.Background(), "", regularCollection)
 	assert.Nil(t, err)
 	err = collectionsCURD.Write(context.Background(), "", proxyCollection)

@@ -8,4 +8,4 @@ package models
 // APIDeleteCollectionResponse api delete collection response
 //
 // swagger:model apiDeleteCollectionResponse
-type APIDeleteCollectionResponse interface{}
+type APIDeleteCollectionResponse any

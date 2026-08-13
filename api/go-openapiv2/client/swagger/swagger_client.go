@@ -7,12 +7,38 @@ package swagger
 
 import (
 	"github.com/go-openapi/runtime"
+	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 )
 
 // New creates a new swagger API client.
 func New(transport runtime.ClientTransport, formats strfmt.Registry) ClientService {
 	return &Client{transport: transport, formats: formats}
+}
+
+// New creates a new swagger API client with basic auth credentials.
+// It takes the following parameters:
+// - host: http host (github.com).
+// - basePath: any base path for the API client ("/v1", "/v3").
+// - scheme: http scheme ("http", "https").
+// - user: user for basic authentication header.
+// - password: password for basic authentication header.
+func NewClientWithBasicAuth(host, basePath, scheme, user, password string) ClientService {
+	transport := httptransport.New(host, basePath, []string{scheme})
+	transport.DefaultAuthentication = httptransport.BasicAuth(user, password)
+	return &Client{transport: transport, formats: strfmt.Default}
+}
+
+// New creates a new swagger API client with a bearer token for authentication.
+// It takes the following parameters:
+// - host: http host (github.com).
+// - basePath: any base path for the API client ("/v1", "/v3").
+// - scheme: http scheme ("http", "https").
+// - bearerToken: bearer token for Bearer authentication header.
+func NewClientWithBearerToken(host, basePath, scheme, bearerToken string) ClientService {
+	transport := httptransport.New(host, basePath, []string{scheme})
+	transport.DefaultAuthentication = httptransport.BearerToken(bearerToken)
+	return &Client{transport: transport, formats: strfmt.Default}
 }
 
 /*
@@ -23,7 +49,7 @@ type Client struct {
 	formats   strfmt.Registry
 }
 
-// ClientOption is the option for Client methods
+// ClientOption may be used to customize the behavior of Client methods.
 type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
@@ -39,7 +65,7 @@ type ClientService interface {
 RestColServiceGetSwaggerDoc returns API doc in swagger
 */
 func (a *Client) RestColServiceGetSwaggerDoc(params *RestColServiceGetSwaggerDocParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceGetSwaggerDocOK, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewRestColServiceGetSwaggerDocParams()
 	}
@@ -59,17 +85,22 @@ func (a *Client) RestColServiceGetSwaggerDoc(params *RestColServiceGetSwaggerDoc
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*RestColServiceGetSwaggerDocOK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
+
+	// unexpected success response.
+	//
+	// a default response is provided: fill this and return an error
 	unexpectedSuccess := result.(*RestColServiceGetSwaggerDocDefault)
+
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
@@ -77,7 +108,7 @@ func (a *Client) RestColServiceGetSwaggerDoc(params *RestColServiceGetSwaggerDoc
 RestColServiceGetSwaggerDoc2 returns API doc in swagger
 */
 func (a *Client) RestColServiceGetSwaggerDoc2(params *RestColServiceGetSwaggerDoc2Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RestColServiceGetSwaggerDoc2OK, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewRestColServiceGetSwaggerDoc2Params()
 	}
@@ -97,17 +128,22 @@ func (a *Client) RestColServiceGetSwaggerDoc2(params *RestColServiceGetSwaggerDo
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*RestColServiceGetSwaggerDoc2OK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
+
+	// unexpected success response.
+	//
+	// a default response is provided: fill this and return an error
 	unexpectedSuccess := result.(*RestColServiceGetSwaggerDoc2Default)
+
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 

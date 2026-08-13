@@ -7,6 +7,7 @@ package models
 
 import (
 	"context"
+	stderrors "errors"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -50,11 +51,15 @@ func (m *RestColServiceCreateDocumentBody) validateDataformat(formats strfmt.Reg
 
 	if m.Dataformat != nil {
 		if err := m.Dataformat.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
 				return ve.ValidateName("dataformat")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
 				return ce.ValidateName("dataformat")
 			}
+
 			return err
 		}
 	}
@@ -85,11 +90,15 @@ func (m *RestColServiceCreateDocumentBody) contextValidateDataformat(ctx context
 		}
 
 		if err := m.Dataformat.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
 				return ve.ValidateName("dataformat")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
 				return ce.ValidateName("dataformat")
 			}
+
 			return err
 		}
 	}

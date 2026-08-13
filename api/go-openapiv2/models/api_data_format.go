@@ -53,7 +53,7 @@ const (
 )
 
 // for schema
-var apiDataFormatEnum []interface{}
+var apiDataFormatEnum []any
 
 func init() {
 	var res []APIDataFormat

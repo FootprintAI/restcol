@@ -46,3 +46,41 @@ jobs:
           export GOPATH=/home/runner/go
           export PATH=$PATH:/home/runner/go/bin
           go test -race -v ./... -short -coverprofile=coverage.out
+  generated:
+    name: Generated code is in sync
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24.1"
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v4
+
+      # Both generators are pinned. buf resolves its plugins from the committed
+      # api/buf.lock, and gen-swagger-go-client.sh refuses to run against a
+      # swagger it was not pinned to, so this job is reproducible rather than
+      # dependent on whatever the runner happens to have.
+      - name: Install buf
+        run: go install github.com/bufbuild/buf/cmd/buf@v1.38.0
+
+      # go install, not a release asset. v0.33.0 is a valid module version but
+      # has no GitHub release, so downloading swagger_linux_amd64 from it 404s -
+      # and `curl -o` writes the 404 body to the file and still exits 0. The
+      # result is an "executable" containing the text "Not Found", which bash
+      # runs as a shell script: `Not: command not found`, exit 127, with the
+      # install step reporting success. Installing from the module proxy makes
+      # the version the single source of truth and fails loudly when wrong.
+      - name: Install swagger
+        run: go install github.com/go-swagger/go-swagger/cmd/swagger@v0.33.0
+
+      # Regenerates api/ from api/restcol.proto and diffs against what is
+      # committed. This exists because DeleteCollection's `force` field lived in
+      # the proto and the swagger for eight months while the generated Go client
+      # had no way to send it - the contract said one thing and the client
+      # another, with nothing to notice.
+      - name: Regenerate and diff
+        run: |
+          export PATH=$PATH:$HOME/go/bin
+          make gen-check

@@ -46,3 +46,37 @@ jobs:
           export GOPATH=/home/runner/go
           export PATH=$PATH:/home/runner/go/bin
           go test -race -v ./... -short -coverprofile=coverage.out
+  generated:
+    name: Generated code is in sync
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24.1"
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v4
+
+      # Both generators are pinned. buf resolves its plugins from the committed
+      # api/buf.lock, and gen-swagger-go-client.sh refuses to run against a
+      # swagger it was not pinned to, so this job is reproducible rather than
+      # dependent on whatever the runner happens to have.
+      - name: Install buf
+        run: go install github.com/bufbuild/buf/cmd/buf@v1.38.0
+
+      - name: Install swagger
+        run: |
+          curl -sSL -o "$HOME/go/bin/swagger" \
+            https://github.com/go-swagger/go-swagger/releases/download/v0.33.0/swagger_linux_amd64
+          chmod +x "$HOME/go/bin/swagger"
+
+      # Regenerates api/ from api/restcol.proto and diffs against what is
+      # committed. This exists because DeleteCollection's `force` field lived in
+      # the proto and the swagger for eight months while the generated Go client
+      # had no way to send it - the contract said one thing and the client
+      # another, with nothing to notice.
+      - name: Regenerate and diff
+        run: |
+          export PATH=$PATH:$HOME/go/bin
+          make gen-check

@@ -272,3 +272,139 @@ func TestGetCollection_MissingIDRejected(t *testing.T) {
 }
 
 func strPtr(s string) *string { return &s }
+
+// DeleteDocument's existence check cannot fail, so it never returns NotFound.
+//
+//	if _, err := r.documentCURD.Get(ctx, "", projectId, cid, did); err != nil {
+//		return nil, err
+//	}
+//
+// Storage .Get uses gorm's .Find, which yields (&ModelDocument{}, nil) for a
+// row that is absent, soft-deleted, or in another project/collection - so the
+// error is always nil and the guard is decorative. Its sibling GetDocument,
+// forty lines above, already converts the empty record into NotFound; this is
+// the same guard, missing.
+//
+// The consequence is not cosmetic. Deleting a document in the wrong project or
+// the wrong collection returns 200 {} while deleting nothing, so a caller
+// cannot tell a successful delete from one that silently matched no row - and a
+// cross-tenant delete reports success rather than 404.
+//
+// AIP-135: delete returns NOT_FOUND for a missing resource unless the request
+// carries allow_missing, which DeleteDocumentRequest does not.
+func TestDeleteDocument_UnknownDocumentReturnsNotFound(t *testing.T) {
+	if testing.Short() {
+		t.Skip("requires a local postgres; skipping under -short")
+	}
+	svc, _ := newTestService(t)
+	ctx := context.Background()
+
+	coll, err := svc.CreateCollection(ctx, &apppb.CreateCollectionRequest{Description: strPtr("del-unknown")})
+	assert.NoError(t, err)
+
+	_, err = svc.DeleteDocument(ctx, &apppb.DeleteDocumentRequest{
+		CollectionId: coll.XMetadata.CollectionId,
+		DocumentId:   documentsmodel.NewDocumentID().String(),
+	})
+	assertErrorCode(t, err, sderrors.CodeNotFound)
+}
+
+// A document deleted through the wrong collection must 404 and must survive.
+//
+// The surviving half matters as much as the status code: before the guard, this
+// call reported success, so a caller had every reason to believe the document
+// was gone when it was not.
+func TestDeleteDocument_WrongCollectionReturnsNotFound(t *testing.T) {
+	if testing.Short() {
+		t.Skip("requires a local postgres; skipping under -short")
+	}
+	svc, _ := newTestService(t)
+	ctx := context.Background()
+
+	c1, err := svc.CreateCollection(ctx, &apppb.CreateCollectionRequest{Description: strPtr("owner")})
+	assert.NoError(t, err)
+	c2, err := svc.CreateCollection(ctx, &apppb.CreateCollectionRequest{Description: strPtr("other")})
+	assert.NoError(t, err)
+
+	doc, err := svc.CreateDocument(ctx, &apppb.CreateDocumentRequest{
+		CollectionId: c1.XMetadata.CollectionId,
+		Data:         []byte(`{"k":"v"}`),
+	})
+	assert.NoError(t, err)
+
+	_, err = svc.DeleteDocument(ctx, &apppb.DeleteDocumentRequest{
+		CollectionId: c2.XMetadata.CollectionId,
+		DocumentId:   doc.XMetadata.DocumentId,
+	})
+	assertErrorCode(t, err, sderrors.CodeNotFound)
+
+	// Still there, under its own collection.
+	_, err = svc.GetDocument(ctx, &apppb.GetDocumentRequest{
+		CollectionId: c1.XMetadata.CollectionId,
+		DocumentId:   doc.XMetadata.DocumentId,
+	})
+	assert.NoError(t, err, "the document must survive a delete aimed at the wrong collection")
+}
+
+// The regression bar for grandturks#936: delete works, and the document is gone
+// afterwards.
+func TestDeleteDocument_RemovesTheDocument(t *testing.T) {
+	if testing.Short() {
+		t.Skip("requires a local postgres; skipping under -short")
+	}
+	svc, _ := newTestService(t)
+	ctx := context.Background()
+
+	coll, err := svc.CreateCollection(ctx, &apppb.CreateCollectionRequest{Description: strPtr("del-happy")})
+	assert.NoError(t, err)
+
+	doc, err := svc.CreateDocument(ctx, &apppb.CreateDocumentRequest{
+		CollectionId: coll.XMetadata.CollectionId,
+		Data:         []byte(`{"k":"v"}`),
+	})
+	assert.NoError(t, err)
+
+	_, err = svc.DeleteDocument(ctx, &apppb.DeleteDocumentRequest{
+		CollectionId: coll.XMetadata.CollectionId,
+		DocumentId:   doc.XMetadata.DocumentId,
+	})
+	assert.NoError(t, err)
+
+	_, err = svc.GetDocument(ctx, &apppb.GetDocumentRequest{
+		CollectionId: coll.XMetadata.CollectionId,
+		DocumentId:   doc.XMetadata.DocumentId,
+	})
+	assertErrorCode(t, err, sderrors.CodeNotFound)
+}
+
+// Deleting twice is NotFound the second time.
+//
+// Stated as a test rather than left implicit, so that a future decision to make
+// delete idempotent - which would need an allow_missing field on the request -
+// has to argue with this instead of quietly changing the contract.
+func TestDeleteDocument_SecondDeleteReturnsNotFound(t *testing.T) {
+	if testing.Short() {
+		t.Skip("requires a local postgres; skipping under -short")
+	}
+	svc, _ := newTestService(t)
+	ctx := context.Background()
+
+	coll, err := svc.CreateCollection(ctx, &apppb.CreateCollectionRequest{Description: strPtr("del-twice")})
+	assert.NoError(t, err)
+
+	doc, err := svc.CreateDocument(ctx, &apppb.CreateDocumentRequest{
+		CollectionId: coll.XMetadata.CollectionId,
+		Data:         []byte(`{"k":"v"}`),
+	})
+	assert.NoError(t, err)
+
+	req := &apppb.DeleteDocumentRequest{
+		CollectionId: coll.XMetadata.CollectionId,
+		DocumentId:   doc.XMetadata.DocumentId,
+	}
+	_, err = svc.DeleteDocument(ctx, req)
+	assert.NoError(t, err)
+
+	_, err = svc.DeleteDocument(ctx, req)
+	assertErrorCode(t, err, sderrors.CodeNotFound)
+}

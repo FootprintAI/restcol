@@ -37,7 +37,7 @@ migrate -path migrations \
 `psql` also works for quick one-off application:
 
 ```bash
-psql "$DATABASE_URL" -f migrations/0001_add_query_indexes.up.sql
+psql "$DATABASE_URL" -f migrations/0002_purge_soft_deleted_documents.up.sql
 ```
 
 ## Writing a new migration
@@ -58,3 +58,23 @@ baseline/snapshot migration matching the current live schema, and deciding how
 to handle the existing AutoMigrate state. Track that as a separate project.
 
 [golang-migrate]: https://github.com/golang-migrate/migrate
+
+## What is here, and what is deliberately not
+
+| | |
+|---|---|
+| `0002_purge_soft_deleted_documents` | erases document rows tombstoned before DeleteDocument became a hard delete (#137). Irreversible; its down migration is a documented no-op |
+| `0003_drop_redundant_query_indexes` | removes the indexes `0001` used to create |
+
+**There is no `0001`.** It added query indexes that GORM's `AutoMigrate` already
+creates from `index:` struct tags on the models — the same columns under
+different names, so its `CREATE INDEX IF NOT EXISTS` never matched and applying
+it produced a second index over each. It was deleted rather than fixed: a
+migration that re-declares what the models already declare is a second source of
+truth for the same schema, and the models win.
+
+Do not re-add index migrations for indexes struct tags can express. Add a
+migration when the change is one struct tags *cannot* describe — a backfill, a
+data purge, an index built concurrently, a column rewrite.
+
+Numbering is not reused: `0003` follows `0002` even though `0001` is gone.

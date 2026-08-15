@@ -115,11 +115,18 @@ func TestMigration0002PurgesTombstonesAndKeepsLiveRows(t *testing.T) {
 
 	// The row is unreachable through the API and still on disk - the state
 	// #936 objected to.
+	//
+	// The jsonb path is data->'json_value'->>'imageBytes', not
+	// data->>'imageBytes': ModelDocumentData marshals the caller's map under a
+	// `json_value` key (documents.go:86). Reading the wrong path returns NULL,
+	// which is how this assertion first failed - and it would have been easy to
+	// "fix" by weakening it to a NOT NULL check on the whole column, which
+	// would no longer show that the PAYLOAD survives.
 	var doomedData string
 	require.NoError(t, postgrescli.GormDB().Unscoped().
 		Model(&appmodeldocuments.ModelDocument{}).
 		Where("id = ?", doomed.ID.String()).
-		Select("data->>'imageBytes'").Scan(&doomedData).Error)
+		Select("data->'json_value'->>'imageBytes'").Scan(&doomedData).Error)
 	assert.Equal(t, "iVBORw0KGgoAAAANSUhEUg==", doomedData,
 		"the tombstoned row should still hold its payload before the purge")
 

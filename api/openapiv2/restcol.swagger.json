@@ -732,6 +732,11 @@
         },
         "dataformat": {
           "$ref": "#/definitions/apiDataFormat"
+        },
+        "UpdatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ts when the record was last written.\n\nWriting a document that already exists is an UPSERT - CreateDocument with\nan existing documentId replaces the payload - and there is no separate\nUpdate rpc. Without this field an overwritten document is\nindistinguishable from one written once, in both content and metadata, so\na caller cannot tell that its data was replaced or when.\n\nNOT a new column: ModelDocument has carried `updated_at` all along and\ngorm has been maintaining it on every write. This only surfaces what the\ndatabase already records.\n\nNon-optional, matching _createdAt rather than _deletedAt: gorm sets\nupdated_at on create as well as on update, so every document has one. On\na document that has never been rewritten it equals _createdAt."
         }
       }
     },

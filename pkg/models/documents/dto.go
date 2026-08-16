@@ -21,6 +21,12 @@ func NewPbDocumentMetadata(md *ModelDocument) *apppb.DataMetadata {
 		//Dataformat: nil;
 		// FIXME(hsiny): need to fix dataformat
 		XCreatedAt: timestamppb.New(md.CreatedAt),
+		// Surfaced so a caller can tell an overwritten document from one written
+		// once. Writing an existing documentId is an upsert and there is no
+		// Update rpc, so before this the two were indistinguishable in both
+		// content and metadata. gorm has always maintained the column; only the
+		// API was hiding it.
+		XUpdatedAt: timestamppb.New(md.UpdatedAt),
 		XDeletedAt: nil,
 	}
 	if deletedAt, _ := md.DeletedAt.Value(); deletedAt != nil {

@@ -282,6 +282,23 @@ message DataMetadata {
     google.protobuf.Timestamp _createdAt = 10; // ts when the record was created
     optional google.protobuf.Timestamp _deletedAt = 11; // ts when the record was deleted
     optional DataFormat dataformat = 12;
+
+    // ts when the record was last written.
+    //
+    // Writing a document that already exists is an UPSERT - CreateDocument with
+    // an existing documentId replaces the payload - and there is no separate
+    // Update rpc. Without this field an overwritten document is
+    // indistinguishable from one written once, in both content and metadata, so
+    // a caller cannot tell that its data was replaced or when.
+    //
+    // NOT a new column: ModelDocument has carried `updated_at` all along and
+    // gorm has been maintaining it on every write. This only surfaces what the
+    // database already records.
+    //
+    // Non-optional, matching _createdAt rather than _deletedAt: gorm sets
+    // updated_at on create as well as on update, so every document has one. On
+    // a document that has never been rewritten it equals _createdAt.
+    google.protobuf.Timestamp _updatedAt = 13;
 }
 
 

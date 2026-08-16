@@ -94,3 +94,52 @@ func TestDeletedAtAndUpdatedAtCoexist(t *testing.T) {
 	assert.Equal(t, updated.UTC(), pb.XUpdatedAt.AsTime().UTC())
 	assert.Equal(t, created.UTC(), pb.XCreatedAt.AsTime().UTC())
 }
+
+// Attribution must survive the DTO. The columns are useless if the API does not
+// carry them, and the failure would be silent: the database would hold the
+// right answer while every caller saw nothing.
+func TestWriterAttributionIsSurfaced(t *testing.T) {
+	const alice = "grandturk:apikey:42:alice-key"
+	const bob = "grandturk:apikey:42:bob-key"
+
+	md := fixture(time.Now(), time.Now())
+	md.CreatedBy = alice
+	md.UpdatedBy = bob
+
+	pb := NewPbDocumentMetadata(md)
+
+	assert.Equal(t, alice, pb.XCreatedBy)
+	assert.Equal(t, bob, pb.XUpdatedBy)
+}
+
+// The distinguishing case, through the API: a document overwritten by someone
+// else must be tellable from one written once by its creator.
+func TestOverwrittenByAnotherPrincipalIsVisibleThroughTheApi(t *testing.T) {
+	const alice = "grandturk:apikey:42:alice-key"
+	const bob = "grandturk:apikey:42:bob-key"
+	at := time.Now()
+
+	own := fixture(at, at)
+	own.CreatedBy, own.UpdatedBy = alice, alice
+
+	replaced := fixture(at, at.Add(time.Hour))
+	replaced.CreatedBy, replaced.UpdatedBy = alice, bob
+
+	ownPb := NewPbDocumentMetadata(own)
+	replacedPb := NewPbDocumentMetadata(replaced)
+
+	assert.Equal(t, ownPb.XCreatedBy, replacedPb.XCreatedBy,
+		"both were created by the same principal")
+	assert.NotEqual(t, ownPb.XUpdatedBy, replacedPb.XUpdatedBy,
+		"but only one was last written by somebody else - if these compared "+
+			"equal the API could not tell an overwrite from a first write")
+}
+
+// Empty means unattributed, and must not become a placeholder on the way out.
+func TestUnattributedStaysEmptyThroughTheApi(t *testing.T) {
+	pb := NewPbDocumentMetadata(fixture(time.Now(), time.Now()))
+
+	assert.Empty(t, pb.XCreatedBy,
+		"an unattributed document must not acquire a writer in the DTO")
+	assert.Empty(t, pb.XUpdatedBy)
+}

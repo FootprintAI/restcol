@@ -406,3 +406,104 @@ func TestUpsertAdvancesUpdatedAtAndPreservesCreatedAt(t *testing.T) {
 	assert.NoError(t, err)
 	assert.EqualValues(t, 1, count, "upsert must not append a second row")
 }
+
+// The scenario this pair of columns exists for: one principal creates a
+// document, a DIFFERENT one overwrites it, and both are recoverable.
+//
+// Writing an existing documentId is an upsert and there is no Update rpc, so
+// before created_by/updated_by there was no way to tell that a second party had
+// replaced someone else's data - not from the content, not from the metadata.
+//
+// It pins the asymmetry that makes the pair meaningful: updated_by is in the
+// upsert's DoUpdates and created_by is not. If created_by ever joined that
+// list, BOTH fields would report the most recent writer, the pair would answer
+// nothing, and every other assertion here would still pass.
+func TestUpsertByADifferentPrincipalKeepsCreatorAndMovesUpdater(t *testing.T) {
+	if testing.Short() {
+		t.Skip("needs postgres")
+		return
+	}
+	ctx := context.Background()
+	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger(false))
+	assert.NoError(t, err)
+
+	regularProject, _, err := storageprojects.TestProjectSuite(postgrescli)
+	assert.Nil(t, err)
+	collection, err := storagecollectionstestutils.TestCollectionSuite(postgrescli, regularProject)
+	assert.NoError(t, err)
+
+	dcrud := NewDocumentCURD(postgrescli)
+	assert.Nil(t, dcrud.AutoMigrate())
+
+	docID := appmodeldocuments.NewDocumentID()
+	write := func(principal, value string) {
+		assert.NoError(t, dcrud.Write(ctx, "", &appmodeldocuments.ModelDocument{
+			ID:                docID,
+			CreatedBy:         principal,
+			UpdatedBy:         principal,
+			Data:              appmodeldocuments.NewModelDocumentData(map[string]interface{}{"v": value}),
+			ModelCollectionID: collection.ID,
+			ModelProjectID:    regularProject.ID,
+		}))
+	}
+
+	const alice = "grandturk:apikey:42:alice-key"
+	const bob = "grandturk:apikey:42:bob-key"
+
+	write(alice, "first")
+	first, err := dcrud.Get(ctx, "", regularProject.ID, collection.ID, docID)
+	assert.NoError(t, err)
+	assert.Equal(t, alice, first.CreatedBy)
+	assert.Equal(t, alice, first.UpdatedBy,
+		"on a document written once, the creator is also the last writer")
+
+	write(bob, "second")
+	second, err := dcrud.Get(ctx, "", regularProject.ID, collection.ID, docID)
+	assert.NoError(t, err)
+
+	assert.Equal(t, alice, second.CreatedBy,
+		"the creator must survive an overwrite by someone else - this is the "+
+			"half that fails if created_by joins the upsert's DoUpdates")
+	assert.Equal(t, bob, second.UpdatedBy,
+		"the last writer must be the principal that actually overwrote it")
+	assert.Equal(t, "second", second.Data.MapValue["v"],
+		"and the overwrite must really have replaced the payload")
+
+	count, err := dcrud.CountByCollection(ctx, "", regularProject.ID, collection.ID)
+	assert.NoError(t, err)
+	assert.EqualValues(t, 1, count, "an upsert must not append a second row")
+}
+
+// An unattributed write records an empty writer rather than a placeholder.
+// A deployment with no caller resolver must be distinguishable from one whose
+// documents were genuinely written by a principal called "system".
+func TestUnattributedWritesRecordNoPrincipal(t *testing.T) {
+	if testing.Short() {
+		t.Skip("needs postgres")
+		return
+	}
+	ctx := context.Background()
+	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger(false))
+	assert.NoError(t, err)
+
+	regularProject, _, err := storageprojects.TestProjectSuite(postgrescli)
+	assert.Nil(t, err)
+	collection, err := storagecollectionstestutils.TestCollectionSuite(postgrescli, regularProject)
+	assert.NoError(t, err)
+
+	dcrud := NewDocumentCURD(postgrescli)
+	assert.Nil(t, dcrud.AutoMigrate())
+
+	docID := appmodeldocuments.NewDocumentID()
+	assert.NoError(t, dcrud.Write(ctx, "", &appmodeldocuments.ModelDocument{
+		ID:                docID,
+		Data:              appmodeldocuments.NewModelDocumentData(map[string]interface{}{"v": "x"}),
+		ModelCollectionID: collection.ID,
+		ModelProjectID:    regularProject.ID,
+	}))
+
+	got, err := dcrud.Get(ctx, "", regularProject.ID, collection.ID, docID)
+	assert.NoError(t, err)
+	assert.Empty(t, got.CreatedBy, "an unattributed document must not invent a writer")
+	assert.Empty(t, got.UpdatedBy)
+}

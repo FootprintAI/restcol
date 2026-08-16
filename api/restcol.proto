@@ -299,6 +299,25 @@ message DataMetadata {
     // updated_at on create as well as on update, so every document has one. On
     // a document that has never been rewritten it equals _createdAt.
     google.protobuf.Timestamp _updatedAt = 13;
+
+    // Who created the document, and who last wrote it.
+    //
+    // Two fields rather than one because writing an existing documentId is an
+    // UPSERT: with only a creator, a document overwritten by a DIFFERENT
+    // principal would still report the original author and the second write
+    // would be invisible. "A created this, B replaced its contents" is the
+    // question these exist to answer.
+    //
+    // _createdBy is set once, on insert, and never moves - it pairs with
+    // _createdAt. _updatedBy is rewritten on every write, pairing with
+    // _updatedAt. The two move independently for the same reason the two
+    // timestamps do.
+    //
+    // EMPTY MEANS UNATTRIBUTED, not anonymous-and-fine. A deployment whose
+    // caller resolver is not wired records no writer, and an empty value here
+    // says exactly that rather than inventing a principal.
+    string _createdBy = 14;
+    string _updatedBy = 15;
 }
 
 

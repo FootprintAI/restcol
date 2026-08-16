@@ -93,8 +93,16 @@ func (r *RestColServiceServerService) CreateDocument(ctx context.Context, req *a
 		}
 	}
 
+	// Both are set on the way in. The upsert then keeps created_by (it is not
+	// in DoUpdates) and overwrites updated_by, so a document replaced by a
+	// different principal reports both of them - which is the question these
+	// two fields exist to answer.
+	caller := r.callerFromCtx(ctx)
+
 	docModel := &documentsmodel.ModelDocument{
 		ID:                docId,
+		CreatedBy:         caller,
+		UpdatedBy:         caller,
 		Data:              documentsmodel.NewModelDocumentData(valueHolder),
 		ModelCollectionID: cid,
 		ModelCollection: collectionsmodel.NewModelCollection(

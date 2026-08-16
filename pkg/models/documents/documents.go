@@ -24,6 +24,26 @@ type ModelDocument struct {
 	UpdatedAt time.Time      `gorm:"column:updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at"`
 
+	// CreatedBy is the principal that first wrote the document; UpdatedBy is
+	// the one that wrote it last.
+	//
+	// Two columns because writing an existing documentId is an UPSERT: with
+	// only a creator, a document overwritten by a DIFFERENT principal would
+	// still report the original author and the second write would leave no
+	// trace of who made it.
+	//
+	// They must move independently, and the upsert in DocumentCURD.Write is
+	// what makes that true: updated_by is in its DoUpdates list and created_by
+	// is deliberately NOT, exactly as with updated_at and created_at. If
+	// created_by ever joined that list, both fields would report the most
+	// recent writer and the pair would answer nothing.
+	//
+	// Empty means unattributed - a deployment with no caller resolver wired
+	// records no writer, which is a different thing from a writer named
+	// "anonymous".
+	CreatedBy string `gorm:"column:created_by"`
+	UpdatedBy string `gorm:"column:updated_by"`
+
 	Data *ModelDocumentData `gorm:"column:data;type:jsonb"`
 
 	ModelCollectionID modelcollections.CollectionID `gorm:"column:model_collection_id;primaryKey;index:docScope,priority:2"` // foreign key to model collection

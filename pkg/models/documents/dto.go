@@ -27,6 +27,10 @@ func NewPbDocumentMetadata(md *ModelDocument) *apppb.DataMetadata {
 		// content and metadata. gorm has always maintained the column; only the
 		// API was hiding it.
 		XUpdatedAt: timestamppb.New(md.UpdatedAt),
+		// Empty when no caller resolver is wired - which says "unattributed"
+		// rather than naming a principal that does not exist.
+		XCreatedBy: md.CreatedBy,
+		XUpdatedBy: md.UpdatedBy,
 		XDeletedAt: nil,
 	}
 	if deletedAt, _ := md.DeletedAt.Value(); deletedAt != nil {

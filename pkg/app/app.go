@@ -31,6 +31,10 @@ type RestColServiceServerService struct {
 	schemaBuilder *schemafinder.SchemaBuilder
 
 	defaultProjectResolver sdinsureruntime.ProjectResolver
+
+	// Optional. Nil records no writer rather than refusing writes - see
+	// callerFromCtx.
+	callerResolver CallerResolver
 }
 
 // NewRestColServiceServerService wires a new service handler. Call
@@ -47,6 +51,16 @@ func NewRestColServiceServerService(
 		documentCURD:   documentCURD,
 		schemaBuilder:  schemaBuilder,
 	}
+}
+
+// SetCallerResolver installs the resolver that names the principal behind a
+// request, so documents record who wrote them.
+//
+// OPTIONAL, unlike the project resolver. Without it restcol still serves every
+// request and records an empty writer: attribution is worth having, not worth
+// refusing data over. A deployment can therefore adopt this without a flag day.
+func (r *RestColServiceServerService) SetCallerResolver(cr CallerResolver) {
+	r.callerResolver = cr
 }
 
 // SetDefaultProjectResolver installs the resolver that maps incoming requests

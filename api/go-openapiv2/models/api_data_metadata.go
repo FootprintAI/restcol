@@ -24,6 +24,24 @@ type APIDataMetadata struct {
 	// Format: date-time
 	CreatedAt strfmt.DateTime `json:"CreatedAt,omitempty"`
 
+	// Who created the document, and who last wrote it.
+	//
+	// Two fields rather than one because writing an existing documentId is an
+	// UPSERT: with only a creator, a document overwritten by a DIFFERENT
+	// principal would still report the original author and the second write
+	// would be invisible. "A created this, B replaced its contents" is the
+	// question these exist to answer.
+	//
+	// _createdBy is set once, on insert, and never moves - it pairs with
+	// _createdAt. _updatedBy is rewritten on every write, pairing with
+	// _updatedAt. The two move independently for the same reason the two
+	// timestamps do.
+	//
+	// EMPTY MEANS UNATTRIBUTED, not anonymous-and-fine. A deployment whose
+	// caller resolver is not wired records no writer, and an empty value here
+	// says exactly that rather than inventing a principal.
+	CreatedBy string `json:"CreatedBy,omitempty"`
+
 	// ts when the record was deleted
 	// Format: date-time
 	DeletedAt strfmt.DateTime `json:"DeletedAt,omitempty"`
@@ -45,6 +63,9 @@ type APIDataMetadata struct {
 	// a document that has never been rewritten it equals _createdAt.
 	// Format: date-time
 	UpdatedAt strfmt.DateTime `json:"UpdatedAt,omitempty"`
+
+	// updated by
+	UpdatedBy string `json:"UpdatedBy,omitempty"`
 
 	// collectionId is collection id from collection data
 	CollectionID string `json:"collectionId,omitempty"`

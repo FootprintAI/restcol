@@ -35,7 +35,7 @@ func (c *DocumentCURD) AutoMigrate() error {
 func (c *DocumentCURD) Write(ctx context.Context, tableName string, record *appmodeldocuments.ModelDocument) error {
 	err := c.With(ctx, tableName).Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "id"}, {Name: "model_collection_id"}, {Name: "model_project_id"}},
-		DoUpdates: clause.AssignmentColumns([]string{"updated_at", "deleted_at", "data"}),
+		DoUpdates: clause.AssignmentColumns([]string{"updated_at", "updated_by", "deleted_at", "data"}),
 	}).Create(record).Error
 	return storage.WrapStorageError(err)
 }
@@ -43,7 +43,7 @@ func (c *DocumentCURD) Write(ctx context.Context, tableName string, record *appm
 func (c *DocumentCURD) BatchWrite(ctx context.Context, tableName string, records []*appmodeldocuments.ModelDocument) error {
 	err := c.With(ctx, tableName).Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "id"}, {Name: "model_collection_id"}, {Name: "model_project_id"}},
-		DoUpdates: clause.AssignmentColumns([]string{"updated_at", "deleted_at", "data"}),
+		DoUpdates: clause.AssignmentColumns([]string{"updated_at", "updated_by", "deleted_at", "data"}),
 	}).Create(&records).Error
 	return storage.WrapStorageError(err)
 }

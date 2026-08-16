@@ -337,3 +337,72 @@ func TestDocumentCURD_DeleteByCollection_IsPermanent(t *testing.T) {
 		Count(&remaining).Error)
 	assert.Zero(t, remaining, "the cascade must remove the rows, not tombstone them")
 }
+
+// Writing an existing documentId is an UPSERT - there is no Update rpc - and
+// the metadata has to record that it happened. Before FootprintAI/restcol#141
+// the API exposed only createdAt and deletedAt, so an overwritten document was
+// indistinguishable from one written once.
+//
+// The storage layer was already correct: Write's OnConflict lists updated_at in
+// DoUpdates and deliberately omits created_at. This pins that behaviour, because
+// the new API field is only meaningful if these two move independently - if
+// created_at ever joined the DoUpdates set, _updatedAt would still be populated
+// and still tell a caller nothing.
+func TestUpsertAdvancesUpdatedAtAndPreservesCreatedAt(t *testing.T) {
+	if testing.Short() {
+		t.Skip("needs postgres")
+		return
+	}
+	ctx := context.Background()
+	postgrescli, err := storagetestutils.NewTestPostgresCli(logger.NewLogger(false))
+	assert.NoError(t, err)
+
+	regularProject, _, err := storageprojects.TestProjectSuite(postgrescli)
+	assert.Nil(t, err)
+	collection, err := storagecollectionstestutils.TestCollectionSuite(postgrescli, regularProject)
+	assert.NoError(t, err)
+
+	dcrud := NewDocumentCURD(postgrescli)
+	assert.Nil(t, dcrud.AutoMigrate())
+
+	docID := appmodeldocuments.NewDocumentID()
+	write := func(v string) {
+		assert.NoError(t, dcrud.Write(ctx, "", &appmodeldocuments.ModelDocument{
+			ID:                docID,
+			Data:              appmodeldocuments.NewModelDocumentData(map[string]interface{}{"v": v}),
+			ModelCollectionID: collection.ID,
+			ModelProjectID:    regularProject.ID,
+		}))
+	}
+
+	write("first")
+	first, err := dcrud.Get(ctx, "", regularProject.ID, collection.ID, docID)
+	assert.NoError(t, err)
+
+	// A fresh row: gorm stamps both columns on insert, which is what makes
+	// _updatedAt safe to expose as non-optional.
+	assert.False(t, first.UpdatedAt.IsZero(), "updated_at must be set on insert")
+	assert.WithinDuration(t, first.CreatedAt, first.UpdatedAt, time.Second,
+		"on a document written once, updated_at should match created_at")
+
+	// Postgres stores microseconds, so without a pause the two writes can land
+	// on the same instant and the assertion below would pass or fail on timing
+	// rather than on behaviour.
+	time.Sleep(10 * time.Millisecond)
+
+	write("second")
+	second, err := dcrud.Get(ctx, "", regularProject.ID, collection.ID, docID)
+	assert.NoError(t, err)
+
+	assert.True(t, second.UpdatedAt.After(first.UpdatedAt),
+		"the upsert must advance updated_at; without it an overwrite leaves no trace")
+	assert.WithinDuration(t, first.CreatedAt, second.CreatedAt, time.Millisecond,
+		"created_at must survive the upsert - it is what _updatedAt is compared against")
+
+	// And the upsert really did replace the payload rather than insert a second
+	// row, which is the premise the timestamps are describing.
+	assert.Equal(t, "second", second.Data.MapValue["v"])
+	count, err := dcrud.CountByCollection(ctx, "", regularProject.ID, collection.ID)
+	assert.NoError(t, err)
+	assert.EqualValues(t, 1, count, "upsert must not append a second row")
+}

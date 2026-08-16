@@ -28,6 +28,24 @@ type APIDataMetadata struct {
 	// Format: date-time
 	DeletedAt strfmt.DateTime `json:"DeletedAt,omitempty"`
 
+	// ts when the record was last written.
+	//
+	// Writing a document that already exists is an UPSERT - CreateDocument with
+	// an existing documentId replaces the payload - and there is no separate
+	// Update rpc. Without this field an overwritten document is
+	// indistinguishable from one written once, in both content and metadata, so
+	// a caller cannot tell that its data was replaced or when.
+	//
+	// NOT a new column: ModelDocument has carried `updated_at` all along and
+	// gorm has been maintaining it on every write. This only surfaces what the
+	// database already records.
+	//
+	// Non-optional, matching _createdAt rather than _deletedAt: gorm sets
+	// updated_at on create as well as on update, so every document has one. On
+	// a document that has never been rewritten it equals _createdAt.
+	// Format: date-time
+	UpdatedAt strfmt.DateTime `json:"UpdatedAt,omitempty"`
+
 	// collectionId is collection id from collection data
 	CollectionID string `json:"collectionId,omitempty"`
 
@@ -53,6 +71,10 @@ func (m *APIDataMetadata) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateDeletedAt(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateUpdatedAt(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -84,6 +106,18 @@ func (m *APIDataMetadata) validateDeletedAt(formats strfmt.Registry) error {
 	}
 
 	if err := validate.FormatOf("DeletedAt", "body", "date-time", m.DeletedAt.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *APIDataMetadata) validateUpdatedAt(formats strfmt.Registry) error {
+	if swag.IsZero(m.UpdatedAt) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("UpdatedAt", "body", "date-time", m.UpdatedAt.String(), formats); err != nil {
 		return err
 	}
 

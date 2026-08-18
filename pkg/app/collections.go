@@ -58,9 +58,62 @@ func (r *RestColServiceServerService) CreateCollection(ctx context.Context, req 
 	return resp, nil
 }
 
-// ListCollections is not yet implemented.
+// ListCollections returns every collection in the caller's project, newest
+// first, each with its latest schema.
+//
+// The project comes from the CALLER'S CREDENTIAL, not from req.ProjectId - the
+// same rule every other handler here follows. The path carries a projectId
+// because the URL shape needs one, but honouring it would let any caller list
+// another tenant's collections by editing the path.
+//
+// Each element is the same GetCollectionResponse the single-collection GET
+// returns, built by the same code, so the two cannot describe one resource
+// differently.
 func (r *RestColServiceServerService) ListCollections(ctx context.Context, req *apppb.ListCollectionsRequest) (*apppb.ListCollectionsResponse, error) {
-	return nil, sderrors.NewNotImplError(errors.New("not implemented"))
+	projectId, err := r.getProjectIdFromCtx(ctx)
+	if err != nil {
+		return nil, err
+	}
+	mcs, err := r.collectionCURD.ListByProjectID(ctx, "", projectId)
+	if err != nil {
+		// A project with no collections is not an error - it is a new project,
+		// and the honest answer is an empty list. Returning NotFound here would
+		// make every client special-case its own first run.
+		if ismyerr, myerr := sderrors.As(err); ismyerr && myerr.Code() == sderrors.CodeNotFound {
+			return &apppb.ListCollectionsResponse{}, nil
+		}
+		return nil, err
+	}
+	resp := &apppb.ListCollectionsResponse{
+		Collections: make([]*apppb.GetCollectionResponse, 0, len(mcs)),
+	}
+	for _, mc := range mcs {
+		if mc == nil {
+			continue
+		}
+		resp.Collections = append(resp.Collections, newPbCollection(mc))
+	}
+	return resp, nil
+}
+
+// newPbCollection renders one stored collection as the wire type. Shared with
+// GetCollection so a collection cannot look like two different things
+// depending on which endpoint returned it.
+func newPbCollection(mc *collectionsmodel.ModelCollection) *apppb.GetCollectionResponse {
+	resp := &apppb.GetCollectionResponse{
+		XMetadata: collectionsmodel.NewPbCollectionMetadata(mc),
+	}
+	if mc == nil {
+		return resp
+	}
+	resp.Description = mc.Summary
+	resp.CollectionType = mc.Type.Proto()
+	// Preloaded with Limit(1), so at most the latest schema is present. A
+	// collection created without one has none, and must not panic here.
+	if len(mc.Schemas) > 0 {
+		resp.Schemas = collectionsmodel.NewPbSchemaFields(mc.Schemas[0])
+	}
+	return resp
 }
 
 // GetCollection returns metadata plus the latest schema for the requested
@@ -82,18 +135,7 @@ func (r *RestColServiceServerService) GetCollection(ctx context.Context, req *ap
 		}
 		return nil, err
 	}
-	resp := &apppb.GetCollectionResponse{
-		XMetadata: collectionsmodel.NewPbCollectionMetadata(mc),
-	}
-	if mc == nil {
-		return resp, nil
-	}
-	resp.Description = mc.Summary
-	resp.CollectionType = mc.Type.Proto()
-	if mc.Schemas != nil {
-		resp.Schemas = collectionsmodel.NewPbSchemaFields(mc.Schemas[0])
-	}
-	return resp, nil
+	return newPbCollection(mc), nil
 }
 
 // DeleteCollection soft-deletes a collection. If the collection still contains

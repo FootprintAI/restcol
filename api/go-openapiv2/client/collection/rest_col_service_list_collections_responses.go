@@ -54,7 +54,7 @@ RestColServiceListCollectionsOK describes a response with status code 200, with 
 A successful response.
 */
 type RestColServiceListCollectionsOK struct {
-	Payload models.APIListCollectionsResponse
+	Payload *models.APIListCollectionsResponse
 }
 
 // IsSuccess returns true when this rest col service list collections o k response has a 2xx status code
@@ -97,14 +97,16 @@ func (o *RestColServiceListCollectionsOK) String() string {
 	return fmt.Sprintf("[GET /v1/projects/{projectId}/collections][%d] restColServiceListCollectionsOK %s", 200, payload)
 }
 
-func (o *RestColServiceListCollectionsOK) GetPayload() models.APIListCollectionsResponse {
+func (o *RestColServiceListCollectionsOK) GetPayload() *models.APIListCollectionsResponse {
 	return o.Payload
 }
 
 func (o *RestColServiceListCollectionsOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
+	o.Payload = new(models.APIListCollectionsResponse)
+
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 

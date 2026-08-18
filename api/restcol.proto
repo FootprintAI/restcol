@@ -230,7 +230,24 @@ message ListCollectionsRequest {
     string projectId = 1;
 }
 
-message ListCollectionsResponse {}
+message ListCollectionsResponse {
+    // The project's collections, newest first.
+    //
+    // Deliberately the SAME message the single-collection GET returns, rather
+    // than a slimmer summary type. ListByProjectID already preloads each
+    // collection's latest schema and its fields - a summary type would throw
+    // away data that has already been read, and would give a client two shapes
+    // to parse for one resource, which is how the two drift.
+    //
+    // "Latest schema" is also what makes this a list of COLLECTIONS and not of
+    // collection-versions: the storage query limits the preload to one schema
+    // per collection.
+    //
+    // No pagination fields yet. Adding them later is backwards-compatible in
+    // proto3; shipping page_size and page_token that nothing honours is not -
+    // it tells a client the endpoint is paginated when it is not.
+    repeated GetCollectionResponse collections = 1;
+}
 
 message GetCollectionRequest{
     string projectId = 1;

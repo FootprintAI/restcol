@@ -2,7 +2,9 @@ package app
 
 import (
 	"context"
+	"sync/atomic"
 	"testing"
+	"time"
 
 	storagetestutils "github.com/footprintai/restcol/pkg/storage/testutil"
 	sderrors "github.com/sdinsure/agent/pkg/errors"
@@ -47,6 +49,24 @@ func (f *fixedProjectInfor) Visibility() string { return "" }
 
 // newTestService spins up a full handler against a real postgres. Tests using
 // it must be guarded with testing.Short() — CI runs -short.
+// Handed out by newTestService so each test gets its own tenant. See the
+// comment there for why sharing one was a problem.
+//
+// Seeded from the clock rather than counting from a fixed base. A plain
+// counter isolates tests WITHIN a run and not ACROSS runs: the database is
+// never reset, so the second `go test` reuses the first's project ids and
+// reads back rows the earlier run left behind. That is not hypothetical - it
+// made a passing test fail on its next invocation with no code change between
+// them, which reads as flakiness rather than as leftover state.
+var nextTestProject = func() *atomic.Int64 {
+	v := &atomic.Int64{}
+	// Seconds, not nanoseconds: ProjectID is rendered with %d and the ids stay
+	// readable in a failure message. Two runs in the same second would collide,
+	// so leave room between runs.
+	v.Store(time.Now().Unix() % 1_000_000 * 1000)
+	return v
+}()
+
 func newTestService(t *testing.T) (*RestColServiceServerService, *projectsmodel.ModelProject) {
 	t.Helper()
 	log := logger.NewLogger(false)
@@ -60,8 +80,17 @@ func newTestService(t *testing.T) (*RestColServiceServerService, *projectsmodel.
 	documentCURD := documentsstorage.NewDocumentCURD(db)
 	assert.NoError(t, documentCURD.AutoMigrate())
 
+	// A DISTINCT project per test, not a shared 9001.
+	//
+	// Every test here talks to the same postgres, and the database is not reset
+	// between them. With one shared project, whatever a test creates is still
+	// there for the next one - fine for assertions that name a specific id, and
+	// wrong for any assertion about how many collections a project has. The
+	// list tests below are exactly that kind, and they failed on rows their own
+	// test never created.
+	//
 	proj := &projectsmodel.ModelProject{
-		ID:   projectsmodel.NewProjectID(9001),
+		ID:   projectsmodel.NewProjectID(int(nextTestProject.Add(1))),
 		Type: projectsmodel.RegularProjectType,
 	}
 	assert.NoError(t, projectCURD.Write(context.Background(), "", proj))
@@ -392,3 +421,133 @@ func TestGetCollection_MissingIDRejected(t *testing.T) {
 }
 
 func strPtr(s string) *string { return &s }
+
+// ListCollections returned 501 while the OpenAPI spec advertised it
+// (FootprintAI/restcol#144). It is the only listed call that needs no prior
+// knowledge - you cannot GET /collections/{id} without an id - so it is the
+// first thing anyone tries from the API doc.
+
+func TestListCollections_EmptyProjectIsAnEmptyListNotAnError(t *testing.T) {
+	if testing.Short() {
+		t.Skip("requires a local postgres; skipping under -short")
+	}
+	svc, _ := newTestService(t)
+
+	// A new project has no collections. That is a normal state, not a failure:
+	// returning NotFound would make every client special-case its own first run.
+	resp, err := svc.ListCollections(context.Background(), &apppb.ListCollectionsRequest{})
+	assert.NoError(t, err)
+	if assert.NotNil(t, resp) {
+		assert.Empty(t, resp.Collections)
+	}
+}
+
+func TestListCollections_ReturnsCreatedCollectionsNewestFirst(t *testing.T) {
+	if testing.Short() {
+		t.Skip("requires a local postgres; skipping under -short")
+	}
+	svc, _ := newTestService(t)
+	ctx := context.Background()
+
+	var ids []string
+	for _, name := range []string{"first", "second", "third"} {
+		created, err := svc.CreateCollection(ctx, &apppb.CreateCollectionRequest{
+			Description: strPtr(name),
+		})
+		assert.NoError(t, err)
+		ids = append(ids, created.XMetadata.CollectionId)
+	}
+
+	resp, err := svc.ListCollections(ctx, &apppb.ListCollectionsRequest{})
+	assert.NoError(t, err)
+	assert.Len(t, resp.Collections, 3)
+
+	got := make([]string, 0, len(resp.Collections))
+	for _, c := range resp.Collections {
+		got = append(got, c.XMetadata.CollectionId)
+	}
+	// Newest first, which is what the storage query orders by and what the
+	// proto comment promises. Asserting the order rather than set membership,
+	// because "newest first" is part of the contract.
+	assert.Equal(t, []string{ids[2], ids[1], ids[0]}, got)
+}
+
+func TestListCollections_ItemMatchesTheSingleCollectionGet(t *testing.T) {
+	if testing.Short() {
+		t.Skip("requires a local postgres; skipping under -short")
+	}
+	svc, _ := newTestService(t)
+	ctx := context.Background()
+
+	created, err := svc.CreateCollection(ctx, &apppb.CreateCollectionRequest{
+		Description: strPtr("same-shape"),
+	})
+	assert.NoError(t, err)
+	cid := created.XMetadata.CollectionId
+
+	list, err := svc.ListCollections(ctx, &apppb.ListCollectionsRequest{})
+	assert.NoError(t, err)
+	if !assert.Len(t, list.Collections, 1) {
+		return
+	}
+	one, err := svc.GetCollection(ctx, &apppb.GetCollectionRequest{CollectionId: cid})
+	assert.NoError(t, err)
+
+	// One resource, one shape. Both endpoints render through newPbCollection,
+	// and this is what stops them drifting apart later.
+	item := list.Collections[0]
+	assert.Equal(t, one.XMetadata.CollectionId, item.XMetadata.CollectionId)
+	assert.Equal(t, one.Description, item.Description)
+	assert.Equal(t, one.CollectionType, item.CollectionType)
+	assert.Equal(t, len(one.Schemas), len(item.Schemas))
+}
+
+func TestListCollections_IgnoresProjectIdInTheRequest(t *testing.T) {
+	if testing.Short() {
+		t.Skip("requires a local postgres; skipping under -short")
+	}
+	svc, proj := newTestService(t)
+	ctx := context.Background()
+
+	_, err := svc.CreateCollection(ctx, &apppb.CreateCollectionRequest{
+		Description: strPtr("mine"),
+	})
+	assert.NoError(t, err)
+
+	// THE TENANT CHECK. The path carries a projectId because the URL shape
+	// needs one, but the project must come from the caller's credential. If
+	// req.ProjectId were honoured, editing the path would list somebody else's
+	// collections - and the naive implementation is exactly the one that does.
+	resp, err := svc.ListCollections(ctx, &apppb.ListCollectionsRequest{
+		ProjectId: projectsmodel.NewProjectID(4242).String(),
+	})
+	assert.NoError(t, err)
+	assert.Len(t, resp.Collections, 1,
+		"a foreign projectId in the request must not change whose collections are returned")
+	assert.NotEqual(t, "4242", proj.ID.String())
+}
+
+func TestListCollections_DeletedCollectionDisappears(t *testing.T) {
+	if testing.Short() {
+		t.Skip("requires a local postgres; skipping under -short")
+	}
+	svc, _ := newTestService(t)
+	ctx := context.Background()
+
+	created, err := svc.CreateCollection(ctx, &apppb.CreateCollectionRequest{
+		Description: strPtr("doomed"),
+	})
+	assert.NoError(t, err)
+
+	_, err = svc.DeleteCollection(ctx, &apppb.DeleteCollectionRequest{
+		CollectionId: created.XMetadata.CollectionId,
+	})
+	assert.NoError(t, err)
+
+	// Soft delete. gorm excludes it, but only if the model carries DeletedAt -
+	// worth pinning, because a list that keeps returning deleted rows looks
+	// like a caching bug from the client side.
+	resp, err := svc.ListCollections(ctx, &apppb.ListCollectionsRequest{})
+	assert.NoError(t, err)
+	assert.Empty(t, resp.Collections)
+}

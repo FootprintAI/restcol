@@ -9,6 +9,7 @@ import (
 
 	openapiloads "github.com/go-openapi/loads"
 	"github.com/go-openapi/spec"
+	"github.com/go-openapi/swag/loading"
 	"github.com/google/uuid"
 
 	api "github.com/footprintai/restcol/api"
@@ -29,7 +30,12 @@ func NewCollectionSwaggerDoc(collections ...*modelcollections.ModelCollection) *
 
 func (c *CollectionSwaggerDoc) RenderDoc() (string, error) {
 
-	embedFsLoader := func(path string) (json.RawMessage, error) {
+	// The variadic loading.Option parameter was added to loads.DocLoader in
+	// go-openapi/loads v0.25.0 - unused here because the embedded FS never
+	// needs the options loads.Spec's own callers can pass (a custom HTTP
+	// client, timeouts, and the like), but it must be in the signature for
+	// this to still satisfy the DocLoader type.
+	embedFsLoader := func(path string, _ ...loading.Option) (json.RawMessage, error) {
 		rawBytes, err := api.OpenApiV2Fs.ReadFile(path)
 		if err != nil {
 			return nil, err
